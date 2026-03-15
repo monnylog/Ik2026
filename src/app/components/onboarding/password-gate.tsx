@@ -11,8 +11,8 @@ import {
   useProfile,
   type UserProfile,
 } from "../../lib/profile-context";
-import istoryaLogo from "../../assets/b55bcac066687e563f77685fc31f20ef43e81d5d.png";
-import istoryaWordmark from "../../assets/f39822aa8d83145832fad1a77f8dd27c27cd088d.png";
+import istoryaLogo from "@/assets/b55bcac066687e563f77685fc31f20ef43e81d5d.png";
+import istoryaWordmark from "@/assets/f39822aa8d83145832fad1a77f8dd27c27cd088d.png";
 
 interface PasswordGateProps {
   onAuthenticated: (role: UserRole, rememberMe: boolean) => void;

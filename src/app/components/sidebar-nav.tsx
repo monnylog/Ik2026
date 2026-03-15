@@ -41,7 +41,7 @@ import {
 import type { UserRole } from "./onboarding/use-auth";
 import { getVisibleNavItemsForView, type ViewMode } from "./onboarding/use-auth";
 import { getAvatar } from "./engagement/avatars";
-import istoryaLogo from "../../assets/b55bcac066687e563f77685fc31f20ef43e81d5d.png";
+import istoryaLogo from "@/assets/b55bcac066687e563f77685fc31f20ef43e81d5d.png";
 import { type RecentPage, getPageIcon, formatRecentTime } from "./ui/recent-pages";
 import type { FavoritePage } from "./ui/favorites";
 
