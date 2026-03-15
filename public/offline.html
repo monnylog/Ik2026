@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="theme-color" content="#2B4440">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <title>Offline — Isang Kusina 2026</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body {
+      height: 100%;
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: #2B4440;
+      color: rgba(244, 237, 228, 0.85);
+      -webkit-tap-highlight-color: transparent;
+      -webkit-user-select: none;
+      user-select: none;
+      overscroll-behavior: none;
+    }
+    body {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 100dvh;
+      padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+      background: radial-gradient(ellipse at 50% 40%, rgba(126,158,120,0.2) 0%, #2B4440 70%);
+    }
+    .container {
+      text-align: center;
+      padding: 2rem;
+      max-width: 340px;
+    }
+    .logo {
+      font-family: Georgia, 'Times New Roman', serif;
+      font-size: 3.5rem;
+      font-weight: 700;
+      background: linear-gradient(135deg, #C9A96E 0%, #DDA15E 50%, #CDA88A 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      line-height: 1;
+      margin-bottom: 0.25rem;
+    }
+    .year {
+      font-size: 1rem;
+      color: rgba(201, 169, 110, 0.45);
+      font-weight: 300;
+      letter-spacing: 0.15em;
+      margin-bottom: 2rem;
+    }
+    .accent-line {
+      width: 60px;
+      height: 1px;
+      background: rgba(201, 169, 110, 0.2);
+      margin: 0 auto 1.5rem;
+    }
+    .icon {
+      width: 48px;
+      height: 48px;
+      margin: 0 auto 1.25rem;
+      border-radius: 50%;
+      background: rgba(201, 169, 110, 0.08);
+      border: 1px solid rgba(201, 169, 110, 0.12);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .icon svg {
+      width: 22px;
+      height: 22px;
+      stroke: rgba(201, 169, 110, 0.5);
+      fill: none;
+      stroke-width: 1.5;
+    }
+    h1 {
+      font-family: Georgia, 'Times New Roman', serif;
+      font-size: 1.25rem;
+      font-weight: 400;
+      color: rgba(244, 237, 228, 0.75);
+      margin-bottom: 0.5rem;
+    }
+    p {
+      font-size: 0.8125rem;
+      line-height: 1.6;
+      color: rgba(244, 237, 228, 0.4);
+      margin-bottom: 1.5rem;
+    }
+    .retry-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      padding: 0.75rem 1.75rem;
+      border: 1px solid rgba(201, 169, 110, 0.25);
+      border-radius: 12px;
+      background: rgba(201, 169, 110, 0.06);
+      color: #C9A96E;
+      font-family: 'Inter', sans-serif;
+      font-size: 0.8125rem;
+      font-weight: 500;
+      cursor: pointer;
+      min-height: 44px;
+      min-width: 44px;
+      transition: all 0.2s ease;
+      -webkit-appearance: none;
+      touch-action: manipulation;
+    }
+    .retry-btn:active {
+      transform: scale(0.97);
+      background: rgba(201, 169, 110, 0.12);
+    }
+    .retry-btn svg {
+      width: 16px;
+      height: 16px;
+      stroke: currentColor;
+      fill: none;
+      stroke-width: 2;
+    }
+    .footer {
+      position: fixed;
+      bottom: calc(1.5rem + env(safe-area-inset-bottom));
+      left: 0;
+      right: 0;
+      text-align: center;
+    }
+    .footer span {
+      font-size: 0.5625rem;
+      text-transform: uppercase;
+      letter-spacing: 0.2em;
+      color: rgba(192, 209, 177, 0.15);
+    }
+    .cached-hint {
+      margin-top: 1.25rem;
+      padding: 0.75rem 1rem;
+      border-radius: 10px;
+      background: rgba(126, 158, 120, 0.06);
+      border: 1px solid rgba(126, 158, 120, 0.1);
+    }
+    .cached-hint p {
+      font-size: 0.75rem;
+      color: rgba(126, 158, 120, 0.6);
+      margin: 0;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="logo">IK</div>
+    <div class="year">2026</div>
+    <div class="accent-line"></div>
+    <div class="icon">
+      <svg viewBox="0 0 24 24">
+        <path d="M1 1l22 22"/>
+        <path d="M16.72 11.06A10.94 10.94 0 0 1 19 12.55"/>
+        <path d="M5 12.55a10.94 10.94 0 0 1 5.17-2.39"/>
+        <path d="M10.71 5.05A16 16 0 0 1 22.56 9"/>
+        <path d="M1.42 9a15.91 15.91 0 0 1 4.7-2.88"/>
+        <path d="M8.53 16.11a6 6 0 0 1 6.95 0"/>
+        <line x1="12" y1="20" x2="12.01" y2="20"/>
+      </svg>
+    </div>
+    <h1>You're offline</h1>
+    <p>It looks like your connection dropped. Don't worry — your data is safe. Reconnect to continue coordinating.</p>
+    <button class="retry-btn" onclick="window.location.reload()">
+      <svg viewBox="0 0 24 24">
+        <polyline points="23 4 23 10 17 10"/>
+        <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/>
+      </svg>
+      Try again
+    </button>
+    <div class="cached-hint">
+      <p>Some cached content may still be available. Try navigating to a previously visited page.</p>
+    </div>
+  </div>
+  <div class="footer">
+    <span>Istorya Creative</span>
+  </div>
+</body>
+</html>

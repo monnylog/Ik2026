@@ -1,0 +1,527 @@
+@import './fonts.css';
+@import './tailwind.css';
+@import './theme.css';
+
+/* ── Pre-JS splash: prevent white flash before React mounts ── */
+/* Sets the initial background to match the branded splash screen */
+html {
+  background-color: #2B4440;
+}
+
+body {
+  background-color: #2B4440;
+}
+
+/* Once the app mounts and applies theme, these are overridden by Tailwind's bg-background */
+#root:empty::after {
+  content: '';
+  display: flex;
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  background: radial-gradient(ellipse at 50% 40%, rgba(126,158,120,0.25) 0%, rgba(43,68,64,1) 70%);
+}
+
+/* ── Mobile Safari PWA / iOS Safe Area fixes ── */
+
+/* Use dvh (dynamic viewport height) for full-screen layout on iOS Safari */
+html, body, #root {
+  height: 100dvh;
+  height: 100vh; /* fallback for older browsers */
+}
+
+@supports (height: 100dvh) {
+  html, body, #root {
+    height: 100dvh;
+  }
+}
+
+/* Safe area padding for notch / home indicator devices */
+.app-shell {
+  padding-top: env(safe-area-inset-top);
+  padding-bottom: env(safe-area-inset-bottom);
+  padding-left: env(safe-area-inset-left);
+  padding-right: env(safe-area-inset-right);
+}
+
+/* Top bar safe area — push below Dynamic Island / notch */
+.top-bar {
+  padding-top: env(safe-area-inset-top);
+}
+
+/* Mobile bottom nav safe area */
+.mobile-bottom-nav {
+  padding-bottom: calc(0.25rem + env(safe-area-inset-bottom));
+}
+
+/* ── iOS Native Feel (WKWebView wrapper) ── */
+
+/* Prevent overscroll / rubber-banding on the main shell */
+html {
+  overscroll-behavior: none;
+}
+
+body {
+  overscroll-behavior: none;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* Disable pull-to-refresh on the app shell */
+.app-shell {
+  overscroll-behavior-y: none;
+  overflow: hidden;
+}
+
+/* Only allow pull-to-refresh / overscroll within scrollable content areas */
+.main-content-area {
+  overscroll-behavior-y: contain;
+  -webkit-overflow-scrolling: touch;
+  scroll-padding-top: 1rem;
+}
+
+/* Prevent tap highlight on iOS */
+* {
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Touch action — disable double-tap zoom for native feel */
+button, a, [role="button"], input, select, textarea, label {
+  touch-action: manipulation;
+}
+
+/* Disable text selection on UI chrome (keep on content) */
+nav, aside, header, footer,
+.sidebar-nav, .top-bar, .mobile-bottom-nav,
+button, [role="button"], [role="tab"], [role="menuitem"],
+label, .select-none {
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+/* Re-enable text selection on content areas */
+main, article, .selectable, p, h1, h2, h3, h4, h5, h6,
+input, textarea, [contenteditable="true"],
+td, th, li, pre, code {
+  -webkit-user-select: text;
+  user-select: text;
+}
+
+/* ── Card hover micro-interaction ── */
+/* Subtle lift effect on dashboard cards for desktop (pointer: fine) */
+@media (pointer: fine) {
+  .ik26-card-hover {
+    transition: box-shadow 0.28s cubic-bezier(0.22, 1, 0.36, 1), transform 0.28s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+  .ik26-card-hover:hover {
+    box-shadow: 0 8px 28px rgba(0,0,0,0.06), 0 2px 10px rgba(0,0,0,0.03);
+    transform: translateY(-2px);
+  }
+  .ik26-card-hover:active {
+    transform: translateY(0);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+  }
+}
+
+/* ── Sidebar active item warm glow ── */
+@media (pointer: fine) {
+  .ik26-sidebar-active-glow {
+    box-shadow: inset 0 0 12px rgba(221,161,94,0.06), 0 0 8px rgba(221,161,94,0.04);
+  }
+}
+
+/* ── Progress bar animated tip dot ── */
+@keyframes ik26-progress-pulse {
+  0%, 100% { box-shadow: 0 0 4px rgba(205,168,138,0.4), 0 0 8px rgba(205,168,138,0.15); transform: scale(1); }
+  50% { box-shadow: 0 0 8px rgba(205,168,138,0.6), 0 0 14px rgba(205,168,138,0.25); transform: scale(1.15); }
+}
+
+.ik26-progress-dot {
+  animation: ik26-progress-pulse 2.4s ease-in-out infinite;
+}
+
+/* ── Section divider with fade ── */
+.ik26-divider {
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(140,165,135,0.1) 20%, rgba(140,165,135,0.1) 80%, transparent);
+}
+
+/* ── Section label chip ── */
+.ik26-section-label {
+  font-family: 'Inter', sans-serif;
+  font-size: 0.5625rem;
+  text-transform: uppercase;
+  letter-spacing: 0.18em;
+  color: rgba(138, 133, 127, 0.5);
+}
+
+/* ── Gradient text utility ── */
+.ik26-gradient-text {
+  background: linear-gradient(135deg, #C9A96E, #DDA15E);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* ── Smooth scrollbar styling ── */
+.main-content-area::-webkit-scrollbar {
+  width: 6px;
+}
+.main-content-area::-webkit-scrollbar-track {
+  background: transparent;
+}
+.main-content-area::-webkit-scrollbar-thumb {
+  background-color: rgba(140,165,135,0.15);
+  border-radius: 3px;
+}
+.main-content-area::-webkit-scrollbar-thumb:hover {
+  background-color: rgba(140,165,135,0.25);
+}
+
+/* Haptic-feel button press animation (subtle scale-down) */
+@media (pointer: coarse) {
+  button:active:not(:disabled),
+  [role="button"]:active:not(:disabled),
+  a[href]:active {
+    transform: scale(0.97);
+    transition: transform 0.08s ease-out;
+  }
+}
+
+/* ── Responsive Modal Sizing ── */
+
+/* Ensure modals never exceed viewport on mobile */
+[role="dialog"] > div,
+[role="alertdialog"] > div {
+  max-height: 90vh;
+  max-height: 90dvh;
+}
+
+/* Scrollable modal content areas */
+[role="dialog"] .overflow-y-auto,
+[role="alertdialog"] .overflow-y-auto {
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* ── Touch Target Minimum (WCAG 2.5.8) ── */
+
+/* Ensure buttons & interactive elements have adequate touch targets */
+@media (pointer: coarse) {
+  button:not(.sr-only):not([aria-hidden="true"]),
+  [role="button"],
+  a[href]:not(.sr-only) {
+    min-height: 44px;
+    min-width: 44px;
+  }
+
+  /* Exception: inline text links, small tags, badge chips */
+  .inline-link,
+  .text-link,
+  kbd,
+  [class*="rounded-full"][class*="text-[0.5"]] {
+    min-height: unset;
+    min-width: unset;
+  }
+}
+
+/* ── Bottom Nav Content Clearance ── */
+
+/* Ensure main content doesn't hide behind mobile bottom nav */
+@media (max-width: 1023px) {
+  .main-content-area {
+    padding-bottom: calc(5rem + env(safe-area-inset-bottom));
+  }
+}
+
+@media (min-width: 1024px) {
+  .main-content-area {
+    padding-bottom: 1.5rem;
+  }
+}
+
+/* ── Overflow Safeguards for Small Screens ── */
+
+@media (max-width: 640px) {
+  /* Prevent horizontal overflow on narrow screens */
+  .app-shell {
+    overflow-x: hidden;
+  }
+
+  /* Ensure long words don't break layout */
+  h1, h2, h3, h4, h5, h6, p, span, td, th, li {
+    overflow-wrap: break-word;
+    word-wrap: break-word;
+    hyphens: auto;
+  }
+
+  /* Ensure tables scroll horizontally */
+  table {
+    display: block;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+}
+
+/* ── Accessibility: Focus-visible ring ── */
+
+/* Gold focus ring for all interactive elements (WCAG AA) */
+*:focus-visible {
+  outline: 2px solid #C9A96E;
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+/* Skip-to-content link enhancement */
+.skip-to-main:focus {
+  outline: 3px solid #C9A96E;
+  outline-offset: 0;
+}
+
+/* Ensure minimum text contrast for muted text (WCAG AA 4.5:1) */
+/* Override any muted-foreground that's too light on light backgrounds */
+.a11y-text-muted {
+  color: #5A6A5C; /* 4.8:1 contrast on #F5F0E8 */
+}
+
+/* ── IK26 Skeleton pulse with warm palette ── */
+@keyframes ik26-pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+
+@keyframes ik26-shimmer {
+  0% { transform: translateX(-100%) rotate(-15deg); }
+  100% { transform: translateX(100%) rotate(-15deg); }
+}
+
+.ik26-skeleton-pulse {
+  animation: ik26-pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  position: relative;
+  overflow: hidden;
+}
+
+.ik26-skeleton-pulse::after {
+  content: "";
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  right: -50%;
+  bottom: -50%;
+  background: linear-gradient(
+    115deg,
+    transparent 30%,
+    rgba(206, 180, 122, 0.08) 42%,
+    rgba(222, 187, 150, 0.12) 50%,
+    rgba(206, 180, 122, 0.08) 58%,
+    transparent 70%
+  );
+  animation: ik26-shimmer 2.2s ease-in-out infinite;
+  pointer-events: none;
+}
+
+/* ── Print stylesheet ── */
+@media print {
+  /* Hide non-content chrome */
+  body > *:not(.print-root):not(#root) { display: none !important; }
+  #root { display: none !important; }
+  .no-print, nav, aside, header, footer,
+  .sidebar-nav, .top-bar, .mobile-bottom-nav,
+  .scroll-to-top, .network-status,
+  .pwa-install-prompt, .sw-update-toast,
+  [role="dialog"], [role="alertdialog"],
+  .sonner-toast-container,
+  button[aria-label="Scroll to top"] { display: none !important; }
+
+  /* Reset body for printing */
+  body {
+    background: white !important;
+    color: #1a1a1a !important;
+    font-family: 'Inter', sans-serif !important;
+    font-size: 11pt !important;
+    line-height: 1.5 !important;
+  }
+
+  /* Print root container */
+  .print-root {
+    display: block !important;
+    position: absolute !important;
+    top: 0;
+    left: 0;
+    width: 100%;
+    padding: 0;
+    background: white !important;
+    color: #1a1a1a !important;
+  }
+
+  .print-root * {
+    color-adjust: exact;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  /* Headings */
+  .print-root h1, .print-root h2, .print-root h3 {
+    color: #3D524D !important;
+    margin-bottom: 0.5rem;
+    page-break-after: avoid;
+  }
+
+  .print-root h1 { font-size: 18pt; }
+  .print-root h2 { font-size: 14pt; margin-top: 1rem; }
+  .print-root h3 { font-size: 12pt; }
+
+  /* Print header — repeated conceptually per page via running header */
+  .print-root .print-header {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+    padding-bottom: 0.75rem;
+    border-bottom: 2px solid #C9A96E;
+  }
+
+  .print-root .print-header h1 {
+    font-size: 16pt;
+    font-family: 'Degular', 'Maragsa', 'Playfair Display', sans-serif;
+  }
+
+  .print-root .print-header .print-event-info {
+    font-size: 9pt;
+    color: #6B7F8E;
+    margin-left: auto;
+  }
+
+  /* Tables */
+  .print-root table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 0.75rem 0;
+    font-size: 9pt;
+    page-break-inside: auto;
+  }
+
+  .print-root tr {
+    page-break-inside: avoid;
+    page-break-after: auto;
+  }
+
+  .print-root thead {
+    display: table-header-group; /* repeat header on each page */
+  }
+
+  .print-root th, .print-root td {
+    border: 1px solid #ccc;
+    padding: 5px 8px;
+    text-align: left;
+    vertical-align: top;
+  }
+
+  .print-root th {
+    background-color: #f0ece3 !important;
+    font-weight: 600;
+    color: #3D524D !important;
+    font-size: 8pt;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+  }
+
+  .print-root td {
+    color: #333 !important;
+  }
+
+  /* Alternating row striping for readability */
+  .print-root tbody tr:nth-child(even) {
+    background-color: #faf8f4 !important;
+  }
+
+  /* Lists */
+  .print-root ul, .print-root ol {
+    padding-left: 1.5rem;
+    margin: 0.5rem 0;
+    font-size: 10pt;
+  }
+
+  .print-root li {
+    margin-bottom: 0.25rem;
+    page-break-inside: avoid;
+  }
+
+  /* Print footer */
+  .print-root .print-footer {
+    margin-top: 1.5rem;
+    padding-top: 0.5rem;
+    border-top: 1px solid #ccc;
+    font-size: 8pt;
+    color: #888;
+    text-align: center;
+  }
+
+  /* Section page breaks */
+  .print-root .print-section {
+    page-break-before: auto;
+    page-break-after: auto;
+    page-break-inside: avoid;
+  }
+
+  .print-root .print-page-break {
+    page-break-before: always;
+  }
+
+  /* Status badges for print */
+  .print-root .print-badge {
+    display: inline-block;
+    padding: 1px 6px;
+    border-radius: 3px;
+    font-size: 8pt;
+    font-weight: 600;
+  }
+
+  .print-root .print-badge-high {
+    background-color: #fce8e3 !important;
+    color: #C75B3F !important;
+  }
+  .print-root .print-badge-medium {
+    background-color: #fef6e0 !important;
+    color: #B8922E !important;
+  }
+  .print-root .print-badge-low {
+    background-color: #eef3ea !important;
+    color: #7E9E78 !important;
+  }
+  .print-root .print-badge-done {
+    background-color: #eef3ea !important;
+    color: #7E9E78 !important;
+  }
+  .print-root .print-badge-todo {
+    background-color: #eef1f5 !important;
+    color: #6B7F8E !important;
+  }
+  .print-root .print-badge-progress {
+    background-color: #fef6e0 !important;
+    color: #B8922E !important;
+  }
+
+  /* Page setup */
+  @page {
+    margin: 1.5cm 1.5cm 2cm 1.5cm;
+    size: letter;
+  }
+
+  @page :first {
+    margin-top: 1cm;
+  }
+
+  /* Running header/footer via @page CSS (limited browser support, graceful degradation) */
+  @page {
+    @top-center {
+      content: "Isang Kusina 2026 — May 22, 2026";
+      font-size: 8pt;
+      color: #999;
+    }
+    @bottom-right {
+      content: counter(page);
+      font-size: 8pt;
+      color: #999;
+    }
+  }
+}

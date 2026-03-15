@@ -1,0 +1,21 @@
+{
+  "name": "Isang Kusina 2026",
+  "short_name": "IK26",
+  "description": "Event coordination hub for the Isang Kusina 2026 Filipino chefs collaboration dinner \u2014 May 22, 2026 at Keep Memory Alive Event Center, Las Vegas.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#2B4440",
+  "theme_color": "#3D524D",
+  "orientation": "portrait-primary",
+  "scope": "/",
+  "lang": "en",
+  "categories": ["food", "events", "collaboration"],
+  "icons": [
+    {
+      "src": "/og-image.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ]
+}
