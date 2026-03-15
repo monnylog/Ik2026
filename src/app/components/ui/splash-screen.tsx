@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "motion/react";
-import istoryaLogo from "figma:asset/b55bcac066687e563f77685fc31f20ef43e81d5d.png";
+import istoryaLogo from "../../assets/b55bcac066687e563f77685fc31f20ef43e81d5d.png";
 
 const headingFont = { fontFamily: "'Degular', 'Maragsa', 'Playfair Display', sans-serif" };
 const bodyFont = { fontFamily: "'Inter', sans-serif" };
