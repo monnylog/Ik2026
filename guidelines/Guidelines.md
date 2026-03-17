@@ -1,61 +1,91 @@
-**Add your own guidelines here**
-<!--
+# IK26 — Figma Make AI Guidelines
 
-System Guidelines
+## Project Context
+This is the **Isang Kusina 2026** event operations dashboard, built by Istorya (Monica Blanco + Walbert Castillo). The event is a Filipino-American culinary collaboration in Las Vegas, NV on May 22, 2026. The app serves chefs, team members, and leadership with role-based access.
 
-Use this file to provide the AI with rules and guidelines you want it to follow.
-This template outlines a few examples of things you can add. You can add your own sections and format it to suit your needs
+**Full project context:** See `IK26_AGENT.md` in the repo root for the complete development agent specification.
 
-TIP: More context isn't always better. It can confuse the LLM. Try and add the most important rules you need
+---
 
-# General guidelines
+## General Guidelines
 
-Any general rules you want the AI to follow.
-For example:
+* Framework before execution — describe the structure before writing code
+* Keep file sizes small; put helper functions and components in their own files
+* Refactor as you go; avoid duplicating logic
+* Never hardcode secrets; use `Deno.env.get()` in Edge Functions and `PropertiesService` in Apps Script
+* All operations must be idempotent (safe to re-run without duplicating data)
+* Never overwrite protected fields: Name, Notes, Relationship Story, Stage (Opportunities), relation fields, documentary_consent, private_topics
+* Ask before irreversible actions (deleting data, dropping tables, removing triggers)
 
-* Only use absolute positioning when necessary. Opt for responsive and well structured layouts that use flexbox and grid by default
-* Refactor code as you go to keep code clean
-* Keep file sizes small and put helper functions and components in their own files.
+---
 
---------------
+## Design System Guidelines
 
-# Design system guidelines
-Rules for how the AI should make generations look like your company's design system
+### Color Palette
+* **Primary Gold:** `#C9A96E` — headings, accents, CTAs
+* **Forest Green:** `#1A5C38` — secondary accents, success states
+* **Warm Gold (lighter):** `#D4A843` — Finance/Money workstream
+* **Steel Blue:** `#4A7FB5` — Creative/Content workstream
+* **Sage Green:** `#7E9E78` — F&B/Kitchen workstream
+* **Warm Terracotta:** `#CDA88A` — Research/Story workstream
+* **Background:** Dark (near-black), not pure white
+* **Text:** Off-white on dark backgrounds
 
-Additionally, if you select a design system to use in the prompt box, you can reference
-your design system's components, tokens, variables and components.
-For example:
+### Typography
+* **Headings:** Maragsa (imported via `src/app/lib/fonts.ts`)
+* **Body:** Kantumruy Pro (imported via `src/app/lib/fonts.ts`)
+* **Base font size:** 14px (0.875rem)
+* **Date formats:** "Mar 17" or "May 22, 2026" — never ISO format in UI
 
-* Use a base font-size of 14px
-* Date formats should always be in the format “Jun 10”
-* The bottom toolbar should only ever have a maximum of 4 items
-* Never use the floating action button with the bottom toolbar
-* Chips should always come in sets of 3 or more
+### Layout Rules
+* Use flexbox and grid by default; avoid absolute positioning unless necessary
+* Mobile-first responsive design
+* Bottom navigation on mobile (`mobile-bottom-nav.tsx`)
+* Sidebar navigation on desktop (`sidebar-nav.tsx`)
+* Maximum 4 items in the bottom toolbar
+* All pages wrapped in `<PageWrapper>` component
+* Cards use `rounded-xl` with `border border-gold/20` and `bg-gold/5` backgrounds
+* Buttons use gold accent with `hover:opacity-80` transitions
+
+### Components
+* Use Radix UI primitives with custom Tailwind styling
+* Use `motion` (Framer Motion v12) for all page transitions and micro-animations
+* Use `lucide-react` for all icons
+* Chips/badges always come in sets of 3 or more
 * Don't use a dropdown if there are 2 or fewer options
 
-You can also create sub sections and add more specific details
-For example:
+---
 
+## Role-Based Access Rules
 
-## Button
-The Button component is a fundamental interactive element in our design system, designed to trigger actions or navigate
-users through the application. It provides visual feedback and clear affordances to enhance user experience.
+* `leadership` — Full access to all pages
+* `team` — Access to operational pages; no Finance, Sponsors, Members, Notion Admin, Mission Control, System Audit, Content Studio
+* `chef` — Access to personal pages only; no team management or financial data
+* Always gate pages with role checks in `page-router.tsx`
+* Never expose leadership data to chef-role users
 
-### Usage
-Buttons should be used for important actions that users need to take, such as form submissions, confirming choices,
-or initiating processes. They communicate interactivity and should have clear, action-oriented labels.
+---
 
-### Variants
-* Primary Button
-  * Purpose : Used for the main action in a section or page
-  * Visual Style : Bold, filled with the primary brand color
-  * Usage : One primary button per section to guide users toward the most important action
-* Secondary Button
-  * Purpose : Used for alternative or supporting actions
-  * Visual Style : Outlined with the primary color, transparent background
-  * Usage : Can appear alongside a primary button for less important actions
-* Tertiary Button
-  * Purpose : Used for the least important actions
-  * Visual Style : Text-only with no border, using primary color
-  * Usage : For actions that should be available but not emphasized
--->
+## API & Data Rules
+
+* Use `apiFetch` or `authApiFetch` from `src/app/lib/supabase.ts` for all API calls
+* All Edge Function routes are prefixed with `/make-server-5ed426e6/`
+* Always handle loading states with skeleton loaders from `skeleton-loaders.tsx`
+* Always handle error states with toast notifications (Sonner)
+* Never cross-contaminate IK26 data with other Monica projects (Monnylog, UNLV, Create Well)
+
+---
+
+## Agent Naming Convention
+
+When adding new AI agents, name them using Filipino words that describe their function:
+
+* Tulay (Bridge) — sponsorship follow-ups
+* Bantay (Guard/Watcher) — data integrity
+* Salo-Salo (Gathering) — chef care and onboarding
+* Kuwento (Story) — narrative and content
+* Damdam (To Feel/Sense) — emotional temperature
+* Mata (Eye/To See) — production and media
+
+New agents follow this pattern: one Filipino word, metaphorically descriptive.
+
