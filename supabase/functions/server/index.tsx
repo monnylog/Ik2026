@@ -13,7 +13,8 @@ import { studio } from "./content-studio.tsx";
 import { notionContent, ensureDefaultConfig, resolveNotionKeyFromHeader, getNotionConfig } from "./notion-content-routes.tsx";
 import { notionTasks, setActiveNotionKey } from "./notion-tasks-routes.tsx";
 import { utility, PHOTO_BUCKET } from "./utility-routes.tsx";
-
+import { instagramSync } from "./instagram-sync-routes.tsx";
+import { websiteCopy } from "./website-copy-routes.tsx";
 const app = new Hono();
 
 // ─── In-memory cache to reduce KV reads on hot paths ────────────
@@ -768,5 +769,7 @@ app.route("/", studio);
 app.route("/", notionContent);
 app.route("/", notionTasks);
 app.route("/", utility);
+app.route("/", instagramSync);
+app.route("/ik26/copy", websiteCopy);
 
 Deno.serve(app.fetch);
