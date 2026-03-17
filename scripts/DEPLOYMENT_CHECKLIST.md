@@ -369,7 +369,7 @@ If anything breaks:
 
 **Owner:** Monica Blanco  
 **Email:** monica.istorya@gmail.com  
-**Notion Workspace:** MUSEO / ISTORYA  
+**Notion Workspace:** Take Home Studio / ISTORYA  
 **Apps Script Project:** IK26 Ops Sync  
 **Supabase Project:** Istorya app
 

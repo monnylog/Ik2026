@@ -219,7 +219,7 @@ Year 3 needs 7 assignments — **Andrew (or JJ) to assign by Mar 14–18**
 
 ## Team Roster Notes: Outdated vs. Updated (IK 2026)
 
-Cross-referenced with Team Directory (MUSEO/Istorya) as of March 2026.
+Cross-referenced with Team Directory (Take Home Studio/Istorya) as of March 2026.
 
 **Current/Updated Team Members (confirmed in Team Directory or RACI):**
 

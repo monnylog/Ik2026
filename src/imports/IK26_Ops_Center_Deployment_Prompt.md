@@ -17,8 +17,8 @@
   - Existing triggers: 6 running (syncFigmaToNotion, etc.)
   - Existing script properties: NOTION_API_KEY, NOTION_LEADS_DB (2df36223d6d64f5385a4f22571c135df), NOTION_INVOICES_DB (323dc6047d2d80a490bdf69032195513), FIGMA_FILE_KEY (matches AGENCY v1), FIGMA_TOKEN (needs personal access token)
 
-### Notion (MUSEO / ISTORYA workspace)
-- MUSEO Home: https://www.notion.so/MUSEO-Home-ba12b036a43749bab395d644b9409bf3
+### Notion (Take Home Studio / ISTORYA workspace)
+- Take Home Studio Home: https://www.notion.so/MUSEO-Home-ba12b036a43749bab395d644b9409bf3
 - IK26 Ops Center: https://www.notion.so/b60f493a780e4c5ca053f14b3ca5ad23?v=31edc6047d2d80fcab76000c628f8aae
 - Integration: "Istorya Sync Engine" (connected to Leader Hub, Projects, Team Hub, Invoice DB, Brand Deals & Collabs)
 - Integration: "Isang Kusina" (connected to IK26 databases under ISTORYA teamspace)
