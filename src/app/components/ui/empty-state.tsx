@@ -1,7 +1,6 @@
 import { motion } from "motion/react";
 
-const bodyFont = { fontFamily: "'Civil', 'Inter', sans-serif" };
-const headingFont = { fontFamily: "'Steiner', 'Degular', 'Maragsa', 'Playfair Display', serif" };
+import { bodyFont, headingFont } from "../../lib/fonts";
 
 type IllustrationVariant =
   | "submissions"

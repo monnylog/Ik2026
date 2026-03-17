@@ -2,8 +2,7 @@ import { useState, useEffect, useRef, useCallback } from "react";
 import { motion, AnimatePresence } from "motion/react";
 import { ChevronRight, ArrowUp, LayoutDashboard, ArrowLeft, CalendarDays, Users, UserCheck, Heart, Plane, UtensilsCrossed, DollarSign, BookOpen, Link2, ListChecks, Tag, CalendarClock, ClipboardList, MessageCircle, Mic, Shield, Share2, Inbox, Settings, Flame } from "lucide-react";
 
-const bodyFont = { fontFamily: "'Inter', sans-serif" };
-const headingFont = { fontFamily: "'Degular', 'Maragsa', 'Playfair Display', sans-serif" };
+import { bodyFont, headingFont } from "../lib/fonts";
 
 // Map page titles to their icons
 const pageIconMap: Record<string, typeof LayoutDashboard> = {

@@ -20,9 +20,7 @@ import {
   ArrowRight,
 } from "lucide-react";
 import { useUserData } from "../../lib/use-user-data";
-
-const bodyFont = { fontFamily: "'Inter', sans-serif" };
-const headingFont = { fontFamily: "'Degular', 'Maragsa', 'Playfair Display', sans-serif" };
+import { bodyFont, headingFont } from "../../lib/fonts";
 
 interface ChecklistItem {
   id: string;

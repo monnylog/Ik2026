@@ -16,9 +16,7 @@ import {
 import { confirmedChefs } from "../onboarding/chef-directory";
 import { apiFetch } from "../../lib/supabase";
 import { useNotion } from "../../lib/notion-context";
-
-const bodyFont = { fontFamily: "'Inter', sans-serif" };
-const headingFont = { fontFamily: "'Degular', 'Maragsa', 'Playfair Display', sans-serif" };
+import { bodyFont, headingFont } from "../../lib/fonts";
 
 interface ExportSummaryProps {
   onClose: () => void;

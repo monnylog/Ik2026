@@ -1,8 +1,7 @@
 import React, { Component, type ReactNode } from "react";
 import { AlertTriangle, RotateCcw, Trash2 } from "lucide-react";
 
-const bodyFont = { fontFamily: "'Civil', 'Inter', sans-serif" };
-const headingFont = { fontFamily: "'Steiner', 'Degular', 'Maragsa', 'Playfair Display', serif" };
+import { bodyFont, headingFont } from "../../lib/fonts";
 
 interface ErrorBoundaryProps {
   children: ReactNode;

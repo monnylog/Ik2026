@@ -2,8 +2,7 @@ import { useState, useEffect, useCallback, createContext, useContext, type React
 import { motion, AnimatePresence } from "motion/react";
 import { X, ChevronRight, ChevronLeft, Sparkles } from "lucide-react";
 
-const bodyFont = { fontFamily: "'Civil', 'Inter', sans-serif" };
-const headingFont = { fontFamily: "'Steiner', 'Degular', 'Maragsa', 'Playfair Display', serif" };
+import { bodyFont, headingFont } from "../../lib/fonts";
 
 /* ── Storage key per role ── */
 function getStorageKey(role: string) {

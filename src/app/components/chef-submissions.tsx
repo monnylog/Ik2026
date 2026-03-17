@@ -16,9 +16,7 @@ import {
 import { apiFetch, supabase } from "../lib/supabase";
 import { useProfile } from "../lib/profile-context";
 import { CardSkeleton } from "./ui/skeleton-loaders";
-
-const bodyFont = { fontFamily: "'Inter', sans-serif" };
-const headingFont = { fontFamily: "'Degular', 'Maragsa', 'Playfair Display', sans-serif" };
+import { bodyFont, headingFont } from "../lib/fonts";
 
 type SubmissionTab = "concept" | "ingredients" | "kitchen";
 
@@ -393,7 +391,7 @@ function FieldInput({ label, value, onChange, placeholder }: {
 }) {
   return (
     <div>
-      <label className="text-foreground text-[0.75rem] mb-1.5 block" style={{ fontFamily: "'Inter', sans-serif" }}>
+      <label className="text-foreground text-[0.75rem] mb-1.5 block" style={bodyFont}>
         {label}
       </label>
       <input
@@ -402,7 +400,7 @@ function FieldInput({ label, value, onChange, placeholder }: {
         onChange={(e) => onChange(e.target.value)}
         placeholder={placeholder}
         className="w-full h-9 px-3 rounded-lg text-[0.8125rem] border border-border bg-background text-foreground focus:outline-none focus:border-gold/50 transition-colors"
-        style={{ fontFamily: "'Inter', sans-serif" }}
+        style={bodyFont}
       />
     </div>
   );
@@ -413,7 +411,7 @@ function FieldTextarea({ label, value, onChange, placeholder, rows = 3 }: {
 }) {
   return (
     <div>
-      <label className="text-foreground text-[0.75rem] mb-1.5 block" style={{ fontFamily: "'Inter', sans-serif" }}>
+      <label className="text-foreground text-[0.75rem] mb-1.5 block" style={bodyFont}>
         {label}
       </label>
       <textarea
@@ -422,7 +420,7 @@ function FieldTextarea({ label, value, onChange, placeholder, rows = 3 }: {
         placeholder={placeholder}
         rows={rows}
         className="w-full px-3 py-2 rounded-lg text-[0.8125rem] border border-border bg-background text-foreground focus:outline-none focus:border-gold/50 transition-colors resize-none"
-        style={{ fontFamily: "'Inter', sans-serif" }}
+        style={bodyFont}
       />
     </div>
   );

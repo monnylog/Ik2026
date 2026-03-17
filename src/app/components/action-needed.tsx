@@ -29,8 +29,7 @@ import type { UserRole } from "./onboarding/use-auth";
 import { useNotionDatabase } from "../lib/notion-sync";
 import { transformDecision } from "../lib/notion-transforms";
 
-const bodyFont = { fontFamily: "'Inter', sans-serif" };
-const headingFont = { fontFamily: "'Degular', 'Maragsa', 'Playfair Display', sans-serif" };
+import { bodyFont, headingFont } from "../lib/fonts";
 
 interface ActionItem {
   id: string;

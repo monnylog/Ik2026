@@ -9,9 +9,7 @@ import {
   CheckCircle2,
   X,
 } from "lucide-react";
-
-const bodyFont = { fontFamily: "'Inter', sans-serif" };
-const headingFont = { fontFamily: "'Degular', 'Maragsa', 'Playfair Display', sans-serif" };
+import { bodyFont, headingFont } from "../lib/fonts";
 
 type Priority = "high" | "medium" | "low";
 type TaskStatus = "todo" | "in-progress" | "done";

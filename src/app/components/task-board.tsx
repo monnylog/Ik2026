@@ -37,9 +37,7 @@ import { useNotionDatabase } from "../lib/notion-sync";
 import { NotionSyncBadge } from "./ui/notion-sync-badge";
 import { transformMilestone } from "../lib/notion-transforms";
 import { Target } from "lucide-react";
-
-const bodyFont = { fontFamily: "'Inter', sans-serif" };
-const headingFont = { fontFamily: "'Degular', 'Maragsa', 'Playfair Display', sans-serif" };
+import { bodyFont, headingFont } from "../lib/fonts";
 
 type Priority = "high" | "medium" | "low";
 type TaskStatus = "todo" | "in-progress" | "done";

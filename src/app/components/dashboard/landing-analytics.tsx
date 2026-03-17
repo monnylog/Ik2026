@@ -13,8 +13,7 @@ import {
 } from "lucide-react";
 import { projectId, publicAnonKey } from "/utils/supabase/info";
 
-const bodyFont = { fontFamily: "'Inter', sans-serif" };
-const headingFont = { fontFamily: "'Degular', 'Maragsa', 'Playfair Display', sans-serif" };
+import { bodyFont, headingFont } from "../../lib/fonts";
 
 // Friendly event labels
 const eventLabels: Record<string, { label: string; icon: React.ElementType; color: string }> = {

@@ -5,9 +5,7 @@ import { useMemo } from "react";
 import { Building2, ArrowRight, CheckCircle2, Clock, Circle } from "lucide-react";
 import { useNotionDatabase } from "../../lib/notion-sync";
 import { transformCommsContact, type TransformedCommsContact } from "../../lib/notion-transforms";
-
-const bodyFont = { fontFamily: "'Inter', sans-serif" };
-const headingFont = { fontFamily: "'Degular', 'Maragsa', 'Playfair Display', sans-serif" };
+import { bodyFont, headingFont } from "../../lib/fonts";
 
 interface SponsorPipelineProps {
   onNavigate?: (page: string) => void;

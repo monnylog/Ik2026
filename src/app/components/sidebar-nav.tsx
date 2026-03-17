@@ -38,6 +38,7 @@ import {
   Wallet,
   Flame,
   ScrollText,
+  PenTool,
 } from "lucide-react";
 import type { UserRole } from "./onboarding/use-auth";
 import { getVisibleNavItemsForView, type ViewMode } from "./onboarding/use-auth";
@@ -46,6 +47,7 @@ import istoryaLogo from "figma:asset/b55bcac066687e563f77685fc31f20ef43e81d5d.pn
 import { type RecentPage, getPageIcon, formatRecentTime } from "./ui/recent-pages";
 import type { FavoritePage } from "./ui/favorites";
 import { APP_VERSION } from "../lib/version";
+import { bodyFont, headingFont } from "../lib/fonts";
 
 const allNavItems = [
   { icon: LayoutDashboard, label: "Dashboard" },
@@ -76,6 +78,7 @@ const allNavItems = [
   { icon: Wallet, label: "Reimbursements" },
   { icon: Flame, label: "Mission Control" },
   { icon: ScrollText, label: "System Audit" },
+  { icon: PenTool, label: "Content Studio" },
 ];
 
 interface NavSection {
@@ -91,10 +94,8 @@ const navSections: NavSection[] = [
   { label: "Insights", items: ["Activity Log"] },
   { label: "Reference", items: ["Links & Resources", "Forms & Agreements"] },
   { label: "Showcase", items: ["Portal", "Share Invite", "Inquiries"] },
-  { label: "Admin", items: ["Notion Admin", "System Audit"] },
+  { label: "Admin", items: ["Notion Admin", "System Audit", "Content Studio"] },
 ];
-
-const bodyFont = { fontFamily: "'Inter', sans-serif" };
 
 interface SidebarNavProps {
   role: UserRole;
@@ -153,7 +154,7 @@ export function SidebarNav({ role, activePage, onNavigate, displayName, avatarId
             <div>
               <h1
                 className="text-sidebar-primary tracking-tight leading-tight"
-                style={{ fontFamily: "'Degular', 'Maragsa', 'Playfair Display', sans-serif", fontSize: "1.25rem" }}
+                style={{ ...headingFont, fontSize: "1.25rem" }}
               >
                 Isang Kusina
               </h1>

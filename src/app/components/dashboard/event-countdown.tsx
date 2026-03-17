@@ -13,8 +13,7 @@ import { useProfile } from "../../lib/profile-context";
 import { getConfirmedChef } from "../onboarding/chef-directory";
 import { ImageWithFallback } from "../figma/ImageWithFallback";
 
-const bodyFont = { fontFamily: "'Inter', sans-serif" };
-const headingFont = { fontFamily: "'Degular', 'Maragsa', 'Playfair Display', sans-serif" };
+import { bodyFont, headingFont } from "../../lib/fonts";
 
 const EVENT_DATE = new Date("2026-05-22");
 const KICKOFF = new Date("2026-01-15");

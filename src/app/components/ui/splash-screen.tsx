@@ -2,8 +2,7 @@ import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "motion/react";
 import istoryaLogo from "figma:asset/b55bcac066687e563f77685fc31f20ef43e81d5d.png";
 
-const headingFont = { fontFamily: "'Steiner', 'Degular', 'Maragsa', 'Playfair Display', serif" };
-const bodyFont = { fontFamily: "'Civil', 'Inter', sans-serif" };
+import { bodyFont, headingFont } from "../../lib/fonts";
 
 interface SplashScreenProps {
   onComplete: () => void;

@@ -22,9 +22,7 @@ import {
 } from "lucide-react";
 
 import { useFocusTrap } from "../../lib/use-focus-trap";
-
-const bodyFont = { fontFamily: "'Inter', sans-serif" };
-const headingFont = { fontFamily: "'Degular', 'Maragsa', 'Playfair Display', sans-serif" };
+import { bodyFont, headingFont } from "../../lib/fonts";
 
 const CURRENT_VERSION = "2.16.0";
 const STORAGE_KEY = "ik26_changelog_seen_version";

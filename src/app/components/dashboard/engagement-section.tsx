@@ -7,8 +7,7 @@ import { MemoryWall } from "../engagement/memory-wall";
 import { FlavorFusion } from "../engagement/flavor-fusion";
 import { RecipeRoulette } from "../engagement/recipe-roulette";
 
-const bodyFont = { fontFamily: "'Inter', sans-serif" };
-const headingFont = { fontFamily: "'Degular', 'Maragsa', 'Playfair Display', sans-serif" };
+import { bodyFont, headingFont } from "../../lib/fonts";
 
 export function EngagementSection({ onNavigate }: { onNavigate?: (page: string) => void }) {
   const [expanded, setExpanded] = useState(true);

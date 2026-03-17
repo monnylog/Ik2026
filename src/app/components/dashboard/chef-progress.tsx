@@ -19,9 +19,7 @@ import { useProfile } from "../../lib/profile-context";
 import { getConfirmedChef } from "../onboarding/chef-directory";
 import { apiFetch } from "../../lib/supabase";
 import { useUserData } from "../../lib/use-user-data";
-
-const bodyFont = { fontFamily: "'Inter', sans-serif" };
-const headingFont = { fontFamily: "'Degular', 'Maragsa', 'Playfair Display', sans-serif" };
+import { bodyFont, headingFont } from "../../lib/fonts";
 
 interface ProgressStep {
   id: string;

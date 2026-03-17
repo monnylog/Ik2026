@@ -34,9 +34,7 @@ import { toast } from "sonner";
 import { EmptyState } from "./ui/empty-state";
 import { useNotificationSound } from "./ui/notification-sound";
 import { NotionCommsTracker } from "./notion-comms-tracker";
-
-const bodyFont = { fontFamily: "'Inter', sans-serif" };
-const headingFont = { fontFamily: "'Degular', 'Maragsa', 'Playfair Display', sans-serif" };
+import { bodyFont, headingFont } from "../lib/fonts";
 
 /* ═══════════════════════════════════════════════════════════════════
    ALOHA TROPICAL PALETTE

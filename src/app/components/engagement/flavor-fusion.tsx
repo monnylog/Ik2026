@@ -5,9 +5,7 @@ import { getAvatar, getSavedAvatar, getSavedName } from "./avatars";
 import { apiFetch } from "../../lib/supabase";
 import { useProfile } from "../../lib/profile-context";
 import { toast } from "sonner";
-
-const bodyFont = { fontFamily: "'Inter', sans-serif" };
-const headingFont = { fontFamily: "'Degular', 'Maragsa', 'Playfair Display', sans-serif" };
+import { bodyFont, headingFont } from "../../lib/fonts";
 
 // Filipino ingredients organized by category
 const ingredients = {

@@ -1,8 +1,7 @@
 import { motion } from "motion/react";
 import { Eye, EyeOff } from "lucide-react";
 import { useSimplifiedView } from "../../lib/simplified-view-context";
-
-const bodyFont = { fontFamily: "'Inter', sans-serif" };
+import { bodyFont } from "../../lib/fonts";
 
 export function SimplifiedViewToggle() {
   const { simplified, toggleSimplified } = useSimplifiedView();

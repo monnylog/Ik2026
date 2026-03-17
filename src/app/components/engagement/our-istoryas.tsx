@@ -6,9 +6,7 @@ import { apiFetch } from "../../lib/supabase";
 import { StorySharing } from "./story-sharing";
 import { useProfile } from "../../lib/profile-context";
 import { Bookmark, Lightbulb, ArrowLeft, RefreshCw, Heart, ChevronsUpDown, ArrowRight, UtensilsCrossed } from "lucide-react";
-
-const bodyFont = { fontFamily: "'Inter', sans-serif" };
-const headingFont = { fontFamily: "'Degular', 'Maragsa', 'Playfair Display', sans-serif" };
+import { bodyFont, headingFont } from "../../lib/fonts";
 
 // Event is considered "post-event" after this date
 const EVENT_DATE = new Date("2026-05-22");

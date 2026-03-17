@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "motion/react";
+import { bodyFont, headingFont } from "../lib/fonts";
 import {
   Clock,
   MapPin,
@@ -43,9 +44,6 @@ function parseTimeToISO(time: string): string {
   if (p === "AM" && h === 12) h = 0;
   return `${String(h).padStart(2, "0")}:${m}:00`;
 }
-
-const bodyFont = { fontFamily: "'Inter', sans-serif" };
-const headingFont = { fontFamily: "'Degular', 'Maragsa', 'Playfair Display', sans-serif" };
 
 type ScheduleStatus = "completed" | "active" | "upcoming";
 

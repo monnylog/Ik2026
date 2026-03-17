@@ -21,9 +21,7 @@ import { apiFetch, supabase } from "../lib/supabase";
 import { getAvatar } from "./engagement/avatars";
 import { EmptyState } from "./ui/empty-state";
 import { CardSkeleton } from "./ui/skeleton-loaders";
-
-const bodyFont = { fontFamily: "'Inter', sans-serif" };
-const headingFont = { fontFamily: "'Degular', 'Maragsa', 'Playfair Display', sans-serif" };
+import { bodyFont, headingFont } from "../lib/fonts";
 
 interface ChefSubmissionSummary {
   userId: string;

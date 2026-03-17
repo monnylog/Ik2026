@@ -17,9 +17,7 @@ import {
 import { useNotionDatabase } from "../../lib/notion-sync";
 import { transformDecision, type TransformedDecision } from "../../lib/notion-transforms";
 import { NotionSyncBadge } from "../ui/notion-sync-badge";
-
-const bodyFont = { fontFamily: "'Inter', sans-serif" };
-const headingFont = { fontFamily: "'Degular', 'Maragsa', 'Playfair Display', sans-serif" };
+import { bodyFont, headingFont } from "../../lib/fonts";
 
 // Fallback: the 5 known IK26 blockers from the Notion Open Decisions table
 const FALLBACK_DECISIONS: TransformedDecision[] = [

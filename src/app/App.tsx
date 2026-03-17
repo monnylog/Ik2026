@@ -47,7 +47,7 @@ import { clearDraft } from "./components/onboarding/use-draft";
 import { NotionProvider } from "./lib/notion-context";
 import { usePrefetchPages } from "./lib/use-prefetch";
 
-import { PasswordGate } from "./components/onboarding/password-gate";
+import { PasswordGate } from "./components/onboarding/password-gate"; // v3.0.1 fixed imports
 import { OnboardingModal } from "./components/onboarding/onboarding-modal";
 import { SidebarNav } from "./components/sidebar-nav";
 import { TopBar } from "./components/top-bar";
@@ -150,6 +150,7 @@ import { ChefCommandCenter } from "./components/dashboard/chef-command-center";
 import { WhatsNew } from "./components/dashboard/whats-new";
 import { BackendHealthIndicator } from "./components/dashboard/backend-health";
 import { AuditTrail } from "./components/dashboard/audit-trail";
+import { ContentStudioWidget } from "./components/dashboard/content-studio-widget";
 
 // Full pages — lazy loaded for code splitting
 // Retry wrapper: handles transient "Failed to fetch dynamically imported module" errors
@@ -215,6 +216,7 @@ const ExpenseTracker = lazyRetry(() => import("./components/expense-tracker"), "
 const FinanceDashboard = lazyRetry(() => import("./components/finance-dashboard"), "FinanceDashboard");
 const MissionControlPage = lazyRetry(() => import("./components/mission-control"), "MissionControl");
 const AuditLogPage = lazyRetry(() => import("./components/audit-log-page"), "AuditLogPage");
+const ContentStudio = lazyRetry(() => import("./components/content-studio"), "ContentStudio");
 
 type AppState = "password" | "onboarding" | "dashboard";
 
@@ -1450,6 +1452,22 @@ function AppInner() {
                               </ErrorBoundary>
                             </motion.div>
                           )}
+                          {isLeadershipView && (
+                            <motion.div
+                              initial={{ opacity: 0, y: 10 }}
+                              animate={{ opacity: 1, y: 0 }}
+                              transition={{
+                                delay: 0.68,
+                                duration: 0.4,
+                                ease: [0.22, 1, 0.36, 1],
+                              }}
+                              className="ik26-card-hover rounded-xl"
+                            >
+                              <ErrorBoundary section="Content Studio Widget">
+                                <ContentStudioWidget onNavigate={handleNavigate} />
+                              </ErrorBoundary>
+                            </motion.div>
+                          )}
                           {isChefView && (
                             <motion.div
                               initial={{ opacity: 0, y: 10 }}
@@ -2147,6 +2165,30 @@ function AppInner() {
                     </motion.div>
                   )}
                 {dashboardReady &&
+                  activePage === "Content Studio" &&
+                  role === "leadership" &&
+                  viewMode === "leadership" && (
+                    <motion.div
+                      key="content-studio"
+                      {...pageTransition}
+                    >
+                      <PageWrapper
+                        title="Content Studio"
+                        onBack={() =>
+                          handleNavigate("Dashboard")
+                        }
+                      >
+                        <ErrorBoundary section="Content Studio">
+                          <Suspense fallback={<PageSkeleton />}>
+                            <ContentStudio
+                              onNavigate={handleNavigate}
+                            />
+                          </Suspense>
+                        </ErrorBoundary>
+                      </PageWrapper>
+                    </motion.div>
+                  )}
+                {dashboardReady &&
                   ![
                     "Dashboard",
                     "Settings",
@@ -2178,6 +2220,7 @@ function AppInner() {
                     "Reimbursements",
                     "Mission Control",
                     "System Audit",
+                    "Content Studio",
                   ].includes(activePage) && (
                     <motion.div
                       key={activePage}

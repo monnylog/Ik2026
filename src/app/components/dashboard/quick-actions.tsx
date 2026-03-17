@@ -16,7 +16,7 @@ import {
 } from "lucide-react";
 import type { UserRole } from "../onboarding/use-auth";
 
-const bodyFont = { fontFamily: "'Inter', sans-serif" };
+import { bodyFont, headingFont } from "../../lib/fonts";
 
 interface QuickAction {
   label: string;

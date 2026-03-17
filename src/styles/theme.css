@@ -209,7 +209,7 @@ button, a, [role="button"] {
 
   h1, h2, h3, h4, h5, h6 {
     break-after: avoid;
-    color: #3D524D !important;
+    color: #2E4F52 !important;
   }
 
   /* Page settings */
@@ -231,5 +231,10 @@ button, a, [role="button"] {
   [style*="opacity"] {
     opacity: 1 !important;
     transform: none !important;
+  }
+
+  .print-root .print-header h1 {
+    font-size: 16pt;
+    font-family: 'Steiner', 'Degular', 'Maragsa', 'Playfair Display', serif;
   }
 }

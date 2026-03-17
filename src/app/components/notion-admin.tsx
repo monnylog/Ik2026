@@ -34,9 +34,7 @@ import {
   type NotionContentType,
   type SyncLogEntry,
 } from "../lib/notion-sync";
-
-const bodyFont = { fontFamily: "'Inter', sans-serif" };
-const headingFont = { fontFamily: "'Degular', 'Maragsa', 'Playfair Display', sans-serif" };
+import { bodyFont, headingFont } from "../lib/fonts";
 const monoFont = { fontFamily: "'JetBrains Mono', monospace" };
 
 // ─── Workstream groupings for the IK26 Notion workspace ─────────

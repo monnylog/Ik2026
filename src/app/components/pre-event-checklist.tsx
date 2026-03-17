@@ -24,9 +24,7 @@ import { toast } from "sonner";
 import { ChecklistSkeleton } from "./ui/skeleton-loaders";
 import { useNotionDatabase } from "../lib/notion-sync";
 import { NotionSyncBadge } from "./ui/notion-sync-badge";
-
-const bodyFont = { fontFamily: "'Inter', sans-serif" };
-const headingFont = { fontFamily: "'Degular', 'Maragsa', 'Playfair Display', sans-serif" };
+import { bodyFont, headingFont } from "../lib/fonts";
 
 const EVENT_DATE = new Date("2026-06-14T18:00:00");
 

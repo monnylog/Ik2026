@@ -17,7 +17,7 @@ interface OrientationStepProps {
   onEnter: () => void;
 }
 
-const bodyFont = { fontFamily: "'Inter', sans-serif" };
+import { bodyFont, headingFont } from "../../lib/fonts";
 
 const allCards = [
   { id: "dashboard", icon: LayoutDashboard, title: "Dashboard", description: "Your at-a-glance view of event status, updates, and critical items" },

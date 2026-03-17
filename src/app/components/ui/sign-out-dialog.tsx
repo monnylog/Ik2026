@@ -3,8 +3,7 @@ import { LogOut, X, Heart } from "lucide-react";
 import { useFocusTrap } from "../../lib/use-focus-trap";
 import { useEffect, useCallback } from "react";
 
-const bodyFont = { fontFamily: "'Inter', sans-serif" };
-const headingFont = { fontFamily: "'Degular', 'Maragsa', 'Playfair Display', sans-serif" };
+import { bodyFont, headingFont } from "../../lib/fonts";
 
 interface SignOutDialogProps {
   open: boolean;

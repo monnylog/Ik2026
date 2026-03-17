@@ -1,25 +1,23 @@
 import { useState, useRef } from "react";
 import { motion, AnimatePresence } from "motion/react";
-import { Lock, Eye, EyeOff, ChevronRight, Loader2, ArrowLeft, User, Check, MapPin, ChefHat, Users, CheckCircle2, ShieldCheck } from "lucide-react";
-import { authenticatePassword, getPersonalPreset, type UserRole } from "./use-auth";
-import { avatarOptions, getAvatar } from "../engagement/avatars";
-import { confirmedChefs, type ConfirmedChef } from "./chef-directory";
 import {
-  apiLookupProfiles,
-  apiRegister,
-  apiSignIn,
-  useProfile,
-  type UserProfile,
-} from "../../lib/profile-context";
+  Lock, Eye, EyeOff, Loader2, CheckCircle2, ShieldCheck,
+  ChevronRight, User, Users, ArrowLeft, Check, MapPin, ChefHat,
+} from "lucide-react";
 import istoryaLogo from "figma:asset/b55bcac066687e563f77685fc31f20ef43e81d5d.png";
 import istoryaWordmark from "figma:asset/f39822aa8d83145832fad1a77f8dd27c27cd088d.png";
+import { bodyFont, headingFont } from "../../lib/fonts";
+import {
+  useProfile, apiLookupProfiles, apiSignIn, apiRegister,
+  type UserProfile,
+} from "../../lib/profile-context";
+import { getPersonalPreset, authenticatePassword, type UserRole } from "./use-auth";
+import { confirmedChefs, type ConfirmedChef } from "./chef-directory";
+import { avatarOptions, getAvatar } from "../engagement/avatars";
 
 interface PasswordGateProps {
   onAuthenticated: (role: UserRole, rememberMe: boolean) => void;
 }
-
-const bodyFont = { fontFamily: "'Inter', sans-serif" };
-const headingFont = { fontFamily: "'Degular', 'Maragsa', 'Playfair Display', sans-serif" };
 
 type GateStep = "code" | "select-profile" | "identify-chef" | "create-profile";
 

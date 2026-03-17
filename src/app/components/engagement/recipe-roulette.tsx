@@ -2,8 +2,7 @@ import { useState, useCallback } from "react";
 import { motion, AnimatePresence } from "motion/react";
 import { Dices, RefreshCw, Sparkles } from "lucide-react";
 
-const bodyFont = { fontFamily: "'Inter', sans-serif" };
-const headingFont = { fontFamily: "'Degular', 'Maragsa', 'Playfair Display', sans-serif" };
+import { bodyFont, headingFont } from "../../lib/fonts";
 
 // Roulette categories
 const proteins = [

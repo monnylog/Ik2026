@@ -23,9 +23,7 @@ import { EmptyState } from "./ui/empty-state";
 import { useNotionDatabase } from "../lib/notion-sync";
 import { NotionSyncBadge } from "./ui/notion-sync-badge";
 import { transformSponsor } from "../lib/notion-transforms";
-
-const bodyFont = { fontFamily: "'Inter', sans-serif" };
-const headingFont = { fontFamily: "'Degular', 'Maragsa', 'Playfair Display', sans-serif" };
+import { bodyFont, headingFont } from "../lib/fonts";
 
 function formatCurrency(n: number) {
   return new Intl.NumberFormat("en-US", { style: "currency", currency: "USD", minimumFractionDigits: 0 }).format(n);

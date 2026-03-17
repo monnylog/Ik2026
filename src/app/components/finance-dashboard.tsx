@@ -26,9 +26,7 @@ import {
 import { toast } from "sonner";
 import { apiFetch } from "../lib/supabase";
 import { useProfile } from "../lib/profile-context";
-
-const bodyFont = { fontFamily: "'Inter', sans-serif" };
-const headingFont = { fontFamily: "'Degular', 'Maragsa', 'Playfair Display', sans-serif" };
+import { bodyFont, headingFont } from "../lib/fonts";
 
 const GOOGLE_SHEETS_URL = "https://docs.google.com/spreadsheets/d/13l95vLKDvOvrgjwRtXY05T8Y2QGa_Uh8ntNP2SKsr9U/edit";
 const QUICKBOOKS_URL = "https://quickbooks.intuit.com";

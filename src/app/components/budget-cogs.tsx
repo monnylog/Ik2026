@@ -20,8 +20,7 @@ import { NotionSyncBadge } from "./ui/notion-sync-badge";
 import { transformBudgetItem, groupBudgetItemsByCategory } from "../lib/notion-transforms";
 import { apiFetch } from "../lib/supabase";
 
-const bodyFont = { fontFamily: "'Inter', sans-serif" };
-const headingFont = { fontFamily: "'Degular', 'Maragsa', 'Playfair Display', sans-serif" };
+import { bodyFont, headingFont } from "../lib/fonts";
 
 interface ReimbExpense {
   id: string;

@@ -11,8 +11,7 @@ import {
   Zap,
 } from "lucide-react";
 import { useHealthCheck, type HealthStatus } from "../../lib/use-health-check";
-
-const bodyFont = { fontFamily: "'Inter', sans-serif" };
+import { bodyFont, headingFont } from "../../lib/fonts";
 
 const statusConfig: Record<
   HealthStatus,

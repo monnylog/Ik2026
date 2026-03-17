@@ -1,8 +1,7 @@
 import React, { Component, type ReactNode } from "react";
 import { AlertTriangle, RotateCcw, Home, Trash2 } from "lucide-react";
 
-const bodyFont = { fontFamily: "'Inter', sans-serif" };
-const headingFont = { fontFamily: "'Degular', 'Maragsa', 'Playfair Display', sans-serif" };
+import { bodyFont, headingFont } from "../../lib/fonts";
 
 interface Props {
   children: ReactNode;
@@ -94,7 +93,7 @@ export class AppErrorBoundary extends Component<Props, State> {
             {/* Title */}
             <h1
               className="text-[1.375rem] mb-2"
-              style={{ ...headingFont, color: "#3D524D" }}
+              style={{ ...headingFont, color: "#2E4F52" }}
             >
               Something went wrong
             </h1>

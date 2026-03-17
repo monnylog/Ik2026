@@ -2,10 +2,7 @@ import { useState } from "react";
 import { motion } from "motion/react";
 import { WifiOff, RotateCcw, RefreshCw, Home } from "lucide-react";
 
-const bodyFont = { fontFamily: "'Inter', sans-serif" };
-const headingFont = {
-  fontFamily: "'Degular', 'Maragsa', 'Playfair Display', sans-serif",
-};
+import { bodyFont, headingFont } from "../../lib/fonts";
 
 interface ModuleLoadErrorProps {
   moduleName?: string;

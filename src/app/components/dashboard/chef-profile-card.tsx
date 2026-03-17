@@ -20,8 +20,7 @@ import { toast } from "sonner";
 import { serverBase } from "../../lib/supabase";
 import { publicAnonKey } from "/utils/supabase/info";
 
-const bodyFont = { fontFamily: "'Inter', sans-serif" };
-const headingFont = { fontFamily: "'Degular', 'Maragsa', 'Playfair Display', sans-serif" };
+import { bodyFont, headingFont } from "../../lib/fonts";
 
 interface ChefProfileCardProps {
   onNavigate?: (page: string) => void;

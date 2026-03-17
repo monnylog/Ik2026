@@ -2,9 +2,7 @@ import { useState, useEffect, useRef, useCallback } from "react";
 import { motion, AnimatePresence } from "motion/react";
 import { StickyNote, Check, Trash2, ChevronDown, Plus } from "lucide-react";
 import { useUserData } from "../../lib/use-user-data";
-
-const bodyFont = { fontFamily: "'Inter', sans-serif" };
-const headingFont = { fontFamily: "'Degular', 'Maragsa', 'Playfair Display', sans-serif" };
+import { bodyFont, headingFont } from "../../lib/fonts";
 
 interface Note {
   id: string;

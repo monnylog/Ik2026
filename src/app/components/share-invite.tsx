@@ -24,9 +24,7 @@ import {
   User,
   type LucideIcon,
 } from "lucide-react";
-
-const headingFont = { fontFamily: "'Degular', 'Maragsa', 'Playfair Display', sans-serif" };
-const bodyFont = { fontFamily: "'Inter', sans-serif" };
+import { bodyFont, headingFont } from "../lib/fonts";
 
 /* ── Share Analytics (localStorage) ── */
 const ANALYTICS_KEY = "ik26_share_analytics";
@@ -595,7 +593,6 @@ function TemplatePreview({
               style={{
                 ...bodyFont,
                 color: "rgba(244,237,228,0.65)",
-                fontFamily: "'Inter', sans-serif",
               }}
             >
               {editedBody}

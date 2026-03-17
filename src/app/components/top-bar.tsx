@@ -11,6 +11,7 @@ import { GlobalSearch } from "./global-search";
 import { useNotion } from "../lib/notion-context";
 import { NotionSyncBadge } from "./ui/notion-sync-badge";
 import istoryaLogo from "figma:asset/b55bcac066687e563f77685fc31f20ef43e81d5d.png";
+import { bodyFont, headingFont } from "../lib/fonts";
 
 interface TopBarProps {
   onResetOnboarding?: () => void;
@@ -115,14 +116,14 @@ export function TopBar({ onResetOnboarding, onMobileMenuToggle, role, onNavigate
         >
           <h2
             className="text-foreground text-[0.875rem] sm:text-base shrink-0"
-            style={{ fontFamily: "'Degular', 'Maragsa', 'Playfair Display', sans-serif" }}
+            style={headingFont}
           >
             Event Hub
           </h2>
           <span className="text-muted-foreground/30 text-[0.8125rem] hidden sm:inline">/</span>
           <span
             className="text-muted-foreground text-[0.8125rem] hidden md:inline truncate"
-            style={{ fontFamily: "'Inter', sans-serif" }}
+            style={bodyFont}
           >
             A Filipino Chefs Collaboration Dinner
           </span>
@@ -153,7 +154,7 @@ export function TopBar({ onResetOnboarding, onMobileMenuToggle, role, onNavigate
                     : viewMode === "team"
                       ? "1px solid rgba(74,127,181,0.2)"
                       : "1px solid rgba(96,108,56,0.15)",
-                fontFamily: "'Inter', sans-serif",
+                ...bodyFont,
               }}
             >
               {viewMode === "leadership" ? (
@@ -178,7 +179,7 @@ export function TopBar({ onResetOnboarding, onMobileMenuToggle, role, onNavigate
                   whileTap={{ scale: 0.95 }}
                   onClick={() => setViewSwitchOpen(!viewSwitchOpen)}
                   className="flex items-center gap-1.5 h-7 px-2.5 rounded-lg text-[0.625rem] text-muted-foreground hover:text-foreground border border-border hover:border-gold/30 transition-[color,border-color] cursor-pointer"
-                  style={{ fontFamily: "'Inter', sans-serif", backgroundColor: "rgba(0,0,0,0)" }}
+                  style={{ ...bodyFont, backgroundColor: "rgba(0,0,0,0)" }}
                   title={`Switch view (currently ${viewMode})`}
                 >
                   <ArrowLeftRight className="w-3 h-3" />
@@ -226,7 +227,7 @@ export function TopBar({ onResetOnboarding, onMobileMenuToggle, role, onNavigate
                                 className="text-[0.75rem] flex-1"
                                 style={{
                                   color: isActive ? item.color : undefined,
-                                  fontFamily: "'Inter', sans-serif",
+                                  ...bodyFont,
                                   fontWeight: isActive ? 600 : 400,
                                 }}
                               >
@@ -252,7 +253,7 @@ export function TopBar({ onResetOnboarding, onMobileMenuToggle, role, onNavigate
       <div className="flex items-center gap-1.5 sm:gap-3 relative z-10">
         <div className="hidden sm:flex items-center gap-1.5 text-muted-foreground text-[0.8125rem]">
           <CalendarDays className="w-3.5 h-3.5" />
-          <span style={{ fontFamily: "'Inter', sans-serif" }}>May 22, 2026</span>
+          <span style={bodyFont}>May 22, 2026</span>
         </div>
 
         <div className="hidden sm:block w-px h-5 bg-border mx-1" />
@@ -267,7 +268,7 @@ export function TopBar({ onResetOnboarding, onMobileMenuToggle, role, onNavigate
             whileTap={{ scale: 0.97 }}
             onClick={onResetOnboarding}
             className="h-8 px-2.5 flex items-center gap-1.5 rounded-lg text-[0.75rem] text-muted-foreground hover:text-gold border border-border hover:border-gold/30 transition-[color,border-color] cursor-pointer"
-            style={{ fontFamily: "'Inter', sans-serif", backgroundColor: "rgba(0,0,0,0)" }}
+            style={{ ...bodyFont, backgroundColor: "rgba(0,0,0,0)" }}
             title="Re-run onboarding"
           >
             <RotateCcw className="w-3 h-3" />
@@ -333,7 +334,7 @@ export function TopBar({ onResetOnboarding, onMobileMenuToggle, role, onNavigate
                 className="absolute right-0 top-full mt-2 w-64 bg-card rounded-xl shadow-xl z-50 p-3 space-y-1"
                 style={{ border: "1px solid var(--border)" }}
               >
-                <p className="text-[0.6875rem] text-muted-foreground uppercase tracking-[0.15em] px-2 pb-1.5" style={{ fontFamily: "'Inter', sans-serif" }}>
+                <p className="text-[0.6875rem] text-muted-foreground uppercase tracking-[0.15em] px-2 pb-1.5" style={bodyFont}>
                   Chapter Palette
                 </p>
                 {themes.map((theme) => (
@@ -359,10 +360,10 @@ export function TopBar({ onResetOnboarding, onMobileMenuToggle, role, onNavigate
                       ))}
                     </div>
                     <div className="flex-1 text-left min-w-0">
-                      <span className="text-foreground text-[0.8125rem] block truncate" style={{ fontFamily: "'Degular', 'Maragsa', 'Playfair Display', sans-serif" }}>
+                      <span className="text-foreground text-[0.8125rem] block truncate" style={headingFont}>
                         {theme.name}
                       </span>
-                      <span className="text-muted-foreground text-[0.625rem]" style={{ fontFamily: "'Inter', sans-serif" }}>
+                      <span className="text-muted-foreground text-[0.625rem]" style={bodyFont}>
                         {theme.chapter}
                       </span>
                     </div>
@@ -422,7 +423,7 @@ export function TopBar({ onResetOnboarding, onMobileMenuToggle, role, onNavigate
                 initial={{ scale: 0.5, opacity: 0 }}
                 animate={{ scale: 1, opacity: 1 }}
                 className="absolute -top-0.5 -right-0.5 min-w-[18px] h-[18px] flex items-center justify-center rounded-full text-white text-[0.5625rem] font-semibold px-1"
-                style={{ backgroundColor: "#C9A96E", fontFamily: "'Inter', sans-serif" }}
+                style={{ backgroundColor: "#C9A96E", ...bodyFont }}
               >
                 {unreadCount > 9 ? "9+" : unreadCount}
               </motion.span>

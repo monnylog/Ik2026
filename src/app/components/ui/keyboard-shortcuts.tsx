@@ -20,9 +20,7 @@ import {
 } from "lucide-react";
 import { BUILD_ID } from "../../lib/version";
 import { useFocusTrap } from "../../lib/use-focus-trap";
-
-const bodyFont = { fontFamily: "'Civil', 'Inter', sans-serif" };
-const headingFont = { fontFamily: "'Steiner', 'Degular', 'Maragsa', 'Playfair Display', serif" };
+import { bodyFont, headingFont } from "../../lib/fonts";
 
 interface ShortcutItem {
   keys: string[];

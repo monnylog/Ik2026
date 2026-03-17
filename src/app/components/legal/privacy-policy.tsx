@@ -1,7 +1,5 @@
 import { ArrowLeft } from "lucide-react";
-
-const bodyFont = { fontFamily: "'Inter', sans-serif" };
-const headingFont = { fontFamily: "'Degular', 'Maragsa', 'Playfair Display', sans-serif" };
+import { bodyFont, headingFont } from "../../lib/fonts";
 
 export function PrivacyPolicy() {
   const goBack = () => {

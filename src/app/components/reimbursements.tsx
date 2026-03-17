@@ -14,9 +14,7 @@ import {
   Minimize2,
   Mail,
 } from "lucide-react";
-
-const bodyFont = { fontFamily: "'Inter', sans-serif" };
-const headingFont = { fontFamily: "'Degular', 'Maragsa', 'Playfair Display', sans-serif" };
+import { bodyFont, headingFont } from "../lib/fonts";
 
 const EXPENSE_FORM_URL = "https://docs.google.com/forms/d/1h3iMlUVQ-YfVazDIBKdH_pR4BDjk1S2UKpFUvBYNotg/viewform";
 const TRACKER_SHEET_URL = "https://docs.google.com/spreadsheets/d/13l95vLKDvOvrgjwRtXY05T8Y2QGa_Uh8ntNP2SKsr9U/edit#gid=431459323";

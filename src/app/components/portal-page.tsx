@@ -41,8 +41,8 @@ const C = {
   transparent: "rgba(0,0,0,0)",
 };
 
-const headingFont = { fontFamily: "'Degular', 'Maragsa', 'Playfair Display', sans-serif" };
-const bodyFont = { fontFamily: "'Inter', sans-serif" };
+import type { UserRole } from "./onboarding/use-auth";
+import { bodyFont, headingFont } from "../lib/fonts";
 
 /* ── Scroll-triggered section wrapper ── */
 function FadeInSection({ children, delay = 0, className = "" }: { children: React.ReactNode; delay?: number; className?: string }) {

@@ -7,6 +7,7 @@ import { useNotion } from "../lib/notion-context";
 import { KpiCardsSkeleton } from "./ui/skeleton-loaders";
 import { useNotionDatabase } from "../lib/notion-sync";
 import { transformWarRoomItem } from "../lib/notion-transforms";
+import { bodyFont, headingFont } from "../lib/fonts";
 
 const eventDate = new Date("2026-05-22");
 
@@ -233,13 +234,13 @@ export function KpiCards({ role }: KpiCardsProps) {
             </div>
             <div
               className="text-[1.375rem] sm:text-[1.75rem] text-foreground leading-none mb-0.5"
-              style={{ fontFamily: "'Degular', 'Maragsa', 'Playfair Display', sans-serif" }}
+              style={headingFont}
             >
               {stat.value}
             </div>
             <span
               className="text-muted-foreground text-[0.75rem]"
-              style={{ fontFamily: "'Inter', sans-serif" }}
+              style={bodyFont}
             >
               {stat.label}
             </span>

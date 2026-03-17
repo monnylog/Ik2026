@@ -3,13 +3,12 @@ import { motion, AnimatePresence } from "motion/react";
 import { Palette, Check, ChevronRight, Sparkles } from "lucide-react";
 import { themes, applyTheme, getSavedTheme, type ThemeId } from "./use-theme";
 
+import { bodyFont, headingFont } from "../../lib/fonts";
+
 interface AppearanceStepProps {
   onNext: () => void;
   onBack: () => void;
 }
-
-const bodyFont = { fontFamily: "'Inter', sans-serif" };
-const headingFont = { fontFamily: "'Degular', 'Maragsa', 'Playfair Display', sans-serif" };
 
 export function AppearanceStep({ onNext, onBack }: AppearanceStepProps) {
   const [selected, setSelected] = useState<ThemeId>(getSavedTheme());

@@ -5,9 +5,7 @@ import { apiFetch } from "../../lib/supabase";
 import { getSavedAvatar, getSavedName } from "./avatars";
 import { useUserData } from "../../lib/use-user-data";
 import { useProfile } from "../../lib/profile-context";
-
-const bodyFont = { fontFamily: "'Inter', sans-serif" };
-const headingFont = { fontFamily: "'Degular', 'Maragsa', 'Playfair Display', sans-serif" };
+import { bodyFont, headingFont } from "../../lib/fonts";
 
 interface TriviaQuestion {
   id: string;

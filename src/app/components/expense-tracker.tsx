@@ -24,9 +24,7 @@ import { toast } from "sonner";
 import { apiFetch } from "../lib/supabase";
 import { useProfile } from "../lib/profile-context";
 import type { UserRole } from "./onboarding/use-auth";
-
-const bodyFont = { fontFamily: "'Inter', sans-serif" };
-const headingFont = { fontFamily: "'Degular', 'Maragsa', 'Playfair Display', sans-serif" };
+import { bodyFont, headingFont } from "../lib/fonts";
 
 const EXPENSE_CATEGORIES = [
   "Travel-Flight",

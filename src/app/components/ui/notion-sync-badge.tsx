@@ -1,7 +1,6 @@
+import { bodyFont } from "../../lib/fonts";
 import { useState } from "react";
 import { RefreshCw, Wifi, WifiOff, Loader2 } from "lucide-react";
-
-const bodyFont = { fontFamily: "'Inter', sans-serif" };
 
 interface NotionSyncBadgeProps {
   /** Whether data is currently sourced from Notion */

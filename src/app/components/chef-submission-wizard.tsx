@@ -23,9 +23,7 @@ import { useProfile } from "../lib/profile-context";
 import { serverBase } from "../lib/supabase";
 import { publicAnonKey } from "/utils/supabase/info";
 import { toast } from "sonner";
-
-const bodyFont = { fontFamily: "'Inter', sans-serif" };
-const headingFont = { fontFamily: "'Degular', 'Maragsa', 'Playfair Display', sans-serif" };
+import { bodyFont, headingFont } from "../lib/fonts";
 
 interface WizardStep {
   id: string;
@@ -803,7 +801,7 @@ function WizardInput({
     <div>
       <label
         className="block text-foreground text-[0.8125rem] mb-1.5"
-        style={{ fontFamily: "'Inter', sans-serif" }}
+        style={bodyFont}
       >
         {label}
       </label>
@@ -813,12 +811,12 @@ function WizardInput({
         onChange={(e) => onChange(e.target.value)}
         placeholder={placeholder}
         className="w-full h-10 px-4 rounded-xl text-[0.875rem] border border-border bg-background text-foreground focus:outline-none focus:border-gold/50 transition-colors"
-        style={{ fontFamily: "'Inter', sans-serif" }}
+        style={bodyFont}
       />
       {hint && (
         <p
           className="text-muted-foreground/40 text-[0.625rem] mt-1"
-          style={{ fontFamily: "'Inter', sans-serif" }}
+          style={bodyFont}
         >
           {hint}
         </p>
@@ -846,7 +844,7 @@ function WizardTextarea({
     <div>
       <label
         className="block text-foreground text-[0.8125rem] mb-1.5"
-        style={{ fontFamily: "'Inter', sans-serif" }}
+        style={bodyFont}
       >
         {label}
       </label>
@@ -856,12 +854,12 @@ function WizardTextarea({
         placeholder={placeholder}
         rows={rows}
         className="w-full px-4 py-3 rounded-xl text-[0.875rem] border border-border bg-background text-foreground focus:outline-none focus:border-gold/50 transition-colors resize-none leading-relaxed"
-        style={{ fontFamily: "'Inter', sans-serif" }}
+        style={bodyFont}
       />
       {hint && (
         <p
           className="text-muted-foreground/40 text-[0.625rem] mt-1"
-          style={{ fontFamily: "'Inter', sans-serif" }}
+          style={bodyFont}
         >
           {hint}
         </p>

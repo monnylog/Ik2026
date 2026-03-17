@@ -3,8 +3,7 @@ import { motion } from "motion/react";
 import { TrendingUp, CheckCircle2, Clock, Users, BarChart3 } from "lucide-react";
 import { LineChart, Line, ResponsiveContainer } from "recharts";
 
-const bodyFont = { fontFamily: "'Inter', sans-serif" };
-const headingFont = { fontFamily: "'Degular', 'Maragsa', 'Playfair Display', sans-serif" };
+import { bodyFont, headingFont } from "../../lib/fonts";
 
 const EVENT_DATE = new Date("2026-05-22T18:00:00");
 

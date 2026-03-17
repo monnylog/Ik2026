@@ -3,8 +3,7 @@ import { toast } from "sonner";
 import { RefreshCw } from "lucide-react";
 import { useSWUpdate } from "../../lib/use-sw-update";
 import { APP_VERSION } from "../../lib/version";
-
-const bodyFont = { fontFamily: "'Inter', sans-serif" };
+import { bodyFont } from "../../lib/fonts";
 
 /**
  * Watches for SW updates and shows a persistent sonner toast

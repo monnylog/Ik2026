@@ -26,9 +26,7 @@ import {
 import { useNotionDatabase } from "../lib/notion-sync";
 import { transformCommsContact, type TransformedCommsContact } from "../lib/notion-transforms";
 import { NotionSyncBadge } from "./ui/notion-sync-badge";
-
-const bodyFont = { fontFamily: "'Inter', sans-serif" };
-const headingFont = { fontFamily: "'Degular', 'Maragsa', 'Playfair Display', sans-serif" };
+import { bodyFont, headingFont } from "../lib/fonts";
 
 const priorityColors: Record<string, { bg: string; text: string; border: string }> = {
   high: { bg: "rgba(200,80,80,0.06)", text: "#C85050", border: "rgba(200,80,80,0.15)" },

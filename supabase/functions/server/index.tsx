@@ -9,6 +9,7 @@ import { formDiscord } from "./form-discord-routes.tsx";
 import { engagement } from "./engagement-routes.tsx";
 import { expenses, EXPENSE_BUCKET as EXPENSE_BUCKET_NAME } from "./expense-routes.tsx";
 import { audit } from "./audit-routes.tsx";
+import { studio } from "./content-studio.tsx";
 const app = new Hono();
 
 // Enable logger
@@ -2386,5 +2387,6 @@ app.route("/", formDiscord);
 app.route("/", engagement);
 app.route("/", expenses);
 app.route("/", audit);
+app.route("/", studio);
 
 Deno.serve(app.fetch);

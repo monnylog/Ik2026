@@ -46,8 +46,7 @@ import { loadNotifPrefs, saveNotifPrefs, type NotificationPrefs } from "../lib/n
 import { BUILD_ID } from "../lib/version";
 import { useFocusTrap } from "../lib/use-focus-trap";
 
-const bodyFont = { fontFamily: "'Inter', sans-serif" };
-const headingFont = { fontFamily: "'Degular', 'Maragsa', 'Playfair Display', sans-serif" };
+import { bodyFont, headingFont } from "../lib/fonts";
 
 // All localStorage keys used by the app
 const ALL_STORAGE_KEYS = [

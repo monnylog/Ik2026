@@ -22,8 +22,7 @@ import { supabase } from "../../lib/supabase";
 import { EmptyState } from "../ui/empty-state";
 import { ActivityFeedSkeleton } from "../ui/skeleton-loaders";
 
-const bodyFont = { fontFamily: "'Inter', sans-serif" };
-const headingFont = { fontFamily: "'Degular', 'Maragsa', 'Playfair Display', sans-serif" };
+import { bodyFont, headingFont } from "../../lib/fonts";
 
 type ActivityCategory = "general" | "menu" | "travel" | "team" | "creative" | "logistics" | "milestones";
 type ActivityStatus = "done" | "in-progress" | "alert" | "info";

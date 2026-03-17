@@ -1,138 +1,157 @@
 import { useState } from "react";
 import { motion } from "motion/react";
 import { ChevronDown } from "lucide-react";
+import { bodyFont, headingFont } from "../../lib/fonts";
 
 interface StakeholderQuestionnaireProps {
   onSubmit: () => void;
 }
 
-const bodyFont = { fontFamily: "'Inter', sans-serif" };
+const questions = [
+  {
+    id: "dietary",
+    label: "Any dietary restrictions or allergies?",
+    options: ["None", "Vegetarian", "Vegan", "Gluten-Free", "Shellfish", "Nut Allergy", "Other"],
+  },
+  {
+    id: "involvement",
+    label: "How would you like to be involved?",
+    options: ["Active Participant", "Observer / Supporter", "Media / Content Creator", "Sponsor Representative"],
+  },
+  {
+    id: "experience",
+    label: "Have you attended a collaborative dinner before?",
+    options: ["Yes, multiple times", "Yes, once", "No, this is my first"],
+  },
+];
 
 export function StakeholderQuestionnaire({ onSubmit }: StakeholderQuestionnaireProps) {
-  const [form, setForm] = useState({
-    fullName: "",
-    organization: "",
-    connection: "",
-  });
-  const [errors, setErrors] = useState<Record<string, string>>({});
-  const [shakeSubmit, setShakeSubmit] = useState(false);
+  const [answers, setAnswers] = useState<Record<string, string>>({});
+  const [openId, setOpenId] = useState<string | null>(null);
 
-  const updateField = (field: string, value: string) => {
-    setForm((prev) => ({ ...prev, [field]: value }));
-    if (errors[field]) {
-      setErrors((prev) => { const n = { ...prev }; delete n[field]; return n; });
-    }
-  };
-
-  const isValid = form.fullName.trim() !== "";
-
-  const handleSubmit = () => {
-    if (!form.fullName.trim()) {
-      setErrors({ fullName: "Name is required" });
-      setShakeSubmit(true);
-      setTimeout(() => setShakeSubmit(false), 600);
-      return;
-    }
-    onSubmit();
-  };
-
-  const inputClass = (field: string) =>
-    `w-full h-10 px-3 rounded-lg bg-input-background text-foreground text-[0.875rem] placeholder:text-muted-foreground/60 focus:outline-none focus:ring-1 transition-colors border ${
-      errors[field] ? "border-destructive/60 focus:ring-destructive/40" : "border-border focus:ring-gold/50 focus:border-gold/30"
-    }`;
-
-  const connections = [
-    "Sponsor / Partner",
-    "Media / Press",
-    "Community Leader",
-    "Industry Peer",
-    "Government / Cultural Org",
-    "Friend of the Event",
-    "Other",
-  ];
+  const allAnswered = questions.every((q) => answers[q.id]);
 
   return (
-    <div className="px-8 py-8">
-      <motion.h2
-        initial={{ opacity: 0, y: 10 }}
-        animate={{ opacity: 1, y: 0 }}
-        className="text-foreground mb-1"
-        style={{ fontFamily: "'Degular', 'Maragsa', 'Playfair Display', sans-serif", fontSize: "1.5rem" }}
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      exit={{ opacity: 0, y: -20 }}
+      className="w-full max-w-md mx-auto"
+    >
+      <h2
+        className="text-xl mb-1 text-center"
+        style={{ ...headingFont, color: "#F4EDE4" }}
       >
-        Quick profile
-      </motion.h2>
-      <p className="text-muted-foreground text-[0.875rem] mb-8" style={bodyFont}>
-        Just the essentials — we'll keep it brief.
+        A few quick questions
+      </h2>
+      <p
+        className="text-sm text-center mb-6"
+        style={{ ...bodyFont, color: "rgba(244,237,228,0.5)" }}
+      >
+        Help us tailor your experience.
       </p>
 
-      <div className="space-y-5">
-        <div>
-          <label className="block text-[0.8125rem] text-foreground mb-1.5" style={bodyFont}>
-            Full Name <span className="text-destructive">*</span>
-          </label>
-          <input
-            type="text"
-            className={inputClass("fullName")}
-            style={bodyFont}
-            placeholder="Your full name"
-            value={form.fullName}
-            onChange={(e) => updateField("fullName", e.target.value)}
-          />
-          {errors.fullName && (
-            <motion.p initial={{ opacity: 0, y: -4 }} animate={{ opacity: 1, y: 0 }} className="text-destructive text-[0.75rem] mt-1" style={bodyFont}>
-              {errors.fullName}
-            </motion.p>
-          )}
-        </div>
-
-        <div>
-          <label className="block text-[0.8125rem] text-foreground mb-1.5" style={bodyFont}>
-            Organization
-          </label>
-          <input
-            type="text"
-            className={inputClass("organization")}
-            style={bodyFont}
-            placeholder="Company or organization"
-            value={form.organization}
-            onChange={(e) => updateField("organization", e.target.value)}
-          />
-        </div>
-
-        <div>
-          <label className="block text-[0.8125rem] text-foreground mb-1.5" style={bodyFont}>
-            Connection to IK26
-          </label>
-          <div className="relative">
-            <select
-              className={`${inputClass("connection")} appearance-none pr-9`}
-              style={bodyFont}
-              value={form.connection}
-              onChange={(e) => updateField("connection", e.target.value)}
+      <div className="space-y-3">
+        {questions.map((q) => (
+          <div
+            key={q.id}
+            className="rounded-xl overflow-hidden"
+            style={{
+              backgroundColor: "rgba(244,237,228,0.035)",
+              border: answers[q.id]
+                ? "1px solid rgba(126,158,120,0.3)"
+                : "1px solid rgba(201,169,110,0.12)",
+            }}
+          >
+            <button
+              onClick={() => setOpenId(openId === q.id ? null : q.id)}
+              className="w-full flex items-center justify-between px-4 py-3 cursor-pointer"
+              style={{ ...bodyFont }}
             >
-              <option value="">Select...</option>
-              {connections.map((c) => <option key={c} value={c}>{c}</option>)}
-            </select>
-            <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground pointer-events-none" />
+              <span
+                className="text-sm text-left"
+                style={{ color: "#F4EDE4" }}
+              >
+                {q.label}
+              </span>
+              <div className="flex items-center gap-2">
+                {answers[q.id] && (
+                  <span
+                    className="text-xs px-2 py-0.5 rounded-full"
+                    style={{
+                      backgroundColor: "rgba(126,158,120,0.1)",
+                      color: "#7E9E78",
+                    }}
+                  >
+                    {answers[q.id]}
+                  </span>
+                )}
+                <ChevronDown
+                  className="w-4 h-4 transition-transform"
+                  style={{
+                    color: "rgba(244,237,228,0.3)",
+                    transform: openId === q.id ? "rotate(180deg)" : "rotate(0)",
+                  }}
+                />
+              </div>
+            </button>
+
+            {openId === q.id && (
+              <motion.div
+                initial={{ height: 0, opacity: 0 }}
+                animate={{ height: "auto", opacity: 1 }}
+                exit={{ height: 0, opacity: 0 }}
+                className="px-4 pb-3"
+              >
+                <div className="space-y-1">
+                  {q.options.map((opt) => (
+                    <button
+                      key={opt}
+                      onClick={() => {
+                        setAnswers((a) => ({ ...a, [q.id]: opt }));
+                        setOpenId(null);
+                      }}
+                      className="w-full text-left px-3 py-2 rounded-lg text-sm cursor-pointer"
+                      style={{
+                        ...bodyFont,
+                        backgroundColor:
+                          answers[q.id] === opt
+                            ? "rgba(201,169,110,0.1)"
+                            : "rgba(0,0,0,0)",
+                        color:
+                          answers[q.id] === opt
+                            ? "#C9A96E"
+                            : "rgba(244,237,228,0.6)",
+                      }}
+                    >
+                      {opt}
+                    </button>
+                  ))}
+                </div>
+              </motion.div>
+            )}
           </div>
-        </div>
+        ))}
       </div>
 
-      <div className="flex justify-end mt-8">
-        <motion.button
-          animate={shakeSubmit ? { x: [0, -8, 8, -6, 6, -3, 3, 0] } : {}}
-          transition={{ duration: 0.5 }}
-          whileHover={isValid ? { scale: 1.03, boxShadow: "0 8px 30px rgba(96,108,56,0.25)" } : {}}
-          whileTap={isValid ? { scale: 0.98 } : {}}
-          onClick={handleSubmit}
-          className={`px-8 py-3 rounded-xl cursor-pointer ${
-            isValid ? "bg-gold text-white" : "bg-gold/40 text-white/60"
-          }`}
-          style={{ ...bodyFont, fontSize: "0.9375rem" }}
-        >
-          Continue
-        </motion.button>
-      </div>
-    </div>
+      <motion.button
+        whileHover={allAnswered ? { scale: 1.02 } : {}}
+        whileTap={allAnswered ? { scale: 0.98 } : {}}
+        onClick={onSubmit}
+        disabled={!allAnswered}
+        className="w-full h-12 rounded-xl mt-6 cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed"
+        style={{
+          ...bodyFont,
+          fontSize: "0.9375rem",
+          fontWeight: 600,
+          background: allAnswered
+            ? "linear-gradient(135deg, #C9A96E 0%, #B8944F 100%)"
+            : "rgba(201,169,110,0.15)",
+          color: allAnswered ? "#1E2019" : "rgba(244,237,228,0.3)",
+        }}
+      >
+        Continue
+      </motion.button>
+    </motion.div>
   );
 }

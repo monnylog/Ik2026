@@ -18,11 +18,7 @@ import {
 } from "lucide-react";
 import type { UserRole } from "./onboarding/use-auth";
 import { apiFetch } from "../lib/supabase";
-
-const bodyFont = { fontFamily: "'Inter', sans-serif" };
-const headingFont = {
-  fontFamily: "'Degular', 'Maragsa', 'Playfair Display', sans-serif",
-};
+import { bodyFont, headingFont } from "../lib/fonts";
 
 interface FormItem {
   id: string;

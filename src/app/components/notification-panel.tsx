@@ -20,8 +20,7 @@ import { useNotion, getCriticalMilestones } from "../lib/notion-context";
 import { useAnnouncement } from "../lib/use-announcement";
 import { loadNotifPrefs, isNotifAllowed } from "../lib/notification-prefs";
 
-const bodyFont = { fontFamily: "'Inter', sans-serif" };
-const headingFont = { fontFamily: "'Degular', 'Maragsa', 'Playfair Display', sans-serif" };
+import { bodyFont, headingFont } from "../lib/fonts";
 
 // Time grouping helpers
 function getNotifTimeGroup(timestamp: string): string {

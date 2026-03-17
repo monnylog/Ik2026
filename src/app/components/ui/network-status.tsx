@@ -2,7 +2,7 @@ import { useState, useEffect, useCallback } from "react";
 import { motion, AnimatePresence } from "motion/react";
 import { Wifi, WifiOff } from "lucide-react";
 
-const bodyFont = { fontFamily: "'Inter', sans-serif" };
+import { bodyFont } from "../../lib/fonts";
 
 /**
  * Hook to track online/offline status.

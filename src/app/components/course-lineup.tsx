@@ -5,9 +5,7 @@ import { useNotionDatabase } from "../lib/notion-sync";
 import { NotionSyncBadge } from "./ui/notion-sync-badge";
 import { transformCourse } from "../lib/notion-transforms";
 
-const bodyFont = { fontFamily: "'Inter', sans-serif" };
-const headingFont = { fontFamily: "'Degular', 'Maragsa', 'Playfair Display', sans-serif" };
-const monoFont = { fontFamily: "'JetBrains Mono', monospace" };
+import { bodyFont, headingFont, monoFont } from "../lib/fonts";
 
 interface Course {
   number: number;

@@ -2,8 +2,7 @@ import { useState, useEffect, useCallback } from "react";
 import { motion, AnimatePresence } from "motion/react";
 import { Download, X, Smartphone, Share } from "lucide-react";
 
-const bodyFont = { fontFamily: "'Inter', sans-serif" };
-const headingFont = { fontFamily: "'Degular', 'Maragsa', 'Playfair Display', sans-serif" };
+import { bodyFont, headingFont } from "../../lib/fonts";
 
 // Generate a high-quality PWA icon as a data URL
 function generateAppIcon(size: number): string {
@@ -161,21 +160,21 @@ export function usePWAManifest() {
       canvas.height = h;
       const ctx = canvas.getContext("2d")!;
 
-      // Dark forest green background
-      ctx.fillStyle = "#2B4440";
+      // Dark teal background
+      ctx.fillStyle = "#2E4F52";
       ctx.fillRect(0, 0, w, h);
 
       // Subtle radial glow
       const glow = ctx.createRadialGradient(w / 2, h * 0.4, 0, w / 2, h * 0.4, w * 0.6);
-      glow.addColorStop(0, "rgba(126,158,120,0.15)");
-      glow.addColorStop(1, "rgba(43,68,64,0)");
+      glow.addColorStop(0, "rgba(78,130,130,0.15)");
+      glow.addColorStop(1, "rgba(46,79,82,0)");
       ctx.fillStyle = glow;
       ctx.fillRect(0, 0, w, h);
 
       // Gold accent glow
       const goldGlow = ctx.createRadialGradient(w / 2, h * 0.45, 0, w / 2, h * 0.45, w * 0.3);
       goldGlow.addColorStop(0, "rgba(201,169,110,0.06)");
-      goldGlow.addColorStop(1, "rgba(43,68,64,0)");
+      goldGlow.addColorStop(1, "rgba(46,79,82,0)");
       ctx.fillStyle = goldGlow;
       ctx.fillRect(0, 0, w, h);
 

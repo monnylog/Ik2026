@@ -16,9 +16,7 @@ import {
 import { useProfile } from "../../lib/profile-context";
 import { getConfirmedChef } from "../onboarding/chef-directory";
 import { useUserData } from "../../lib/use-user-data";
-
-const bodyFont = { fontFamily: "'Inter', sans-serif" };
-const headingFont = { fontFamily: "'Degular', 'Maragsa', 'Playfair Display', sans-serif" };
+import { bodyFont, headingFont } from "../../lib/fonts";
 
 interface TourStep {
   id: string;
@@ -293,7 +291,7 @@ export function ChefWelcomeTour({ onNavigate }: ChefWelcomeTourProps) {
             className="flex items-center gap-1.5 px-4 py-2 rounded-xl text-[0.8125rem] text-white cursor-pointer"
             style={{
               backgroundColor: step.iconColor,
-              fontFamily: "'Inter', sans-serif",
+              fontFamily: "'Civil', 'Inter', sans-serif",
             }}
           >
             {isLast ? (

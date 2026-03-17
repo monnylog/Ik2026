@@ -6,8 +6,7 @@ import { apiFetch } from "../../lib/supabase";
 import { useProfile } from "../../lib/profile-context";
 import { toast } from "sonner";
 
-const bodyFont = { fontFamily: "'Inter', sans-serif" };
-const headingFont = { fontFamily: "'Degular', 'Maragsa', 'Playfair Display', sans-serif" };
+import { bodyFont, headingFont } from "../../lib/fonts";
 
 const memoryTags = [
   { id: "food-memory", label: "Food Memory", color: "#C9A96E" },

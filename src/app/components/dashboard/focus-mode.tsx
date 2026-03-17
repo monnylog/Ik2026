@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "motion/react";
 import { Focus, Eye, EyeOff } from "lucide-react";
 
-const bodyFont = { fontFamily: "'Inter', sans-serif" };
+import { bodyFont, headingFont } from "../../lib/fonts";
 
 const STORAGE_KEY = "ik26_focus_mode";
 

@@ -19,8 +19,7 @@ import {
 } from "lucide-react";
 import { getVisibleNavItems } from "./onboarding/use-auth";
 
-const bodyFont = { fontFamily: "'Inter', sans-serif" };
-const headingFont = { fontFamily: "'Degular', 'Maragsa', 'Playfair Display', sans-serif" };
+import { bodyFont, headingFont } from "../lib/fonts";
 
 interface ResourceLink {
   title: string;

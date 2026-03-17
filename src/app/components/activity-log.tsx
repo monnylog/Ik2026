@@ -23,9 +23,7 @@ import {
 } from "lucide-react";
 import type { UserRole } from "./onboarding/use-auth";
 import { printToPDF } from "../lib/print-pdf";
-
-const bodyFont = { fontFamily: "'Inter', sans-serif" };
-const headingFont = { fontFamily: "'Degular', 'Maragsa', 'Playfair Display', sans-serif" };
+import { bodyFont, headingFont } from "../lib/fonts";
 
 type ActionType =
   | "task_move"

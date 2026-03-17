@@ -35,14 +35,15 @@ import {
   Wallet,
   Database,
   Inbox,
+  PenTool,
+  ScrollText,
 } from "lucide-react";
 import type { UserRole } from "./onboarding/use-auth";
 import { getVisibleNavItemsForView, type ViewMode } from "./onboarding/use-auth";
 import { confirmedChefs } from "./onboarding/chef-directory";
 import { useFocusTrap } from "../lib/use-focus-trap";
 
-const bodyFont = { fontFamily: "'Inter', sans-serif" };
-const headingFont = { fontFamily: "'Degular', 'Maragsa', 'Playfair Display', sans-serif" };
+import { bodyFont, headingFont } from "../lib/fonts";
 
 interface SearchableItem {
   label: string;
@@ -85,6 +86,8 @@ const pageItems: SearchableItem[] = [
   { label: "Portal", description: "Public-facing event landing page preview", keywords: ["portal", "public", "landing", "website", "preview"], icon: Sparkles, color: "#C9A96E", category: "page", navigateTo: "Portal" },
   { label: "Inquiries", description: "Manage portal contact form inquiries", keywords: ["inquiry", "inquiries", "contact", "form", "message", "visitor"], icon: Inbox, color: "#4A7FB5", category: "page", navigateTo: "Inquiries" },
   { label: "Notion Admin", description: "Configure Notion database sync and content types", keywords: ["notion", "admin", "sync", "database", "config", "api"], icon: Database, color: "#6B7F8E", category: "page", navigateTo: "Notion Admin" },
+  { label: "System Audit", description: "Audit trail dashboard with system event history and analytics", keywords: ["audit", "system", "log", "trail", "history", "events", "security"], icon: ScrollText, color: "#8B7EC8", category: "page", navigateTo: "System Audit" },
+  { label: "Content Studio", description: "Edit and manage all backend content, KV data, and Notion sync in one place", keywords: ["content", "studio", "cms", "edit", "data", "kv", "manage", "backend", "curate"], icon: PenTool, color: "#9FB0D4", category: "page", navigateTo: "Content Studio" },
 ];
 
 // Chef searchable items from confirmed chef directory

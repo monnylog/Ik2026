@@ -7,8 +7,7 @@ import { useUserData } from "../../lib/use-user-data";
 import { useProfile } from "../../lib/profile-context";
 import { toast } from "sonner";
 
-const bodyFont = { fontFamily: "'Inter', sans-serif" };
-const headingFont = { fontFamily: "'Degular', 'Maragsa', 'Playfair Display', sans-serif" };
+import { bodyFont, headingFont } from "../../lib/fonts";
 
 // ─── Curated prompts ─────────────────────────────────────────────
 // Rotate daily based on day-of-year

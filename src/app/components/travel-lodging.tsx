@@ -29,9 +29,7 @@ import { confirmedChefs } from "./onboarding/chef-directory";
 import { apiFetch } from "../lib/supabase";
 import { toast } from "sonner";
 import { ChefItinerary } from "./chef-itinerary";
-
-const bodyFont = { fontFamily: "'Inter', sans-serif" };
-const headingFont = { fontFamily: "'Degular', 'Maragsa', 'Playfair Display', sans-serif" };
+import { bodyFont, headingFont } from "../lib/fonts";
 
 interface TravelRecord {
   id: string;

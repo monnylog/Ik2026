@@ -16,8 +16,7 @@ import {
 import { useUserData } from "../../lib/use-user-data";
 import { EmptyState } from "../ui/empty-state";
 
-const bodyFont = { fontFamily: "'Inter', sans-serif" };
-const headingFont = { fontFamily: "'Degular', 'Maragsa', 'Playfair Display', sans-serif" };
+import { bodyFont, headingFont } from "../../lib/fonts";
 
 interface Task {
   id: string;

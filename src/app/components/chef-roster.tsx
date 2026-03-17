@@ -27,9 +27,7 @@ import { useNotionDatabase } from "../lib/notion-sync";
 import { NotionSyncBadge } from "./ui/notion-sync-badge";
 import { transformChef } from "../lib/notion-transforms";
 import { ImageWithFallback } from "./figma/ImageWithFallback";
-
-const bodyFont = { fontFamily: "'Inter', sans-serif" };
-const headingFont = { fontFamily: "'Degular', 'Maragsa', 'Playfair Display', sans-serif" };
+import { bodyFont, headingFont } from "../lib/fonts";
 
 interface Chef {
   id: string;
@@ -724,7 +722,7 @@ function ChefRosterFullView({ role, onNavigate }: { role: UserRole; onNavigate?:
                     background: "linear-gradient(90deg, rgba(212,175,55,0.12), rgba(212,175,55,0.06))",
                     color: "#D4AF37",
                     borderBottom: "1px solid rgba(212,175,55,0.15)",
-                    fontFamily: "'Inter', sans-serif",
+                    ...bodyFont,
                   }}
                 >
                   <Star className="w-3 h-3" style={{ fill: "#D4AF37" }} />
@@ -739,7 +737,7 @@ function ChefRosterFullView({ role, onNavigate }: { role: UserRole; onNavigate?:
                     background: "linear-gradient(90deg, rgba(205,168,138,0.08), rgba(201,169,110,0.06))",
                     color: "#CDA88A",
                     borderBottom: "1px solid rgba(205,168,138,0.1)",
-                    fontFamily: "'Inter', sans-serif",
+                    ...bodyFont,
                   }}
                 >
                   <ChefHat className="w-3 h-3" />

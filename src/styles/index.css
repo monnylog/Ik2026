@@ -125,14 +125,14 @@ td, th, li, pre, code {
 /* ── Sidebar active item warm glow ── */
 @media (pointer: fine) {
   .ik26-sidebar-active-glow {
-    box-shadow: inset 0 0 12px rgba(221,161,94,0.06), 0 0 8px rgba(221,161,94,0.04);
+    box-shadow: inset 0 0 12px rgba(203,164,122,0.06), 0 0 8px rgba(203,164,122,0.04);
   }
 }
 
 /* ── Progress bar animated tip dot ── */
 @keyframes ik26-progress-pulse {
-  0%, 100% { box-shadow: 0 0 4px rgba(205,168,138,0.4), 0 0 8px rgba(205,168,138,0.15); transform: scale(1); }
-  50% { box-shadow: 0 0 8px rgba(205,168,138,0.6), 0 0 14px rgba(205,168,138,0.25); transform: scale(1.15); }
+  0%, 100% { box-shadow: 0 0 4px rgba(203,164,122,0.4), 0 0 8px rgba(203,164,122,0.15); transform: scale(1); }
+  50% { box-shadow: 0 0 8px rgba(203,164,122,0.6), 0 0 14px rgba(203,164,122,0.25); transform: scale(1.15); }
 }
 
 .ik26-progress-dot {
@@ -361,7 +361,7 @@ td, th, li, pre, code {
 
   /* Headings */
   .print-root h1, .print-root h2, .print-root h3 {
-    color: #3D524D !important;
+    color: #2E4F52 !important;
     margin-bottom: 0.5rem;
     page-break-after: avoid;
   }
@@ -377,12 +377,12 @@ td, th, li, pre, code {
     gap: 1rem;
     margin-bottom: 1.5rem;
     padding-bottom: 0.75rem;
-    border-bottom: 2px solid #C9A96E;
+    border-bottom: 2px solid #CBA47A;
   }
 
   .print-root .print-header h1 {
     font-size: 16pt;
-    font-family: 'Degular', 'Maragsa', 'Playfair Display', sans-serif;
+    font-family: 'Steiner', 'Degular', 'Maragsa', 'Playfair Display', serif;
   }
 
   .print-root .print-header .print-event-info {
@@ -417,9 +417,9 @@ td, th, li, pre, code {
   }
 
   .print-root th {
-    background-color: #f0ece3 !important;
+    background-color: #EDF1F4 !important;
     font-weight: 600;
-    color: #3D524D !important;
+    color: #2E4F52 !important;
     font-size: 8pt;
     text-transform: uppercase;
     letter-spacing: 0.03em;

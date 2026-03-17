@@ -24,8 +24,7 @@ import { useNotion } from "../../lib/notion-context";
 import { ExportSummary } from "./export-summary";
 import { WeeklyDigest } from "./weekly-digest";
 
-const bodyFont = { fontFamily: "'Inter', sans-serif" };
-const headingFont = { fontFamily: "'Degular', 'Maragsa', 'Playfair Display', sans-serif" };
+import { bodyFont, headingFont } from "../../lib/fonts";
 
 interface ManagerAnalyticsProps {
   onNavigate: (page: string) => void;

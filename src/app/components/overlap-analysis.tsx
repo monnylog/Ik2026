@@ -10,9 +10,7 @@ import {
   Users,
 } from "lucide-react";
 import { getAvatar } from "./engagement/avatars";
-
-const bodyFont = { fontFamily: "'Inter', sans-serif" };
-const headingFont = { fontFamily: "'Degular', 'Maragsa', 'Playfair Display', sans-serif" };
+import { bodyFont, headingFont } from "../lib/fonts";
 
 interface ChefSubmissionSummary {
   userId: string;

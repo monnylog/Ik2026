@@ -35,9 +35,7 @@ import {
 } from "lucide-react";
 import type { ViewMode } from "./onboarding/use-auth";
 import { getUnreadCount } from "./notification-data";
-
-const bodyFont = { fontFamily: "'Inter', sans-serif" };
-const headingFont = { fontFamily: "'Degular', 'Maragsa', 'Playfair Display', sans-serif" };
+import { bodyFont, headingFont } from "../lib/fonts";
 
 interface MobileBottomNavProps {
   activePage: string;
@@ -376,7 +374,7 @@ export function MobileBottomNav({ activePage, onNavigate, viewMode }: MobileBott
                   initial={{ scale: 0 }}
                   animate={{ scale: 1 }}
                   className="absolute top-0.5 right-2 w-4 h-4 rounded-full flex items-center justify-center text-[0.5rem] font-bold text-white z-20"
-                  style={{ backgroundColor: "#C49370", fontFamily: "'Inter', sans-serif" }}
+                  style={{ backgroundColor: "#C49370", ...bodyFont }}
                 >
                   {unreadCount > 9 ? "9+" : unreadCount}
                 </motion.span>

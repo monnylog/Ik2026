@@ -32,11 +32,7 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 import { projectId, publicAnonKey } from "/utils/supabase/info";
-
-const bodyFont = { fontFamily: "'Inter', sans-serif" };
-const headingFont = {
-  fontFamily: "'Degular', 'Maragsa', 'Playfair Display', sans-serif",
-};
+import { bodyFont, headingFont } from "../lib/fonts";
 
 const API = `https://${projectId}.supabase.co/functions/v1/make-server-5ed426e6`;
 const headers = {
@@ -1053,13 +1049,13 @@ function DetailRow({ label, value }: { label: string; value: string }) {
     <div>
       <span
         className="text-[0.5625rem] text-muted-foreground/60 uppercase tracking-wider block"
-        style={{ fontFamily: "'Inter', sans-serif" }}
+        style={bodyFont}
       >
         {label}
       </span>
       <span
         className="text-[0.6875rem] text-foreground break-all"
-        style={{ fontFamily: "'Inter', sans-serif" }}
+        style={bodyFont}
       >
         {value}
       </span>

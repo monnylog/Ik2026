@@ -19,8 +19,7 @@ import { apiFetch } from "../../lib/supabase";
 import { useNotion } from "../../lib/notion-context";
 import { toast } from "sonner";
 
-const bodyFont = { fontFamily: "'Inter', sans-serif" };
-const headingFont = { fontFamily: "'Degular', 'Maragsa', 'Playfair Display', sans-serif" };
+import { bodyFont, headingFont } from "../../lib/fonts";
 
 interface WeeklyDigestProps {
   onClose: () => void;

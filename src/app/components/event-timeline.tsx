@@ -32,10 +32,7 @@ import { useNotion } from "../lib/notion-context";
 import { EmptyState } from "./ui/empty-state";
 import { TimelineSkeleton } from "./ui/skeleton-loaders";
 import { toast } from "sonner";
-
-const bodyFont = { fontFamily: "'Inter', sans-serif" };
-const headingFont = { fontFamily: "'Degular', 'Maragsa', 'Playfair Display', sans-serif" };
-const monoFont = { fontFamily: "'JetBrains Mono', monospace" };
+import { bodyFont, headingFont, monoFont } from "../lib/fonts";
 
 type MilestoneStatus = "done" | "in-progress" | "upcoming" | "critical";
 

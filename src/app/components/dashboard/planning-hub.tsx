@@ -10,8 +10,7 @@ import {
   Clock,
 } from "lucide-react";
 
-const bodyFont = { fontFamily: "'Inter', sans-serif" };
-const headingFont = { fontFamily: "'Degular', 'Maragsa', 'Playfair Display', sans-serif" };
+import { bodyFont, headingFont } from "../../lib/fonts";
 
 const EVENT_DATE = new Date("2026-06-14T18:00:00");
 

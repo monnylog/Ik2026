@@ -11,7 +11,7 @@ import {
 } from "../../lib/notion-sync";
 import { toast } from "sonner";
 
-const bodyFont = { fontFamily: "'Inter', sans-serif" };
+import { bodyFont, headingFont } from "../../lib/fonts";
 
 function timeAgo(cachedAt: number): string {
   const diffMs = Date.now() - cachedAt;

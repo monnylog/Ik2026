@@ -5,12 +5,12 @@ import { useProfile } from "../../lib/profile-context";
 import { getConfirmedChef } from "./chef-directory";
 import istoryaLogo from "figma:asset/b55bcac066687e563f77685fc31f20ef43e81d5d.png";
 
+import { bodyFont, headingFont } from "../../lib/fonts";
+
 interface WelcomeStepProps {
   onNext: () => void;
   role: UserRole;
 }
-
-const bodyFont = { fontFamily: "'Inter', sans-serif" };
 
 const roleGreetings: Record<UserRole, string> = {
   leadership: "Welcome back.",
@@ -96,7 +96,7 @@ export function WelcomeStep({ onNext, role }: WelcomeStepProps) {
       {/* Heading with typewriter */}
       <h1
         className="text-foreground mb-2 relative min-h-[2.8rem]"
-        style={{ fontFamily: "'Degular', 'Maragsa', 'Playfair Display', sans-serif", fontSize: "2rem", lineHeight: 1.2 }}
+        style={{ ...headingFont, fontSize: "2rem", lineHeight: 1.2 }}
       >
         {heading.includes("2026") ? (
           <>
@@ -127,7 +127,7 @@ export function WelcomeStep({ onNext, role }: WelcomeStepProps) {
         animate={headingDone ? { opacity: 1, y: 0 } : {}}
         transition={{ duration: 0.5, delay: 0.15 }}
         className="text-gold text-[0.875rem] mb-6"
-        style={{ fontFamily: "'Degular', 'Maragsa', 'Playfair Display', sans-serif", fontStyle: "italic" }}
+        style={{ ...headingFont, fontStyle: "italic" }}
       >
         {confirmedChef ? confirmedChef.greeting : roleGreetings[role]}
       </motion.p>

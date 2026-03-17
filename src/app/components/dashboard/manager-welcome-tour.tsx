@@ -15,9 +15,7 @@ import {
 } from "lucide-react";
 import { useProfile } from "../../lib/profile-context";
 import { useUserData } from "../../lib/use-user-data";
-
-const bodyFont = { fontFamily: "'Inter', sans-serif" };
-const headingFont = { fontFamily: "'Degular', 'Maragsa', 'Playfair Display', sans-serif" };
+import { bodyFont, headingFont } from "../../lib/fonts";
 
 interface TourStep {
   id: string;

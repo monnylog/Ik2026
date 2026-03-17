@@ -20,10 +20,7 @@ import {
 } from "lucide-react";
 import type { ViewMode } from "../onboarding/use-auth";
 
-const bodyFont = { fontFamily: "'Inter', sans-serif" };
-const headingFont = {
-  fontFamily: "'Degular', 'Maragsa', 'Playfair Display', sans-serif",
-};
+import { bodyFont, headingFont } from "../../lib/fonts";
 
 const STORAGE_KEY = "ik26-prelaunch-checks";
 

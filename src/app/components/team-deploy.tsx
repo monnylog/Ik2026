@@ -34,8 +34,7 @@ import {
   type TaskStatus,
 } from "../lib/ik26-team-roster";
 
-const bodyFont = { fontFamily: "'Inter', sans-serif" };
-const headingFont = { fontFamily: "'Degular', 'Maragsa', 'Playfair Display', sans-serif" };
+import { bodyFont, headingFont } from "../lib/fonts";
 
 // Re-export local type alias for sub-components that reference TeamMember
 type TeamMember = IK26TeamMember;

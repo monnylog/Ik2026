@@ -14,7 +14,7 @@ import { useUserData } from "../../lib/use-user-data";
 import { useNotionDatabase } from "../../lib/notion-sync";
 import { transformAnnouncement } from "../../lib/notion-transforms";
 
-const bodyFont = { fontFamily: "'Inter', sans-serif" };
+import { bodyFont, headingFont } from "../../lib/fonts";
 
 const typeConfig: Record<
   EventType,

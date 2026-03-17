@@ -27,9 +27,7 @@ import {
 import { useNotionDatabase } from "../lib/notion-sync";
 import { transformWarRoomItem, transformDecision, type TransformedWarRoomItem } from "../lib/notion-transforms";
 import { NotionSyncBadge } from "./ui/notion-sync-badge";
-
-const bodyFont = { fontFamily: "'Inter', sans-serif" };
-const headingFont = { fontFamily: "'Degular', 'Maragsa', 'Playfair Display', sans-serif" };
+import { bodyFont, headingFont } from "../lib/fonts";
 
 // Fallback mission control items
 const FALLBACK_ITEMS: TransformedWarRoomItem[] = [
