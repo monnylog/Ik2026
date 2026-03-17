@@ -51,6 +51,8 @@ studio.get("/make-server-5ed426e6/content-studio/registry", async (c) => {
       { prefix: "ik26:logo:", label: "Logo Cache", icon: "image", category: "cache" },
       { prefix: "ik26:user-data:", label: "User Data", icon: "folder", category: "user" },
       { prefix: "ik26:taskboard:", label: "Task Board", icon: "kanban", category: "planning" },
+      { prefix: "ik26:chef-journey:", label: "Chef Journey Milestones", icon: "route", category: "planning" },
+      { prefix: "ik26:pins:", label: "Pinned Messages", icon: "message-circle", category: "engagement" },
       { prefix: "ik26:code-users:", label: "Access Codes", icon: "key", category: "auth" },
       { prefix: "ik26:creds:", label: "Credentials", icon: "lock", category: "auth", sensitive: true },
     ];

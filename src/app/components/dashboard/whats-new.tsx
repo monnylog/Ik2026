@@ -40,7 +40,7 @@ const updates: UpdateItem[] = [
     date: "Mar 17",
     title: "v3.4.0 Chef Journey & Deep Links",
     description:
-      "New Chef Journey narrative view with per-chef storytelling, dish inspiration, and milestone timelines. URL deep linking for all 30+ pages — shareable links and browser back/forward. Access codes moved from hardcoded to KV with Content Studio management UI. Chef Command Center gains Journey quick-link.",
+      "New Chef Journey narrative view with per-chef storytelling, dish inspiration, and milestone timelines. URL deep linking for all 30+ pages — shareable links and browser back/forward. Access codes moved from hardcoded to KV with Content Studio management UI. Comms page migrated to Mediterranean palette with unread tracking and viewer read-only mode. Dashboard extracted to DashboardView component (-400 lines from App.tsx).",
     icon: BookOpen,
     color: "#4E8282",
     audience: "all",

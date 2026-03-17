@@ -378,3 +378,39 @@ utility.get("/make-server-5ed426e6/analytics/summary", async (c) => {
     return c.json({ error: `Failed to load analytics: ${err}` }, 500);
   }
 });
+
+// ─── Chef Journey Milestones (KV-backed, Content Studio editable) ───
+
+// GET all chef journey data
+utility.get("/make-server-5ed426e6/chef-journey/milestones", async (c) => {
+  try {
+    const data = await kv.getByPrefix("ik26:chef-journey:");
+    const result: Record<string, any> = {};
+    for (const item of (data || [])) {
+      const entry = item as any;
+      if (entry?.chefId) result[entry.chefId] = entry;
+    }
+    return c.json({ milestones: result });
+  } catch (err) {
+    return c.json({ error: `Failed to load chef journey milestones: ${err}` }, 500);
+  }
+});
+
+// PUT update a single chef's milestone data
+utility.put("/make-server-5ed426e6/chef-journey/milestones/:chefId", async (c) => {
+  try {
+    const chefId = c.req.param("chefId");
+    const body = await c.req.json();
+    const payload = {
+      chefId,
+      milestones: body.milestones || [],
+      updatedAt: new Date().toISOString(),
+      ...(body.dishStatus ? { dishStatus: body.dishStatus } : {}),
+      ...(body.notes ? { notes: body.notes } : {}),
+    };
+    await kv.set(`ik26:chef-journey:${chefId}`, payload);
+    return c.json({ success: true, data: payload });
+  } catch (err) {
+    return c.json({ error: `Failed to update chef journey milestone: ${err}` }, 500);
+  }
+});

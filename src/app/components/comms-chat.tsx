@@ -16,6 +16,11 @@ import {
   Database,
   Shield,
   MessageCircle,
+  Search,
+  Pin,
+  PinOff,
+  ChevronUp,
+  ChevronDown,
 } from "lucide-react";
 import type { UserRole } from "./onboarding/use-auth";
 import {
@@ -176,11 +181,14 @@ function TapbackPill({ reactions, isOwn }: { reactions: Record<string, string>; 
 }
 
 function TapbackMenu({
-  onSelect, onClose, position,
+  onSelect, onClose, position, onPin, isPinned, canPin,
 }: {
   onSelect: (type: TapbackType) => void;
   onClose: () => void;
   position: { x: number; y: number };
+  onPin?: () => void;
+  isPinned?: boolean;
+  canPin?: boolean;
 }) {
   return (
     <>
@@ -211,6 +219,20 @@ function TapbackMenu({
             {opt.emoji}
           </motion.button>
         ))}
+        {canPin && onPin && (
+          <>
+            <div className="w-px h-5 mx-0.5" style={{ backgroundColor: P.borderLight }} />
+            <motion.button
+              whileHover={{ scale: 1.2 }}
+              whileTap={{ scale: 0.9 }}
+              onClick={() => { onPin(); onClose(); }}
+              className="w-9 h-9 rounded-full flex items-center justify-center cursor-pointer"
+              title={isPinned ? "Unpin" : "Pin message"}
+            >
+              {isPinned ? <PinOff className="w-4 h-4" style={{ color: P.mutedText }} /> : <Pin className="w-4 h-4" style={{ color: P.warmSand }} />}
+            </motion.button>
+          </>
+        )}
       </motion.div>
     </>
   );
@@ -397,6 +419,14 @@ export function CommsChat({ role, onBack, onNavigate }: CommsChatProps) {
   const [showIdentityEditor, setShowIdentityEditor] = useState(false);
   const [photoUrlInput, setPhotoUrlInput] = useState<string>(profile?.customPhotoUrl || "");
   const [typingUsers, setTypingUsers] = useState<Record<string, string[]>>({});
+  // Search state
+  const [searchOpen, setSearchOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [searchResultIdx, setSearchResultIdx] = useState(0);
+  const searchInputRef = useRef<HTMLInputElement>(null);
+  // Pin state
+  const [pinnedIds, setPinnedIds] = useState<Record<string, string[]>>({});
+  const [showPinned, setShowPinned] = useState(false);
   const [readCounts, setReadCounts] = useState<Record<string, number>>(() => {
     try {
       const saved = localStorage.getItem("ik26-chat-read-counts");
@@ -427,6 +457,65 @@ export function CommsChat({ role, onBack, onNavigate }: CommsChatProps) {
     const readCount = readCounts[channelId] || 0;
     return Math.max(0, totalMsgs - readCount);
   }, [messages, readCounts]);
+
+  // Search results for current channel
+  const searchResults = searchQuery.trim()
+    ? channelMessages.filter((m) =>
+        m.text.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        m.author.toLowerCase().includes(searchQuery.toLowerCase())
+      )
+    : [];
+
+  // Load pins for all channels on mount
+  const loadPins = useCallback(async () => {
+    try {
+      const results: Record<string, string[]> = {};
+      await Promise.all(
+        channels.map(async (ch) => {
+          try {
+            const d = await apiFetch(`/pins/${ch.id}`);
+            results[ch.id] = d.pins?.messageIds || [];
+          } catch { results[ch.id] = []; }
+        })
+      );
+      setPinnedIds(results);
+    } catch {}
+  }, []);
+
+  useEffect(() => { loadPins(); }, [loadPins]);
+
+  const togglePin = useCallback(async (msgId: string) => {
+    if (!activeChannel) return;
+    const currentPins = pinnedIds[activeChannel] || [];
+    const isPinned = currentPins.includes(msgId);
+    // Optimistic update
+    setPinnedIds((prev) => ({
+      ...prev,
+      [activeChannel]: isPinned
+        ? currentPins.filter((id) => id !== msgId)
+        : [...currentPins, msgId],
+    }));
+    try {
+      await apiFetch("/pins", {
+        method: "POST",
+        body: JSON.stringify({
+          channelId: activeChannel,
+          messageId: msgId,
+          userId: profile?.id,
+          action: isPinned ? "unpin" : "pin",
+        }),
+      });
+      toast.success(isPinned ? "Message unpinned" : "Message pinned");
+    } catch {
+      toast.error("Failed to update pin");
+      // Revert
+      setPinnedIds((prev) => ({ ...prev, [activeChannel]: currentPins }));
+    }
+  }, [activeChannel, pinnedIds, profile?.id]);
+
+  const channelPinnedMessages = activeChannel
+    ? channelMessages.filter((m) => (pinnedIds[activeChannel] || []).includes(m.id))
+    : [];
 
   // Mark channel as read when selecting it
   const markChannelRead = useCallback((channelId: string) => {
@@ -543,6 +632,9 @@ export function CommsChat({ role, onBack, onNavigate }: CommsChatProps) {
   const selectChannel = (id: string) => {
     setActiveChannel(id);
     setMobileView("conversation");
+    setSearchOpen(false);
+    setSearchQuery("");
+    setShowPinned(false);
     loadMessages(id);
     loadReactions(id);
     markChannelRead(id);
@@ -582,6 +674,14 @@ export function CommsChat({ role, onBack, onNavigate }: CommsChatProps) {
   };
 
   const handleKeyDown = (e: React.KeyboardEvent) => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); sendMessage(); } };
+
+  // Auto-scroll to active search result
+  useEffect(() => {
+    if (searchResults.length > 0 && searchResults[searchResultIdx]) {
+      const el = document.getElementById(`msg-${searchResults[searchResultIdx].id}`);
+      el?.scrollIntoView({ behavior: "smooth", block: "center" });
+    }
+  }, [searchResultIdx, searchResults]);
 
   // Broadcast typing indicator (debounced)
   const lastTypingBroadcast = useRef<number>(0);
@@ -952,8 +1052,114 @@ export function CommsChat({ role, onBack, onNavigate }: CommsChatProps) {
                 </div>
                 <p className="text-[0.6875rem] truncate" style={{ color: P.mutedText, ...bodyFont }}>{currentChannel?.description}</p>
               </div>
-              <div className="text-[0.6875rem] shrink-0" style={{ color: P.mutedText, ...bodyFont }}>{channelMessages.length} msg{channelMessages.length !== 1 ? "s" : ""}</div>
+              <div className="flex items-center gap-1.5 shrink-0">
+                {channelPinnedMessages.length > 0 && (
+                  <button
+                    onClick={() => setShowPinned(!showPinned)}
+                    className="flex items-center gap-1 px-2 py-1 rounded-lg text-[0.625rem] cursor-pointer transition-colors"
+                    style={{
+                      backgroundColor: showPinned ? `${P.warmSand}15` : "transparent",
+                      color: P.warmSand,
+                      border: `1px solid ${showPinned ? `${P.warmSand}25` : "transparent"}`,
+                      ...bodyFont,
+                    }}
+                    title={`${channelPinnedMessages.length} pinned`}
+                  >
+                    <Pin className="w-3 h-3" />
+                    {channelPinnedMessages.length}
+                  </button>
+                )}
+                <button
+                  onClick={() => { setSearchOpen(!searchOpen); setSearchQuery(""); setSearchResultIdx(0); setTimeout(() => searchInputRef.current?.focus(), 100); }}
+                  className="w-7 h-7 rounded-lg flex items-center justify-center cursor-pointer transition-colors"
+                  style={{ backgroundColor: searchOpen ? `${P.medTeal}12` : "transparent", color: searchOpen ? P.medTeal : P.mutedText }}
+                  title="Search messages"
+                >
+                  <Search className="w-3.5 h-3.5" />
+                </button>
+                <span className="text-[0.6875rem]" style={{ color: P.mutedText, ...bodyFont }}>{channelMessages.length}</span>
+              </div>
             </div>
+
+            {/* Search bar */}
+            <AnimatePresence>
+              {searchOpen && (
+                <motion.div
+                  initial={{ height: 0, opacity: 0 }}
+                  animate={{ height: "auto", opacity: 1 }}
+                  exit={{ height: 0, opacity: 0 }}
+                  transition={{ duration: 0.15 }}
+                  className="overflow-hidden shrink-0"
+                  style={{ borderBottom: `1px solid ${P.borderLight}` }}
+                >
+                  <div className="px-4 py-2 flex items-center gap-2" style={{ backgroundColor: `${P.cream}` }}>
+                    <Search className="w-3.5 h-3.5 shrink-0" style={{ color: P.mutedText }} />
+                    <input
+                      ref={searchInputRef}
+                      type="text"
+                      value={searchQuery}
+                      onChange={(e) => { setSearchQuery(e.target.value); setSearchResultIdx(0); }}
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter" && searchResults.length > 0) setSearchResultIdx((i) => (i + 1) % searchResults.length);
+                        if (e.key === "Escape") { setSearchOpen(false); setSearchQuery(""); }
+                      }}
+                      placeholder="Search messages..."
+                      className="flex-1 bg-transparent text-[0.8125rem] focus:outline-none min-w-0"
+                      style={{ color: P.darkText, ...bodyFont }}
+                    />
+                    {searchQuery && (
+                      <div className="flex items-center gap-1 shrink-0">
+                        <span className="text-[0.625rem]" style={{ color: P.mutedText, ...bodyFont }}>
+                          {searchResults.length > 0 ? `${searchResultIdx + 1}/${searchResults.length}` : "No results"}
+                        </span>
+                        {searchResults.length > 1 && (
+                          <>
+                            <button onClick={() => setSearchResultIdx((i) => (i - 1 + searchResults.length) % searchResults.length)} className="w-5 h-5 rounded flex items-center justify-center cursor-pointer" style={{ color: P.mutedText }}><ChevronUp className="w-3 h-3" /></button>
+                            <button onClick={() => setSearchResultIdx((i) => (i + 1) % searchResults.length)} className="w-5 h-5 rounded flex items-center justify-center cursor-pointer" style={{ color: P.mutedText }}><ChevronDown className="w-3 h-3" /></button>
+                          </>
+                        )}
+                      </div>
+                    )}
+                    <button onClick={() => { setSearchOpen(false); setSearchQuery(""); }} className="w-5 h-5 rounded flex items-center justify-center cursor-pointer" style={{ color: P.mutedText }}><X className="w-3 h-3" /></button>
+                  </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
+
+            {/* Pinned messages panel */}
+            <AnimatePresence>
+              {showPinned && channelPinnedMessages.length > 0 && (
+                <motion.div
+                  initial={{ height: 0, opacity: 0 }}
+                  animate={{ height: "auto", opacity: 1 }}
+                  exit={{ height: 0, opacity: 0 }}
+                  transition={{ duration: 0.15 }}
+                  className="overflow-hidden shrink-0 max-h-40 overflow-y-auto"
+                  style={{ borderBottom: `1px solid ${P.borderLight}`, backgroundColor: `${P.warmSand}06` }}
+                >
+                  <div className="px-4 py-2 space-y-1.5">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-1.5">
+                        <Pin className="w-3 h-3" style={{ color: P.warmSand }} />
+                        <span className="text-[0.6875rem] font-medium" style={{ color: P.warmSand, ...bodyFont }}>Pinned Messages</span>
+                      </div>
+                      <button onClick={() => setShowPinned(false)} className="w-5 h-5 rounded flex items-center justify-center cursor-pointer" style={{ color: P.mutedText }}><X className="w-3 h-3" /></button>
+                    </div>
+                    {channelPinnedMessages.map((m) => (
+                      <div key={m.id} className="flex items-start gap-2 px-2.5 py-1.5 rounded-lg" style={{ backgroundColor: "rgba(255,255,255,0.6)", border: `1px solid ${P.borderLight}` }}>
+                        <div className="flex-1 min-w-0">
+                          <span className="text-[0.6875rem] font-medium" style={{ color: P.darkText, ...bodyFont }}>{m.author}</span>
+                          <p className="text-[0.75rem] truncate" style={{ color: P.mutedText, ...bodyFont }}>{m.text}</p>
+                        </div>
+                        {(role === "leadership" || role === "team") && (
+                          <button onClick={() => togglePin(m.id)} className="w-5 h-5 rounded flex items-center justify-center cursor-pointer shrink-0 mt-0.5" title="Unpin" style={{ color: P.mutedText }}><PinOff className="w-3 h-3" /></button>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
 
             {/* Messages area */}
             <div
@@ -995,11 +1201,33 @@ export function CommsChat({ role, onBack, onNavigate }: CommsChatProps) {
 
               {/* Message bubbles */}
               <div className="relative z-10">
-                {getMessageGroups(channelMessages).map(({ msg, isOwn, isFirst, isLast }) => (
-                  <div key={msg.id} className={isFirst && !isOwn ? "mt-3" : isFirst ? "mt-2" : "mt-0.5"}>
-                    <MessageBubble msg={msg} isOwn={isOwn} isFirst={isFirst} isLast={isLast} reactions={reactions[msg.id] || {}} onTapback={(id, pos) => setTapbackTarget({ msgId: id, position: pos })} currentUserId={profile?.id} />
-                  </div>
-                ))}
+                {getMessageGroups(channelMessages).map(({ msg, isOwn, isFirst, isLast }) => {
+                  const isSearchMatch = searchQuery.trim() && (
+                    msg.text.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                    msg.author.toLowerCase().includes(searchQuery.toLowerCase())
+                  );
+                  const isActiveResult = isSearchMatch && searchResults[searchResultIdx]?.id === msg.id;
+                  const isPinned = activeChannel ? (pinnedIds[activeChannel] || []).includes(msg.id) : false;
+                  return (
+                    <div
+                      key={msg.id}
+                      id={`msg-${msg.id}`}
+                      className={`${isFirst && !isOwn ? "mt-3" : isFirst ? "mt-2" : "mt-0.5"} relative`}
+                      style={{
+                        ...(isActiveResult ? { backgroundColor: `${P.warmSand}15`, borderRadius: "12px", marginLeft: "-4px", marginRight: "-4px", paddingLeft: "4px", paddingRight: "4px" } : {}),
+                        ...(isSearchMatch && !isActiveResult ? { opacity: 1 } : searchQuery.trim() && !isSearchMatch ? { opacity: 0.35 } : {}),
+                      }}
+                    >
+                      {isPinned && isFirst && (
+                        <div className={`flex items-center gap-1 mb-0.5 ${isOwn ? "justify-end pr-1" : "pl-1"}`}>
+                          <Pin className="w-2.5 h-2.5" style={{ color: P.warmSand, opacity: 0.5 }} />
+                          <span className="text-[0.5rem]" style={{ color: P.warmSand, opacity: 0.5, ...bodyFont }}>Pinned</span>
+                        </div>
+                      )}
+                      <MessageBubble msg={msg} isOwn={isOwn} isFirst={isFirst} isLast={isLast} reactions={reactions[msg.id] || {}} onTapback={(id, pos) => setTapbackTarget({ msgId: id, position: pos })} currentUserId={profile?.id} />
+                    </div>
+                  );
+                })}
               </div>
               <div ref={messagesEndRef} />
             </div>
@@ -1086,7 +1314,14 @@ export function CommsChat({ role, onBack, onNavigate }: CommsChatProps) {
       {/* Tapback overlay */}
       <AnimatePresence>
         {tapbackTarget && (
-          <TapbackMenu position={tapbackTarget.position} onSelect={(t) => sendReaction(tapbackTarget.msgId, t)} onClose={() => setTapbackTarget(null)} />
+          <TapbackMenu
+            position={tapbackTarget.position}
+            onSelect={(t) => sendReaction(tapbackTarget.msgId, t)}
+            onClose={() => setTapbackTarget(null)}
+            onPin={() => togglePin(tapbackTarget.msgId)}
+            isPinned={activeChannel ? (pinnedIds[activeChannel] || []).includes(tapbackTarget.msgId) : false}
+            canPin={role === "leadership" || role === "team"}
+          />
         )}
       </AnimatePresence>
 

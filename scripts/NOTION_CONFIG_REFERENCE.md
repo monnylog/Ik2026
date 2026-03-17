@@ -171,7 +171,7 @@ NOTION (Source of Truth)
 ### Notion Integration
 **Name:** "Istorya Sync Engine" OR "Isang Kusina"  
 **Connected to:**
-- Take Home Studio Home
+- MUSEO Home
 - IK26 Ops Center
 - Leader Hub
 - Projects

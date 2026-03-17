@@ -1,6 +1,6 @@
 // Chef Journey — narrative storytelling view showing each chef's arc
 // from invitation through event night
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect, useCallback } from "react";
 import { motion, AnimatePresence } from "motion/react";
 import {
   ChefHat,
@@ -20,10 +20,16 @@ import {
   Sparkles,
   Clock,
   CheckCircle2,
+  Loader2,
+  Wifi,
+  WifiOff,
 } from "lucide-react";
 import type { ViewMode } from "./onboarding/use-auth";
 import { bodyFont, headingFont } from "../lib/fonts";
 import { ImageWithFallback } from "./figma/ImageWithFallback";
+import { useNotionDatabase } from "../lib/notion-sync";
+import { transformChef } from "../lib/notion-transforms";
+import { apiFetch } from "../lib/supabase";
 
 // ── Chef data (same source as chef-roster) ──────────────────────
 
@@ -251,9 +257,72 @@ interface ChefJourneyProps {
   onNavigate: (page: string) => void;
 }
 
+// ── Hook: merge Notion roster + KV milestones with hardcoded fallbacks ──
+function useChefJourneyData() {
+  const { items: notionChefs, isLoading: notionLoading } = useNotionDatabase("roster");
+  const [kvMilestones, setKvMilestones] = useState<Record<string, any>>({});
+  const [kvLoading, setKvLoading] = useState(true);
+
+  useEffect(() => {
+    apiFetch("/chef-journey/milestones")
+      .then((d) => setKvMilestones(d.milestones || {}))
+      .catch(() => {})
+      .finally(() => setKvLoading(false));
+  }, []);
+
+  const mergedChefs = useMemo(() => {
+    // Build a lookup from Notion roster by matching name or course number
+    const notionLookup = new Map<string, any>();
+    if (notionChefs.length > 0) {
+      for (const raw of notionChefs) {
+        const t = transformChef(raw);
+        if (t.name) notionLookup.set(t.name.toLowerCase().replace("chef ", ""), t);
+        if (t.course) notionLookup.set(`course-${t.course}`, t);
+      }
+    }
+
+    return chefStories.map((story) => {
+      // Try to find matching Notion data
+      const nameKey = story.name.toLowerCase().replace("chef ", "");
+      const notionData = notionLookup.get(nameKey) || notionLookup.get(`course-${story.course}`);
+
+      // Merge Notion fields over hardcoded (Notion wins if non-empty)
+      const merged = { ...story };
+      if (notionData) {
+        if (notionData.name) merged.name = notionData.name;
+        if (notionData.city) merged.city = notionData.city;
+        if (notionData.bio) merged.bio = notionData.bio;
+        if (notionData.signatureDish) merged.signatureDish = notionData.signatureDish;
+        if (notionData.storySnippet) merged.storySnippet = notionData.storySnippet;
+        if (notionData.specialties?.length) merged.specialties = notionData.specialties;
+        if (notionData.restaurant) merged.restaurant = notionData.restaurant;
+        if (notionData.restaurantUrl) merged.restaurantUrl = notionData.restaurantUrl;
+        if (notionData.restaurantLogoUrl) merged.restaurantLogoUrl = notionData.restaurantLogoUrl;
+        if (notionData.instagram) merged.instagram = notionData.instagram;
+        if (notionData.accolades?.length) merged.accolades = notionData.accolades;
+        if (notionData.jamesBearStatus) merged.jamesBearStatus = notionData.jamesBearStatus;
+      }
+
+      // Override milestones from KV if available
+      const kvData = kvMilestones[story.id];
+      if (kvData?.milestones?.length) {
+        merged.journeyMilestones = kvData.milestones;
+      }
+
+      return merged;
+    });
+  }, [notionChefs, kvMilestones]);
+
+  const isLive = notionChefs.length > 0 || Object.keys(kvMilestones).length > 0;
+  const isLoading = notionLoading || kvLoading;
+
+  return { chefs: mergedChefs, isLive, isLoading };
+}
+
 export function ChefJourney({ viewMode, onNavigate }: ChefJourneyProps) {
+  const { chefs, isLive, isLoading } = useChefJourneyData();
   const [selectedChefIdx, setSelectedChefIdx] = useState(0);
-  const chef = chefStories[selectedChefIdx];
+  const chef = chefs[selectedChefIdx] || chefStories[0];
 
   const completedMilestones = chef.journeyMilestones.filter(
     (m) => m.status === "complete"
@@ -295,6 +364,19 @@ export function ChefJourney({ viewMode, onNavigate }: ChefJourneyProps) {
             Follow each chef's journey from invitation to event night — their dish, their history,
             and the story they're bringing to Las Vegas on May 22, 2026.
           </p>
+          {/* Data source indicator */}
+          <div className="flex items-center gap-1.5 mt-3">
+            {isLoading ? (
+              <Loader2 className="w-3 h-3 text-white/30 animate-spin" />
+            ) : isLive ? (
+              <Wifi className="w-3 h-3 text-white/40" />
+            ) : (
+              <WifiOff className="w-3 h-3 text-white/25" />
+            )}
+            <span className="text-[0.5625rem] text-white/30" style={bodyFont}>
+              {isLoading ? "Syncing live data..." : isLive ? "Synced with Notion & KV" : "Using local data"}
+            </span>
+          </div>
         </div>
       </motion.div>
 

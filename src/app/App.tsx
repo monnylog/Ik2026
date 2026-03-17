@@ -3,9 +3,8 @@ import {
   useState,
   useEffect,
   useRef,
-  lazy,
-  Suspense,
-} from "react";
+}
+from "react";
 import { motion, AnimatePresence } from "motion/react";
 import { Toaster } from "sonner";
 /* Notion integration v3.1 — IK26 single source of truth */
@@ -16,21 +15,24 @@ import {
   ChefHat,
   ChevronDown,
   ArrowLeftRight,
-} from "lucide-react";
+}
+from "lucide-react";
 
 import {
   ProfileProvider,
   useProfile,
-} from "./lib/profile-context";
+}
+from "./lib/profile-context";
 import {
   SimplifiedViewProvider,
   useSimplifiedView,
-} from "./lib/simplified-view-context";
-import { SimplifiedViewToggle } from "./components/ui/simplified-view-toggle";
+}
+from "./lib/simplified-view-context";
 import type {
   UserRole,
   ViewMode,
-} from "./components/onboarding/use-auth";
+}
+from "./components/onboarding/use-auth";
 import {
   getSession,
   saveSession,
@@ -38,192 +40,112 @@ import {
   completeOnboarding,
   leadershipOnlyPages,
   teamHiddenPages,
-} from "./components/onboarding/use-auth";
+}
+from "./components/onboarding/use-auth";
 import {
   applyTheme,
   getSavedTheme,
-} from "./components/onboarding/use-theme";
-import { clearDraft } from "./components/onboarding/use-draft";
-import { NotionProvider } from "./lib/notion-context";
-import { usePrefetchPages } from "./lib/use-prefetch";
-import { bodyFont, headingFont } from "./lib/fonts";
-import { useUrlSync } from "./lib/use-url-sync";
+}
+from "./components/onboarding/use-theme";
+import { clearDraft }
+from "./components/onboarding/use-draft";
+import { NotionProvider }
+from "./lib/notion-context";
+import { usePrefetchPages }
+from "./lib/use-prefetch";
+import { bodyFont, headingFont }
+from "./lib/fonts";
+import { useUrlSync }
+from "./lib/use-url-sync";
 
-import { PasswordGate } from "./components/onboarding/password-gate"; // v3.0.1 fixed imports
-import { OnboardingModal } from "./components/onboarding/onboarding-modal";
-import { SidebarNav } from "./components/sidebar-nav";
-import { TopBar } from "./components/top-bar";
-import { MobileBottomNav } from "./components/mobile-bottom-nav";
-import { PageWrapper } from "./components/page-wrapper";
-import { ProfileSettings } from "./components/profile-settings";
+import { PasswordGate }
+from "./components/onboarding/password-gate"; // v3.0.1 fixed imports
+import { OnboardingModal }
+from "./components/onboarding/onboarding-modal";
+import { SidebarNav }
+from "./components/sidebar-nav";
+import { TopBar }
+from "./components/top-bar";
+import { MobileBottomNav }
+from "./components/mobile-bottom-nav";
+import { ProfileSettings }
+from "./components/profile-settings";
 
 // UX Polish
-import { ErrorBoundary } from "./components/ui/error-boundary";
-import { TooltipWalkthroughProvider } from "./components/ui/feature-tooltip";
+import { ErrorBoundary }
+from "./components/ui/error-boundary";
+import { TooltipWalkthroughProvider }
+from "./components/ui/feature-tooltip";
 import {
   DashboardSkeleton,
-  EventTimelineSkeleton,
-  EventScheduleSkeleton,
-  TaskBoardSkeleton,
-  ChecklistSkeleton,
-  CommsSkeleton,
-  ChefRosterSkeleton,
-  PageSkeleton,
-} from "./components/ui/skeleton-loaders";
+}
+from "./components/ui/skeleton-loaders";
 import {
   KeyboardShortcuts,
   useKeyboardShortcuts,
-} from "./components/ui/keyboard-shortcuts";
-import { SignOutDialog } from "./components/ui/sign-out-dialog";
+}
+from "./components/ui/keyboard-shortcuts";
+import { SignOutDialog }
+from "./components/ui/sign-out-dialog";
 import {
   PageProgressBar,
   usePageTransition,
-} from "./components/ui/page-progress-bar";
-import { useRecentPages } from "./components/ui/recent-pages";
-import { useFavorites } from "./components/ui/favorites";
-import { useInquiryBadge } from "./components/ui/use-inquiry-badge";
-import { NetworkStatusBanner } from "./components/ui/network-status";
-import { ScrollToTop } from "./components/ui/scroll-to-top";
-import { FloatingShareButton } from "./components/share-invite";
-import { SessionTimeout } from "./components/ui/session-timeout";
-import { SplashScreen } from "./components/ui/splash-screen";
+}
+from "./components/ui/page-progress-bar";
+import { useRecentPages }
+from "./components/ui/recent-pages";
+import { useFavorites }
+from "./components/ui/favorites";
+import { useInquiryBadge }
+from "./components/ui/use-inquiry-badge";
+import { NetworkStatusBanner }
+from "./components/ui/network-status";
+import { ScrollToTop }
+from "./components/ui/scroll-to-top";
+import { FloatingShareButton }
+from "./components/share-invite";
+import { SessionTimeout }
+from "./components/ui/session-timeout";
+import { SplashScreen }
+from "./components/ui/splash-screen";
 import {
   usePWAManifest,
   PWAInstallBanner,
-} from "./components/ui/pwa-install";
-import { useServiceWorker } from "./components/ui/pwa-install";
+}
+from "./components/ui/pwa-install";
+import { useServiceWorker }
+from "./components/ui/pwa-install";
 import {
   GuidedTour,
   useGuidedTour,
-} from "./components/ui/guided-tour";
-import { AppErrorBoundary } from "./components/ui/app-error-boundary";
-import { SWUpdateToast } from "./components/ui/sw-update-toast";
-import { ModuleLoadError } from "./components/ui/module-load-error";
-import { moduleRetryToast } from "./lib/api-toast";
+}
+from "./components/ui/guided-tour";
+import { AppErrorBoundary }
+from "./components/ui/app-error-boundary";
+import { SWUpdateToast }
+from "./components/ui/sw-update-toast";
 
-import { LandingPage } from "./components/landing/landing-page";
+import { LandingPage }
+from "./components/landing/landing-page";
 
 // Legal pages
-import { PrivacyPolicy } from "./components/legal/privacy-policy";
-import { TermsOfService } from "./components/legal/terms-of-service";
+import { PrivacyPolicy }
+from "./components/legal/privacy-policy";
+import { TermsOfService }
+from "./components/legal/terms-of-service";
 
 // App Store screenshots
-import { AppStoreScreenshots } from "./components/app-store-screenshots";
-import { FormsAgreements } from "./components/forms-agreements";
-import { Reimbursements } from "./components/reimbursements";
+import { AppStoreScreenshots }
+from "./components/app-store-screenshots";
 
-// Dashboard widgets
-import { EventCountdown } from "./components/dashboard/event-countdown";
-import { RoleWelcome } from "./components/dashboard/role-welcome";
-import { AnnouncementsBanner } from "./components/dashboard/announcements-banner";
-import { QuickActions } from "./components/dashboard/quick-actions";
-import { KpiCards } from "./components/kpi-cards";
-import { NotionSyncIndicator } from "./components/dashboard/notion-sync-indicator";
-import { ActionNeeded } from "./components/action-needed";
-import { ActivityFeed } from "./components/dashboard/activity-feed";
-import { DailyPrompt } from "./components/engagement/daily-prompt";
-import { CommsHub } from "./components/dashboard/comms-hub";
-import { EngagementSection } from "./components/dashboard/engagement-section";
-import { OutreachPipeline } from "./components/dashboard/outreach-pipeline";
-import { CourseLineup } from "./components/course-lineup";
-import { LandingAnalytics } from "./components/dashboard/landing-analytics";
-import { PlanningHub } from "./components/dashboard/planning-hub";
-import { PerformanceWidget } from "./components/dashboard/performance-widget";
-import { SponsorPipeline } from "./components/dashboard/sponsor-pipeline";
+// Dashboard view — extracted from App.tsx in v3.4.0
+import { DashboardView }
+from "./components/dashboard-view";
 
-// Manager dashboard
-import { ManagerWelcomeTour } from "./components/dashboard/manager-welcome-tour";
-import { ManagerAnalytics } from "./components/dashboard/manager-analytics";
-import { DeploymentReadiness } from "./components/dashboard/deployment-readiness";
-import { PreLaunchChecklist } from "./components/dashboard/prelaunch-checklist";
-import { PreflightPanel } from "./components/dashboard/preflight-panel";
-
-// Team dashboard
-import { TeamWelcomeTour } from "./components/dashboard/team-welcome-tour";
-import { TeamChecklist } from "./components/dashboard/team-checklist";
-import { MyTasks } from "./components/dashboard/my-tasks";
-
-// Chef dashboard
-import { ChefWelcomeTour } from "./components/dashboard/chef-welcome-tour";
-import { ChefProgress } from "./components/dashboard/chef-progress";
-import { ChefProfileCard } from "./components/dashboard/chef-profile-card";
-import { ChefArrivalKit } from "./components/dashboard/chef-arrival-kit";
-import { ChefCommandCenter } from "./components/dashboard/chef-command-center";
-import { WhatsNew } from "./components/dashboard/whats-new";
-import { BackendHealthIndicator } from "./components/dashboard/backend-health";
-import { AuditTrail } from "./components/dashboard/audit-trail";
-import { ContentStudioWidget } from "./components/dashboard/content-studio-widget";
-
-// Dashboard layout helpers
-import { StaggeredWidget, SectionDivider, GoldAccentLine } from "./components/dashboard/dashboard-layout";
 import { MilestoneCelebration, useCelebration } from "./components/ui/milestone-celebration";
 
-// Full pages — lazy loaded for code splitting
-// Retry wrapper: handles transient "Failed to fetch dynamically imported module" errors
-function lazyRetry<T extends Record<string, any>>(
-  factory: () => Promise<T>,
-  namedExport: keyof T,
-): React.LazyExoticComponent<React.ComponentType<any>> {
-  return lazy(() =>
-    factory()
-      .then((m) => ({ default: m[namedExport] as React.ComponentType<any> }))
-      .catch((err: unknown) => {
-        console.warn("[LazyRetry] Module fetch failed, retrying…", err);
-        return new Promise<{ default: React.ComponentType<any> }>((resolve) =>
-          setTimeout(
-            () =>
-              factory()
-                .then((m) => {
-                  moduleRetryToast(String(namedExport));
-                  resolve({ default: m[namedExport] as React.ComponentType<any> });
-                })
-                .catch((retryErr: unknown) => {
-                  console.error("[LazyRetry] Module fetch failed after retry:", retryErr);
-                  // Show graceful error UI instead of hard-reloading
-                  resolve({
-                    default: (() => (
-                      <ModuleLoadError
-                        moduleName={String(namedExport)}
-                        onRetry={() => window.location.reload()}
-                      />
-                    )) as unknown as React.ComponentType<any>,
-                  });
-                }),
-            1500,
-          ),
-        );
-      }),
-  );
-}
-
-const CommunityPage = lazyRetry(() => import("./components/community-page"), "CommunityPage");
-const CommsChat = lazyRetry(() => import("./components/comms-chat"), "CommsChat");
-const OurIstoryas = lazyRetry(() => import("./components/engagement/our-istoryas"), "OurIstoryas");
-const ChefRoster = lazyRetry(() => import("./components/chef-roster"), "ChefRoster");
-const ChefJourney = lazyRetry(() => import("./components/chef-journey"), "ChefJourney");
-const EventTimeline = lazyRetry(() => import("./components/event-timeline"), "EventTimeline");
-const TravelLodging = lazyRetry(() => import("./components/travel-lodging"), "TravelLodging");
-const MenuCourses = lazyRetry(() => import("./components/menu-courses"), "MenuCourses");
-const TeamDeploy = lazyRetry(() => import("./components/team-deploy"), "TeamDeploy");
-const ResearchStory = lazyRetry(() => import("./components/research-story"), "ResearchStory");
-const BudgetCogs = lazyRetry(() => import("./components/budget-cogs"), "BudgetCogs");
-const LinksResources = lazyRetry(() => import("./components/links-resources"), "LinksResources");
-const ChefSubmissionWizard = lazyRetry(() => import("./components/chef-submission-wizard"), "ChefSubmissionWizard");
-const UserManagement = lazyRetry(() => import("./components/user-management"), "UserManagement");
-const PreEventChecklist = lazyRetry(() => import("./components/pre-event-checklist"), "PreEventChecklist");
-const TaskBoard = lazyRetry(() => import("./components/task-board"), "TaskBoard");
-const EventSchedule = lazyRetry(() => import("./components/event-schedule"), "EventSchedule");
-const ActivityLog = lazyRetry(() => import("./components/activity-log"), "ActivityLog");
-const PortalPage = lazyRetry(() => import("./components/portal-page"), "PortalPage");
-const ShareInvite = lazyRetry(() => import("./components/share-invite"), "ShareInvite");
-const PortalInquiries = lazyRetry(() => import("./components/portal-inquiries"), "PortalInquiries");
-const NotionAdmin = lazyRetry(() => import("./components/notion-admin"), "NotionAdmin");
-const SponsorsPartners = lazyRetry(() => import("./components/sponsors-partners"), "SponsorsPartners");
-const ExpenseTracker = lazyRetry(() => import("./components/expense-tracker"), "ExpenseTracker");
-const FinanceDashboard = lazyRetry(() => import("./components/finance-dashboard"), "FinanceDashboard");
-const MissionControlPage = lazyRetry(() => import("./components/mission-control"), "MissionControl");
-const AuditLogPage = lazyRetry(() => import("./components/audit-log-page"), "AuditLogPage");
-const ContentStudio = lazyRetry(() => import("./components/content-studio"), "ContentStudio");
+// Page routing extracted to PageRouter component
+import { PageRouter } from "./components/page-router";
 
 type AppState = "password" | "onboarding" | "dashboard";
 
@@ -1135,1181 +1057,34 @@ function AppInner() {
                     </motion.div>
                   )}
 
-                {/* ===== DASHBOARD ===== */}
+                {/* ===== DASHBOARD (extracted to DashboardView) ===== */}
                 {dashboardReady &&
                   activePage === "Dashboard" && (
                     <motion.div
                       key={`dashboard-${viewMode}`}
                       {...pageTransition}
-                      className="space-y-6"
                     >
-                      <ErrorBoundary section="Event Countdown">
-                        <motion.div
-                          initial={{ opacity: 0, y: 16 }}
-                          animate={{ opacity: 1, y: 0 }}
-                          transition={{
-                            delay: 0.05,
-                            duration: 0.4,
-                            ease: [0.22, 1, 0.36, 1],
-                          }}
-                        >
-                          <EventCountdown
-                            role={effectiveRole}
-                            onNavigate={handleNavigate}
-                          />
-                        </motion.div>
-                      </ErrorBoundary>
-                      <motion.div
-                        initial={{ opacity: 0, y: 12 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{
-                          delay: 0.08,
-                          duration: 0.4,
-                          ease: [0.22, 1, 0.36, 1],
-                        }}
-                      >
-                        <RoleWelcome viewMode={viewMode} />
-                      </motion.div>
-                      <ErrorBoundary section="Announcements">
-                        <motion.div
-                          initial={{ opacity: 0, y: 12 }}
-                          animate={{ opacity: 1, y: 0 }}
-                          transition={{
-                            delay: 0.11,
-                            duration: 0.4,
-                            ease: [0.22, 1, 0.36, 1],
-                          }}
-                        >
-                          <AnnouncementsBanner
-                            role={effectiveRole}
-                            onNavigate={handleNavigate}
-                          />
-                        </motion.div>
-                      </ErrorBoundary>
-                      <div data-tooltip-id="quick-actions">
-                        <ErrorBoundary section="Quick Actions">
-                          <motion.div
-                            initial={{ opacity: 0, y: 12 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            transition={{
-                              delay: 0.14,
-                              duration: 0.4,
-                              ease: [0.22, 1, 0.36, 1],
-                            }}
-                          >
-                            <QuickActions
-                              role={effectiveRole}
-                              onNavigate={handleNavigate}
-                            />
-                          </motion.div>
-                        </ErrorBoundary>
-                      </div>
-                      {isLeadershipView && (
-                        <div data-tooltip-id="kpi-cards">
-                          <ErrorBoundary section="KPI Cards">
-                            <motion.div
-                              initial={{ opacity: 0, y: 12 }}
-                              animate={{ opacity: 1, y: 0 }}
-                              transition={{
-                                delay: 0.17,
-                                duration: 0.4,
-                                ease: [0.22, 1, 0.36, 1],
-                              }}
-                            >
-                              <KpiCards role={effectiveRole} />
-                            </motion.div>
-                          </ErrorBoundary>
-                        </div>
-                      )}
-                      {isTeamView && (
-                        <motion.div
-                          initial={{ opacity: 0, y: 8 }}
-                          animate={{ opacity: 1, y: 0 }}
-                          transition={{
-                            delay: 0.17,
-                            duration: 0.4,
-                          }}
-                          className="flex justify-end"
-                        >
-                          <SimplifiedViewToggle />
-                        </motion.div>
-                      )}
-                      {isLeadershipView && (
-                        <div className="flex items-center justify-end gap-3">
-                          <BackendHealthIndicator />
-                          <NotionSyncIndicator />
-                        </div>
-                      )}
-
-                      <GoldAccentLine />
-
-                      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 ik26-ambient-section">
-                        <div className="lg:col-span-2 space-y-6">
-                          {isLeadershipView && (
-                            <>
-                              <ErrorBoundary section="Manager Welcome Tour">
-                                <ManagerWelcomeTour
-                                  onNavigate={handleNavigate}
-                                />
-                              </ErrorBoundary>
-                              <ErrorBoundary section="Manager Analytics">
-                                <ManagerAnalytics
-                                  onNavigate={handleNavigate}
-                                />
-                              </ErrorBoundary>
-                              <ErrorBoundary section="Deployment Readiness">
-                                <DeploymentReadiness
-                                  onNavigate={handleNavigate}
-                                />
-                              </ErrorBoundary>
-                              <ErrorBoundary section="Pre-flight Check">
-                                <PreflightPanel />
-                              </ErrorBoundary>
-                              <ErrorBoundary section="Pre-Launch Checklist">
-                                <PreLaunchChecklist
-                                  onNavigate={handleNavigate}
-                                  onViewModeChange={setViewMode}
-                                />
-                              </ErrorBoundary>
-                            </>
-                          )}
-                          {isTeamView && (
-                            <>
-                              <ErrorBoundary section="Team Welcome Tour">
-                                <TeamWelcomeTour
-                                  onNavigate={handleNavigate}
-                                />
-                              </ErrorBoundary>
-                              <ErrorBoundary section="Team Checklist">
-                                <TeamChecklist
-                                  onNavigate={handleNavigate}
-                                />
-                              </ErrorBoundary>
-                              <div
-                                id="my-tasks-section"
-                                data-tooltip-id="my-tasks"
-                              >
-                                <ErrorBoundary section="My Tasks">
-                                  <MyTasks
-                                    onNavigate={handleNavigate}
-                                  />
-                                </ErrorBoundary>
-                              </div>
-                            </>
-                          )}
-                          {isChefView && (
-                            <>
-                              <ErrorBoundary section="Chef Welcome Tour">
-                                <ChefWelcomeTour
-                                  onNavigate={handleNavigate}
-                                />
-                              </ErrorBoundary>
-                              <div data-tooltip-id="chef-progress">
-                                <ErrorBoundary section="Chef Progress">
-                                  <ChefProgress
-                                    onNavigate={handleNavigate}
-                                  />
-                                </ErrorBoundary>
-                              </div>
-                            </>
-                          )}
-                          {/* Section divider */}
-                          <div className="ik26-divider my-1" />
-                          <div
-                            id="action-needed-section"
-                            data-tooltip-id="action-needed"
-                          >
-                            <ErrorBoundary section="Comms Action Items">
-                              <CommsHub
-                                role={effectiveRole}
-                                onNavigate={handleNavigate}
-                              />
-                            </ErrorBoundary>
-                          </div>
-                          {/* Section divider */}
-                          <div className="ik26-divider my-1" />
-                          <ErrorBoundary section="Activity Feed">
-                            <ActivityFeed
-                              role={effectiveRole}
-                              onNavigate={handleNavigate}
-                            />
-                          </ErrorBoundary>
-                          {/* Section divider */}
-                          <div className="ik26-divider my-1" />
-                          <ErrorBoundary section="Course Lineup">
-                            <CourseLineup collapsible />
-                          </ErrorBoundary>
-                          {isLeadershipView && (
-                            <>
-                              <ErrorBoundary section="Planning Hub">
-                                <PlanningHub
-                                  onNavigate={handleNavigate}
-                                />
-                              </ErrorBoundary>
-                              <ErrorBoundary section="Performance Widget">
-                                <PerformanceWidget
-                                  onNavigate={handleNavigate}
-                                />
-                              </ErrorBoundary>
-                            </>
-                          )}
-                        </div>
-                        <div className="space-y-6">
-                          <motion.div
-                            initial={{ opacity: 0, y: 10 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            transition={{
-                              delay: 0.2,
-                              duration: 0.4,
-                              ease: [0.22, 1, 0.36, 1],
-                            }}
-                            className="ik26-card-hover rounded-xl"
-                          >
-                            <ErrorBoundary section="Daily Prompt">
-                              <DailyPrompt />
-                            </ErrorBoundary>
-                          </motion.div>
-                          <motion.div
-                            initial={{ opacity: 0, y: 10 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            transition={{
-                              delay: 0.24,
-                              duration: 0.4,
-                              ease: [0.22, 1, 0.36, 1],
-                            }}
-                            className="ik26-card-hover rounded-xl"
-                          >
-                            <ErrorBoundary section="What's New">
-                              <WhatsNew
-                                role={effectiveRole}
-                                onNavigate={handleNavigate}
-                              />
-                            </ErrorBoundary>
-                          </motion.div>
-                          <motion.div
-                            initial={{ opacity: 0, y: 10 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            transition={{
-                              delay: 0.28,
-                              duration: 0.4,
-                              ease: [0.22, 1, 0.36, 1],
-                            }}
-                            className="ik26-card-hover rounded-xl"
-                          >
-                            <ErrorBoundary section="Engagement">
-                              <EngagementSection
-                                onNavigate={handleNavigate}
-                              />
-                            </ErrorBoundary>
-                          </motion.div>
-                          {!isChefView && (
-                            <motion.div
-                              initial={{ opacity: 0, y: 10 }}
-                              animate={{ opacity: 1, y: 0 }}
-                              transition={{
-                                delay: 0.52,
-                                duration: 0.4,
-                                ease: [0.22, 1, 0.36, 1],
-                              }}
-                              className="ik26-card-hover rounded-xl"
-                            >
-                              <ErrorBoundary section="Outreach Pipeline">
-                                <OutreachPipeline
-                                  role={effectiveRole}
-                                  onNavigate={handleNavigate}
-                                />
-                              </ErrorBoundary>
-                            </motion.div>
-                          )}
-                          {isLeadershipView && (
-                            <motion.div
-                              initial={{ opacity: 0, y: 10 }}
-                              animate={{ opacity: 1, y: 0 }}
-                              transition={{
-                                delay: 0.56,
-                                duration: 0.4,
-                                ease: [0.22, 1, 0.36, 1],
-                              }}
-                              className="ik26-card-hover rounded-xl"
-                            >
-                              <ErrorBoundary section="Sponsor Pipeline">
-                                <SponsorPipeline
-                                  onNavigate={handleNavigate}
-                                />
-                              </ErrorBoundary>
-                            </motion.div>
-                          )}
-                          {isLeadershipView && (
-                            <motion.div
-                              initial={{ opacity: 0, y: 10 }}
-                              animate={{ opacity: 1, y: 0 }}
-                              transition={{
-                                delay: 0.6,
-                                duration: 0.4,
-                                ease: [0.22, 1, 0.36, 1],
-                              }}
-                              className="ik26-card-hover rounded-xl"
-                            >
-                              <ErrorBoundary section="Landing Analytics">
-                                <LandingAnalytics
-                                  onNavigate={handleNavigate}
-                                />
-                              </ErrorBoundary>
-                            </motion.div>
-                          )}
-                          {isLeadershipView && (
-                            <motion.div
-                              initial={{ opacity: 0, y: 10 }}
-                              animate={{ opacity: 1, y: 0 }}
-                              transition={{
-                                delay: 0.64,
-                                duration: 0.4,
-                                ease: [0.22, 1, 0.36, 1],
-                              }}
-                              className="ik26-card-hover rounded-xl"
-                            >
-                              <ErrorBoundary section="Audit Trail">
-                                <AuditTrail onNavigate={handleNavigate} />
-                              </ErrorBoundary>
-                            </motion.div>
-                          )}
-                          {isLeadershipView && (
-                            <motion.div
-                              initial={{ opacity: 0, y: 10 }}
-                              animate={{ opacity: 1, y: 0 }}
-                              transition={{
-                                delay: 0.68,
-                                duration: 0.4,
-                                ease: [0.22, 1, 0.36, 1],
-                              }}
-                              className="ik26-card-hover rounded-xl"
-                            >
-                              <ErrorBoundary section="Content Studio Widget">
-                                <ContentStudioWidget onNavigate={handleNavigate} />
-                              </ErrorBoundary>
-                            </motion.div>
-                          )}
-                          {isChefView && (
-                            <motion.div
-                              initial={{ opacity: 0, y: 10 }}
-                              animate={{ opacity: 1, y: 0 }}
-                              transition={{
-                                delay: 0.2,
-                                duration: 0.4,
-                                ease: [0.22, 1, 0.36, 1],
-                              }}
-                              className="ik26-card-hover rounded-xl"
-                            >
-                              <ErrorBoundary section="Chef Profile">
-                                <ChefProfileCard
-                                  onNavigate={handleNavigate}
-                                />
-                              </ErrorBoundary>
-                            </motion.div>
-                          )}
-                          {isChefView && (
-                            <motion.div
-                              initial={{ opacity: 0, y: 10 }}
-                              animate={{ opacity: 1, y: 0 }}
-                              transition={{
-                                delay: 0.28,
-                                duration: 0.4,
-                                ease: [0.22, 1, 0.36, 1],
-                              }}
-                              className="ik26-card-hover rounded-xl"
-                            >
-                              <ErrorBoundary section="Chef Arrival Kit">
-                                <ChefArrivalKit
-                                  onNavigate={handleNavigate}
-                                />
-                              </ErrorBoundary>
-                            </motion.div>
-                          )}
-                          {isChefView && (
-                            <motion.div
-                              initial={{ opacity: 0, y: 10 }}
-                              animate={{ opacity: 1, y: 0 }}
-                              transition={{
-                                delay: 0.36,
-                                duration: 0.4,
-                                ease: [0.22, 1, 0.36, 1],
-                              }}
-                              className="ik26-card-hover rounded-xl"
-                            >
-                              <ErrorBoundary section="Chef Command Center">
-                                <ChefCommandCenter
-                                  onNavigate={handleNavigate}
-                                />
-                              </ErrorBoundary>
-                            </motion.div>
-                          )}
-                        </div>
-                      </div>
+                      <DashboardView
+                        role={effectiveRole}
+                        viewMode={viewMode}
+                        onNavigate={handleNavigate}
+                        onViewModeChange={setViewMode}
+                      />
                     </motion.div>
                   )}
 
-                {/* ===== OTHER PAGES ===== */}
+                {/* ===== OTHER PAGES (extracted to PageRouter) ===== */}
                 {dashboardReady &&
-                  activePage === "Community" &&
-                  role && (
-                    <motion.div
-                      key="community"
-                      {...pageTransition}
-                    >
-                      <ErrorBoundary section="Community">
-                        <Suspense fallback={<PageSkeleton />}>
-                          <CommunityPage
-                            role={effectiveRole}
-                            viewMode={viewMode}
-                            onBack={() =>
-                              handleNavigate("Dashboard")
-                            }
-                            onNavigate={handleNavigate}
-                          />
-                        </Suspense>
-                      </ErrorBoundary>
-                    </motion.div>
-                  )}
-                {dashboardReady && activePage === "Comms" && (
-                  <motion.div key="comms" {...pageTransition}>
-                    <ErrorBoundary section="Communications">
-                      <Suspense fallback={<CommsSkeleton />}>
-                        <CommsChat
-                          role={effectiveRole}
-                          onBack={() =>
-                            handleNavigate("Dashboard")
-                          }
-                          onNavigate={handleNavigate}
-                        />
-                      </Suspense>
-                    </ErrorBoundary>
-                  </motion.div>
-                )}
-                {dashboardReady &&
-                  activePage === "Our Istoryas" && (
-                    <motion.div
-                      key="our-istoryas"
-                      {...pageTransition}
-                    >
-                      <ErrorBoundary section="Our Istoryas">
-                        <Suspense fallback={<PageSkeleton />}>
-                          <OurIstoryas
-                            onBack={() =>
-                              handleNavigate("Dashboard")
-                            }
-                            onNavigate={handleNavigate}
-                          />
-                        </Suspense>
-                      </ErrorBoundary>
-                    </motion.div>
-                  )}
-                {dashboardReady &&
-                  activePage === "Chef Roster" &&
-                  role && (
-                    <motion.div
-                      key="chef-roster"
-                      {...pageTransition}
-                    >
-                      <PageWrapper
-                        title="Chef Roster"
-                        onBack={() =>
-                          handleNavigate("Dashboard")
-                        }
-                      >
-                        <ErrorBoundary section="Chef Roster">
-                          <Suspense
-                            fallback={<ChefRosterSkeleton />}
-                          >
-                            <ChefRoster
-                              role={effectiveRole}
-                              viewMode={viewMode}
-                              onNavigate={handleNavigate}
-                            />
-                          </Suspense>
-                        </ErrorBoundary>
-                      </PageWrapper>
-                    </motion.div>
-                  )}
-                {dashboardReady &&
-                  activePage === "Chef Journey" && (
-                    <motion.div
-                      key="chef-journey"
-                      {...pageTransition}
-                    >
-                      <PageWrapper
-                        title="Chef Journey"
-                        onBack={() =>
-                          handleNavigate("Dashboard")
-                        }
-                      >
-                        <ErrorBoundary section="Chef Journey">
-                          <Suspense
-                            fallback={<PageSkeleton />}
-                          >
-                            <ChefJourney
-                              viewMode={viewMode}
-                              onNavigate={handleNavigate}
-                            />
-                          </Suspense>
-                        </ErrorBoundary>
-                      </PageWrapper>
-                    </motion.div>
-                  )}
-                {dashboardReady &&
-                  activePage === "Event Timeline" && (
-                    <motion.div
-                      key="event-timeline"
-                      {...pageTransition}
-                    >
-                      <PageWrapper
-                        title="Event Timeline"
-                        onBack={() =>
-                          handleNavigate("Dashboard")
-                        }
-                      >
-                        <ErrorBoundary section="Event Timeline">
-                          <Suspense
-                            fallback={<EventTimelineSkeleton />}
-                          >
-                            <EventTimeline
-                              role={effectiveRole}
-                              onNavigate={handleNavigate}
-                            />
-                          </Suspense>
-                        </ErrorBoundary>
-                      </PageWrapper>
-                    </motion.div>
-                  )}
-                {dashboardReady &&
-                  activePage === "Travel & Lodging" && (
-                    <motion.div
-                      key="travel-lodging"
-                      {...pageTransition}
-                    >
-                      <PageWrapper
-                        title="Travel & Lodging"
-                        onBack={() =>
-                          handleNavigate("Dashboard")
-                        }
-                      >
-                        <ErrorBoundary section="Travel & Lodging">
-                          <Suspense fallback={<PageSkeleton />}>
-                            <TravelLodging
-                              role={effectiveRole}
-                              onNavigate={handleNavigate}
-                            />
-                          </Suspense>
-                        </ErrorBoundary>
-                      </PageWrapper>
-                    </motion.div>
-                  )}
-                {dashboardReady &&
-                  activePage === "Menu & Courses" && (
-                    <motion.div
-                      key="menu-courses"
-                      {...pageTransition}
-                    >
-                      <PageWrapper
-                        title="Menu & Courses"
-                        onBack={() =>
-                          handleNavigate("Dashboard")
-                        }
-                      >
-                        <ErrorBoundary section="Menu & Courses">
-                          <Suspense fallback={<PageSkeleton />}>
-                            <MenuCourses
-                              role={effectiveRole}
-                              onNavigate={handleNavigate}
-                            />
-                          </Suspense>
-                        </ErrorBoundary>
-                      </PageWrapper>
-                    </motion.div>
-                  )}
-                {dashboardReady &&
-                  activePage === "Team Deploy" &&
-                  (viewMode === "leadership" ||
-                    viewMode === "team") && (
-                    <motion.div
-                      key="team-deploy"
-                      {...pageTransition}
-                    >
-                      <PageWrapper
-                        title="Team Deploy"
-                        onBack={() =>
-                          handleNavigate("Dashboard")
-                        }
-                      >
-                        <ErrorBoundary section="Team Deploy">
-                          <Suspense fallback={<PageSkeleton />}>
-                            <TeamDeploy
-                              viewMode={viewMode}
-                              onNavigate={handleNavigate}
-                            />
-                          </Suspense>
-                        </ErrorBoundary>
-                      </PageWrapper>
-                    </motion.div>
-                  )}
-                {dashboardReady &&
-                  activePage === "Research & Story" &&
-                  (viewMode === "leadership" ||
-                    viewMode === "team") && (
-                    <motion.div
-                      key="research-story"
-                      {...pageTransition}
-                    >
-                      <PageWrapper
-                        title="Research & Story"
-                        onBack={() =>
-                          handleNavigate("Dashboard")
-                        }
-                      >
-                        <ErrorBoundary section="Research & Story">
-                          <Suspense fallback={<PageSkeleton />}>
-                            <ResearchStory
-                              onNavigate={handleNavigate}
-                            />
-                          </Suspense>
-                        </ErrorBoundary>
-                      </PageWrapper>
-                    </motion.div>
-                  )}
-                {dashboardReady &&
-                  activePage === "Budget & COGS" &&
-                  role === "leadership" &&
-                  viewMode === "leadership" && (
-                    <motion.div
-                      key="budget-cogs"
-                      {...pageTransition}
-                    >
-                      <PageWrapper
-                        title="Budget & COGS"
-                        onBack={() =>
-                          handleNavigate("Dashboard")
-                        }
-                      >
-                        <ErrorBoundary section="Budget & COGS">
-                          <Suspense fallback={<PageSkeleton />}>
-                            <BudgetCogs
-                              onNavigate={handleNavigate}
-                            />
-                          </Suspense>
-                        </ErrorBoundary>
-                      </PageWrapper>
-                    </motion.div>
-                  )}
-                {dashboardReady &&
-                  activePage === "Sponsors & Partners" &&
-                  role === "leadership" &&
-                  viewMode === "leadership" && (
-                    <motion.div
-                      key="sponsors-partners"
-                      {...pageTransition}
-                    >
-                      <PageWrapper
-                        title="Sponsors & Partners"
-                        onBack={() =>
-                          handleNavigate("Dashboard")
-                        }
-                      >
-                        <ErrorBoundary section="Sponsors & Partners">
-                          <Suspense fallback={<PageSkeleton />}>
-                            <SponsorsPartners
-                              onNavigate={handleNavigate}
-                            />
-                          </Suspense>
-                        </ErrorBoundary>
-                      </PageWrapper>
-                    </motion.div>
-                  )}
-                {dashboardReady &&
-                  activePage === "Links & Resources" && (
-                    <motion.div
-                      key="links-resources"
-                      {...pageTransition}
-                    >
-                      <PageWrapper
-                        title="Links & Resources"
-                        onBack={() =>
-                          handleNavigate("Dashboard")
-                        }
-                      >
-                        <ErrorBoundary section="Links & Resources">
-                          <Suspense fallback={<PageSkeleton />}>
-                            <LinksResources
-                              role={effectiveRole}
-                              onNavigate={handleNavigate}
-                            />
-                          </Suspense>
-                        </ErrorBoundary>
-                      </PageWrapper>
-                    </motion.div>
-                  )}
-                {dashboardReady &&
-                  activePage === "Submit Menu" && (
-                    <motion.div
-                      key="submit-menu"
-                      {...pageTransition}
-                    >
-                      <PageWrapper
-                        title="Submit Menu"
-                        onBack={() =>
-                          handleNavigate("Dashboard")
-                        }
-                      >
-                        <ErrorBoundary section="Chef Submission">
-                          <Suspense fallback={<PageSkeleton />}>
-                            <ChefSubmissionWizard
-                              onNavigate={handleNavigate}
-                              onClose={() =>
-                                handleNavigate("Dashboard")
-                              }
-                              onCelebrate={celebrate}
-                            />
-                          </Suspense>
-                        </ErrorBoundary>
-                      </PageWrapper>
-                    </motion.div>
-                  )}
-                {dashboardReady &&
-                  activePage === "Members" &&
-                  role === "leadership" &&
-                  viewMode === "leadership" && (
-                    <motion.div
-                      key="members"
-                      {...pageTransition}
-                    >
-                      <PageWrapper
-                        title="Members"
-                        onBack={() =>
-                          handleNavigate("Dashboard")
-                        }
-                      >
-                        <ErrorBoundary section="User Management">
-                          <Suspense fallback={<PageSkeleton />}>
-                            <UserManagement />
-                          </Suspense>
-                        </ErrorBoundary>
-                      </PageWrapper>
-                    </motion.div>
-                  )}
-                {dashboardReady &&
-                  activePage === "Pre-Event Checklist" && (
-                    <motion.div
-                      key="pre-event-checklist"
-                      {...pageTransition}
-                    >
-                      <PageWrapper
-                        title="Pre-Event Checklist"
-                        onBack={() =>
-                          handleNavigate("Dashboard")
-                        }
-                      >
-                        <ErrorBoundary section="Pre-Event Checklist">
-                          <Suspense
-                            fallback={<ChecklistSkeleton />}
-                          >
-                            <PreEventChecklist
-                              role={effectiveRole}
-                              onNavigate={handleNavigate}
-                            />
-                          </Suspense>
-                        </ErrorBoundary>
-                      </PageWrapper>
-                    </motion.div>
-                  )}
-                {dashboardReady &&
-                  activePage === "Task Board" && (
-                    <motion.div
-                      key="task-board"
-                      {...pageTransition}
-                    >
-                      <PageWrapper
-                        title="Task Board"
-                        onBack={() =>
-                          handleNavigate("Dashboard")
-                        }
-                      >
-                        <ErrorBoundary section="Task Board">
-                          <Suspense
-                            fallback={<TaskBoardSkeleton />}
-                          >
-                            <TaskBoard
-                              role={effectiveRole}
-                              onNavigate={handleNavigate}
-                            />
-                          </Suspense>
-                        </ErrorBoundary>
-                      </PageWrapper>
-                    </motion.div>
-                  )}
-                {dashboardReady &&
-                  activePage === "Event Schedule" && (
-                    <motion.div
-                      key="event-schedule"
-                      {...pageTransition}
-                    >
-                      <PageWrapper
-                        title="Event Schedule"
-                        onBack={() =>
-                          handleNavigate("Dashboard")
-                        }
-                      >
-                        <ErrorBoundary section="Event Schedule">
-                          <Suspense
-                            fallback={<EventScheduleSkeleton />}
-                          >
-                            <EventSchedule
-                              role={effectiveRole}
-                              onNavigate={handleNavigate}
-                            />
-                          </Suspense>
-                        </ErrorBoundary>
-                      </PageWrapper>
-                    </motion.div>
-                  )}
-                {dashboardReady &&
-                  activePage === "Activity Log" && (
-                    <motion.div
-                      key="activity-log"
-                      {...pageTransition}
-                    >
-                      <PageWrapper
-                        title="Activity Log"
-                        onBack={() =>
-                          handleNavigate("Dashboard")
-                        }
-                      >
-                        <ErrorBoundary section="Activity Log">
-                          <Suspense fallback={<PageSkeleton />}>
-                            <ActivityLog
-                              role={effectiveRole}
-                              onNavigate={handleNavigate}
-                            />
-                          </Suspense>
-                        </ErrorBoundary>
-                      </PageWrapper>
-                    </motion.div>
-                  )}
-                {dashboardReady && activePage === "Portal" && (
-                  <motion.div
-                    key="portal"
-                    {...pageTransition}
-                    className="-m-3 sm:-m-4 md:-m-6 -mb-20 lg:-mb-6"
-                  >
-                    <ErrorBoundary section="Portal">
-                      <Suspense fallback={<PageSkeleton />}>
-                        <PortalPage
-                          onNavigate={handleNavigate}
-                        />
-                      </Suspense>
-                    </ErrorBoundary>
-                  </motion.div>
-                )}
-                {dashboardReady &&
-                  activePage === "Share Invite" && (
-                    <motion.div
-                      key="share-invite"
-                      {...pageTransition}
-                    >
-                      <PageWrapper
-                        title="Share & Invite"
-                        onBack={() =>
-                          handleNavigate("Dashboard")
-                        }
-                      >
-                        <ErrorBoundary section="Share Invite">
-                          <Suspense fallback={<PageSkeleton />}>
-                            <ShareInvite
-                              onNavigate={handleNavigate}
-                            />
-                          </Suspense>
-                        </ErrorBoundary>
-                      </PageWrapper>
-                    </motion.div>
-                  )}
-                {dashboardReady &&
-                  activePage === "Inquiries" && (
-                    <motion.div
-                      key="inquiries"
-                      {...pageTransition}
-                    >
-                      <PageWrapper
-                        title="Portal Inquiries"
-                        onBack={() =>
-                          handleNavigate("Dashboard")
-                        }
-                      >
-                        <ErrorBoundary section="Portal Inquiries">
-                          <Suspense fallback={<PageSkeleton />}>
-                            <PortalInquiries />
-                          </Suspense>
-                        </ErrorBoundary>
-                      </PageWrapper>
-                    </motion.div>
-                  )}
-                {dashboardReady &&
-                  activePage === "Notion Admin" &&
-                  role === "leadership" &&
-                  viewMode === "leadership" && (
-                    <motion.div
-                      key="notion-admin"
-                      {...pageTransition}
-                    >
-                      <PageWrapper
-                        title="Notion Admin"
-                        onBack={() =>
-                          handleNavigate("Dashboard")
-                        }
-                      >
-                        <ErrorBoundary section="Notion Admin">
-                          <Suspense fallback={<PageSkeleton />}>
-                            <NotionAdmin />
-                          </Suspense>
-                        </ErrorBoundary>
-                      </PageWrapper>
-                    </motion.div>
-                  )}
-                {dashboardReady &&
-                  activePage === "Expenses" && (
-                    <motion.div
-                      key="expenses"
-                      {...pageTransition}
-                    >
-                      <PageWrapper
-                        title="Expenses"
-                        onBack={() =>
-                          handleNavigate("Dashboard")
-                        }
-                      >
-                        <ErrorBoundary section="Expense Tracker">
-                          <Suspense fallback={<PageSkeleton />}>
-                            <ExpenseTracker
-                              role={effectiveRole}
-                              onNavigate={handleNavigate}
-                            />
-                          </Suspense>
-                        </ErrorBoundary>
-                      </PageWrapper>
-                    </motion.div>
-                  )}
-                {dashboardReady &&
-                  activePage === "Finance" &&
-                  role === "leadership" &&
-                  viewMode === "leadership" && (
-                    <motion.div
-                      key="finance"
-                      {...pageTransition}
-                    >
-                      <PageWrapper
-                        title="Finance Dashboard"
-                        onBack={() =>
-                          handleNavigate("Dashboard")
-                        }
-                      >
-                        <ErrorBoundary section="Finance Dashboard">
-                          <Suspense fallback={<PageSkeleton />}>
-                            <FinanceDashboard
-                              onNavigate={handleNavigate}
-                            />
-                          </Suspense>
-                        </ErrorBoundary>
-                      </PageWrapper>
-                    </motion.div>
-                  )}
-                {dashboardReady &&
-                  activePage === "Forms & Agreements" && (
-                    <motion.div
-                      key="forms-agreements"
-                      {...pageTransition}
-                    >
-                      <PageWrapper
-                        title="Forms & Agreements"
-                        onBack={() =>
-                          handleNavigate("Dashboard")
-                        }
-                      >
-                        <ErrorBoundary section="Forms & Agreements">
-                          <Suspense fallback={<PageSkeleton />}>
-                            <FormsAgreements
-                              onNavigate={handleNavigate}
-                              role={effectiveRole}
-                            />
-                          </Suspense>
-                        </ErrorBoundary>
-                      </PageWrapper>
-                    </motion.div>
-                  )}
-                {dashboardReady &&
-                  activePage === "Reimbursements" && (
-                    <motion.div
-                      key="reimbursements"
-                      {...pageTransition}
-                    >
-                      <PageWrapper
-                        title="Reimbursements"
-                        onBack={() =>
-                          handleNavigate("Dashboard")
-                        }
-                      >
-                        <ErrorBoundary section="Reimbursements">
-                          <Suspense fallback={<PageSkeleton />}>
-                            <Reimbursements
-                              onNavigate={handleNavigate}
-                            />
-                          </Suspense>
-                        </ErrorBoundary>
-                      </PageWrapper>
-                    </motion.div>
-                  )}
-                {dashboardReady &&
-                  activePage === "Mission Control" &&
-                  role === "leadership" &&
-                  viewMode === "leadership" && (
-                    <motion.div
-                      key="mission-control"
-                      {...pageTransition}
-                    >
-                      <PageWrapper
-                        title="Mission Control"
-                        onBack={() =>
-                          handleNavigate("Dashboard")
-                        }
-                      >
-                        <ErrorBoundary section="Mission Control">
-                          <Suspense fallback={<PageSkeleton />}>
-                            <MissionControlPage
-                              onNavigate={handleNavigate}
-                            />
-                          </Suspense>
-                        </ErrorBoundary>
-                      </PageWrapper>
-                    </motion.div>
-                  )}
-                {dashboardReady &&
-                  activePage === "System Audit" &&
-                  role === "leadership" &&
-                  viewMode === "leadership" && (
-                    <motion.div
-                      key="system-audit"
-                      {...pageTransition}
-                    >
-                      <PageWrapper
-                        title="System Audit"
-                        onBack={() =>
-                          handleNavigate("Dashboard")
-                        }
-                      >
-                        <ErrorBoundary section="System Audit">
-                          <Suspense fallback={<PageSkeleton />}>
-                            <AuditLogPage
-                              onNavigate={handleNavigate}
-                            />
-                          </Suspense>
-                        </ErrorBoundary>
-                      </PageWrapper>
-                    </motion.div>
-                  )}
-                {dashboardReady &&
-                  activePage === "Content Studio" &&
-                  role === "leadership" &&
-                  viewMode === "leadership" && (
-                    <motion.div
-                      key="content-studio"
-                      {...pageTransition}
-                    >
-                      <PageWrapper
-                        title="Content Studio"
-                        onBack={() =>
-                          handleNavigate("Dashboard")
-                        }
-                      >
-                        <ErrorBoundary section="Content Studio">
-                          <Suspense fallback={<PageSkeleton />}>
-                            <ContentStudio
-                              onNavigate={handleNavigate}
-                            />
-                          </Suspense>
-                        </ErrorBoundary>
-                      </PageWrapper>
-                    </motion.div>
-                  )}
-                {dashboardReady &&
-                  ![
-                    "Dashboard",
-                    "Settings",
-                    "Members",
-                    "Community",
-                    "Comms",
-                    "Our Istoryas",
-                    "Chef Roster",
-                    "Event Timeline",
-                    "Travel & Lodging",
-                    "Menu & Courses",
-                    "Team Deploy",
-                    "Research & Story",
-                    "Budget & COGS",
-                    "Links & Resources",
-                    "Submit Menu",
-                    "Pre-Event Checklist",
-                    "Task Board",
-                    "Event Schedule",
-                    "Activity Log",
-                    "Portal",
-                    "Share Invite",
-                    "Inquiries",
-                    "Notion Admin",
-                    "Expenses",
-                    "Finance",
-                    "Forms & Agreements",
-                    "Sponsors & Partners",
-                    "Reimbursements",
-                    "Mission Control",
-                    "System Audit",
-                    "Content Studio",
-                  ].includes(activePage) && (
-                    <motion.div
-                      key={activePage}
-                      initial={{ opacity: 0, y: 10 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      exit={{ opacity: 0 }}
-                      transition={{ duration: 0.3 }}
-                      className="flex flex-col items-center justify-center h-64 text-center"
-                    >
-                      <div className="w-12 h-12 rounded-xl bg-gold/10 border border-gold/20 flex items-center justify-center mb-4">
-                        <span
-                          className="text-gold text-[1.25rem]"
-                          style={headingFont}
-                        >
-                          {activePage.charAt(0)}
-                        </span>
-                      </div>
-                      <h3
-                        className="text-foreground mb-1"
-                        style={headingFont}
-                      >
-                        {activePage}
-                      </h3>
-                      <p
-                        className="text-muted-foreground text-[0.875rem]"
-                        style={bodyFont}
-                      >
-                        This page isn't available in your current view.
-                      </p>
-                      <button
-                        onClick={() => handleNavigate("Dashboard")}
-                        className="mt-3 px-4 py-2 rounded-xl text-[0.8125rem] cursor-pointer transition-colors hover:opacity-80"
-                        style={{
-                          backgroundColor: "rgba(201,169,110,0.1)",
-                          color: "#C9A96E",
-                          border: "1px solid rgba(201,169,110,0.2)",
-                          ...bodyFont,
-                        }}
-                      >
-                        Back to Dashboard
-                      </button>
-                    </motion.div>
+                  activePage !== "Dashboard" &&
+                  activePage !== "Settings" && (
+                    <PageRouter
+                      activePage={activePage}
+                      role={effectiveRole}
+                      viewMode={viewMode}
+                      onNavigate={handleNavigate}
+                      onCelebrate={celebrate}
+                      pageTransition={pageTransition}
+                    />
                   )}
               </AnimatePresence>
             </main>

@@ -214,7 +214,7 @@ RLS Policies:
 
 | Tool | Monica | Walbert | Team | Public |
 |------|--------|---------|------|--------|
-| **Notion DBs (edit)** | ✅ Full | ✅ Full (Take Home Studio space) | ✅ Orgs, Contacts, Opps, Activities | ❌ |
+| **Notion DBs (edit)** | ✅ Full | ✅ Full (MUSEO space) | ✅ Orgs, Contacts, Opps, Activities | ❌ |
 | **Notion Sync Log** | ✅ Full | ✅ View | ✅ View | ❌ |
 | **Google Sheets** | ✅ All tabs | ✅ View (team tabs) | ✅ View (Pipeline Summary) | ❌ |
 | **Apps Script** | ✅ Edit + deploy | ❌ | ❌ | ❌ |
@@ -362,7 +362,7 @@ supabase db push
 
 **Owner:** Monica Blanco  
 **Email:** monica.istorya@gmail.com / mb@tablante.com  
-**Notion:** Take Home Studio / ISTORYA workspace  
+**Notion:** MUSEO / ISTORYA workspace  
 **Apps Script:** IK26 Ops Sync  
 **Supabase:** Istorya app  
 **Figma Make:** IK26 App / AGENCY v1

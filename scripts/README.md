@@ -212,7 +212,7 @@ setupFlowFTrigger();
 | Apps Script | Full (edit + deploy) | No access | No access | No access |
 | Script Properties | Full | No access | No access | No access |
 | Google Sheets | Full (all tabs) | View (team tabs only) | View (Pipeline Summary) | No access |
-| Notion DBs | Full (edit) | Edit (Take Home Studio workspace) | Edit (Orgs, Contacts, Opps, Activities) | No access (forms only) |
+| Notion DBs | Full (edit) | Edit (MUSEO workspace) | Edit (Orgs, Contacts, Opps, Activities) | No access (forms only) |
 | Supabase Dashboard | Full | No access | No access | No access |
 | Supabase Data (via app) | — | — | — | Read-only (confirmed sponsors) |
 
@@ -320,7 +320,7 @@ These fields are **ONLY** edited by humans in Notion:
 
 **Owner:** Monica Blanco  
 **Email:** monica.istorya@gmail.com  
-**Notion:** Take Home Studio / ISTORYA workspace  
+**Notion:** MUSEO / ISTORYA workspace  
 **Apps Script:** IK26 Ops Sync project  
 **Supabase:** Istorya app project
 
