@@ -21,8 +21,7 @@ interface CommandCard {
   description: string;
   icon: typeof BookOpen;
   color: string;
-  bg: string;
-  border: string;
+  accentGradient: string;
   navigateTo: string;
   cta: string;
 }
@@ -30,41 +29,37 @@ interface CommandCard {
 const commandCards: CommandCard[] = [
   {
     title: "Your Research Partner",
-    description: "Connect with your assigned researcher for historical context, storytelling, and cultural background for your course.",
+    description: "Connect with your researcher for historical context, storytelling, and cultural background.",
     icon: BookOpen,
-    color: "#8899A6",
-    bg: "rgba(136,153,166,0.04)",
-    border: "rgba(136,153,166,0.10)",
+    color: "#9FB0D4",
+    accentGradient: "linear-gradient(135deg, rgba(159,176,212,0.12) 0%, rgba(159,176,212,0.04) 100%)",
     navigateTo: "Comms",
     cta: "Open Comms",
   },
   {
     title: "Menu & Ingredients",
-    description: "Submit your dish concepts, key ingredients, specialty sourcing requests, and plating ideas.",
+    description: "Submit your dish concepts, key ingredients, specialty sourcing, and plating ideas.",
     icon: UtensilsCrossed,
-    color: "#D4B896",
-    bg: "rgba(212,184,150,0.04)",
-    border: "rgba(212,184,150,0.10)",
+    color: "#CBA47A",
+    accentGradient: "linear-gradient(135deg, rgba(203,164,122,0.12) 0%, rgba(203,164,122,0.04) 100%)",
     navigateTo: "Submit Menu",
     cta: "Submit Menu",
   },
   {
     title: "Kitchen & Equipment",
-    description: "Log your equipment needs, cookware preferences, station setup, and any special kitchen requirements.",
+    description: "Log equipment needs, cookware preferences, station setup, and special requirements.",
     icon: ClipboardList,
     color: "#8AAD84",
-    bg: "rgba(138,173,132,0.04)",
-    border: "rgba(138,173,132,0.10)",
+    accentGradient: "linear-gradient(135deg, rgba(138,173,132,0.12) 0%, rgba(138,173,132,0.04) 100%)",
     navigateTo: "Menu & Courses",
     cta: "Submit Needs",
   },
   {
     title: "Travel & Logistics",
-    description: "View your flight details, lodging info, airport transfers, and arrival day schedule.",
+    description: "View flight details, lodging info, airport transfers, and arrival day schedule.",
     icon: Plane,
-    color: "#6B9EC2",
-    bg: "rgba(107,158,194,0.04)",
-    border: "rgba(107,158,194,0.10)",
+    color: "#4E8282",
+    accentGradient: "linear-gradient(135deg, rgba(78,130,130,0.12) 0%, rgba(78,130,130,0.04) 100%)",
     navigateTo: "Travel & Lodging",
     cta: "Check Travel",
   },
@@ -76,66 +71,108 @@ export function ChefCommandCenter({ onNavigate }: ChefCommandCenterProps) {
       initial={{ opacity: 0, y: 16 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: 0.2, duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
-      className="bg-card rounded-xl overflow-hidden"
-      style={{ border: "1px solid rgba(212,184,150,0.08)" }}
+      className="ik26-card-elevated overflow-hidden"
     >
-      {/* Header */}
-      <div className="px-5 py-4 border-b border-border/30">
-        <div className="flex items-center gap-2 mb-1">
-          <div className="w-1 h-5 rounded-full" style={{ backgroundColor: "#D4B896" }} />
-          <ChefHat className="w-4 h-4" style={{ color: "#D4B896" }} />
-          <h3 className="text-foreground" style={headingFont}>
-            Your Command Center
-          </h3>
+      {/* Header with warm gradient accent */}
+      <div
+        className="relative px-5 pt-5 pb-4"
+        style={{
+          background: "linear-gradient(180deg, rgba(203,164,122,0.04) 0%, transparent 100%)",
+        }}
+      >
+        {/* Decorative accent line */}
+        <div
+          className="absolute top-0 left-5 right-5 h-[2px] rounded-full"
+          style={{
+            background: "linear-gradient(90deg, rgba(203,164,122,0.3) 0%, rgba(192,142,126,0.2) 50%, transparent 100%)",
+          }}
+        />
+        <div className="flex items-center gap-2.5 mb-1.5">
+          <div
+            className="w-8 h-8 rounded-xl flex items-center justify-center"
+            style={{
+              background: "linear-gradient(135deg, rgba(203,164,122,0.15) 0%, rgba(192,142,126,0.1) 100%)",
+              border: "1px solid rgba(203,164,122,0.15)",
+            }}
+          >
+            <ChefHat className="w-4 h-4" style={{ color: "#CBA47A" }} />
+          </div>
+          <div>
+            <h3
+              className="text-[0.9375rem] text-foreground leading-tight"
+              style={headingFont}
+            >
+              Your Command Center
+            </h3>
+            <p
+              className="text-[0.6875rem] text-muted-foreground mt-0.5"
+              style={bodyFont}
+            >
+              Everything you need — one tap away
+            </p>
+          </div>
         </div>
-        <p className="text-muted-foreground text-[0.75rem] pl-7" style={bodyFont}>
-          Everything you need to coordinate — one tap away.
-        </p>
       </div>
 
-      {/* Command cards */}
-      <div className="p-3 space-y-2">
+      {/* Command cards grid */}
+      <div className="px-3 pb-3 grid grid-cols-1 sm:grid-cols-2 gap-2">
         {commandCards.map((card, idx) => {
           const Icon = card.icon;
           return (
             <motion.button
               key={card.title}
-              initial={{ opacity: 0, x: -8 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ delay: 0.25 + idx * 0.06 }}
-              whileHover={{ x: 2 }}
+              initial={{ opacity: 0, y: 8 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.25 + idx * 0.07, duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
+              whileHover={{ y: -2, transition: { duration: 0.2 } }}
+              whileTap={{ scale: 0.98 }}
               onClick={() => onNavigate(card.navigateTo)}
-              className="w-full flex items-start gap-3 px-4 py-3.5 rounded-xl cursor-pointer group text-left"
+              className="relative flex flex-col items-start p-4 rounded-xl cursor-pointer group text-left overflow-hidden"
               style={{
-                backgroundColor: card.bg,
-                border: `1px solid ${card.border}`,
+                background: card.accentGradient,
+                border: `1px solid ${card.color}18`,
               }}
             >
+              {/* Hover glow effect */}
               <div
-                className="w-9 h-9 rounded-lg flex items-center justify-center shrink-0 mt-0.5"
-                style={{ backgroundColor: `${card.color}15`, border: `1px solid ${card.color}25` }}
+                className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none"
+                style={{
+                  background: `radial-gradient(circle at 50% 50%, ${card.color}08 0%, transparent 70%)`,
+                }}
+              />
+
+              <div
+                className="w-10 h-10 rounded-xl flex items-center justify-center mb-3 relative"
+                style={{
+                  background: `${card.color}12`,
+                  border: `1px solid ${card.color}20`,
+                  boxShadow: `0 2px 8px ${card.color}10`,
+                }}
               >
-                <Icon className="w-4 h-4" style={{ color: card.color }} />
+                <Icon className="w-[18px] h-[18px]" style={{ color: card.color }} />
               </div>
-              <div className="flex-1 min-w-0">
-                <div className="flex items-center gap-2 mb-0.5">
-                  <span className="text-foreground text-[0.8125rem]" style={bodyFont}>
-                    {card.title}
-                  </span>
-                </div>
-                <p className="text-muted-foreground text-[0.6875rem] leading-relaxed" style={bodyFont}>
-                  {card.description}
-                </p>
-              </div>
-              <div className="flex items-center gap-1 shrink-0 mt-1">
+              <span
+                className="text-foreground text-[0.8125rem] font-medium mb-1 relative"
+                style={bodyFont}
+              >
+                {card.title}
+              </span>
+              <p
+                className="text-muted-foreground text-[0.6875rem] leading-relaxed mb-3 relative"
+                style={bodyFont}
+              >
+                {card.description}
+              </p>
+              <div className="flex items-center gap-1 mt-auto relative">
                 <span
-                  className="text-[0.625rem] opacity-0 group-hover:opacity-100 transition-opacity"
+                  className="text-[0.6875rem] font-medium"
                   style={{ color: card.color, ...bodyFont }}
                 >
                   {card.cta}
                 </span>
                 <ArrowRight
-                  className="w-3.5 h-3.5 text-muted-foreground/25 group-hover:text-gold transition-colors"
+                  className="w-3 h-3 group-hover:translate-x-0.5 transition-transform duration-200"
+                  style={{ color: card.color, opacity: 0.6 }}
                 />
               </div>
             </motion.button>
@@ -144,22 +181,22 @@ export function ChefCommandCenter({ onNavigate }: ChefCommandCenterProps) {
       </div>
 
       {/* Brainstorm CTA */}
-      <div className="px-4 pb-4">
+      <div className="px-3 pb-4">
         <motion.button
           whileHover={{ scale: 1.01 }}
           whileTap={{ scale: 0.98 }}
           onClick={() => onNavigate("Our Istoryas")}
-          className="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl cursor-pointer"
+          className="w-full flex items-center justify-center gap-2.5 py-3 rounded-xl cursor-pointer relative overflow-hidden"
           style={{
-            backgroundColor: "rgba(201,169,110,0.08)",
-            border: "1px solid rgba(201,169,110,0.2)",
+            background: "linear-gradient(135deg, rgba(203,164,122,0.08) 0%, rgba(192,142,126,0.06) 100%)",
+            border: "1px solid rgba(203,164,122,0.15)",
           }}
         >
-          <Sparkles className="w-3.5 h-3.5" style={{ color: "#C9A96E" }} />
-          <span className="text-[0.75rem]" style={{ color: "#C9A96E", ...bodyFont }}>
+          <Sparkles className="w-3.5 h-3.5" style={{ color: "#CBA47A" }} />
+          <span className="text-[0.75rem] font-medium" style={{ color: "#CBA47A", ...bodyFont }}>
             Brainstorm & Share Your Istorya
           </span>
-          <ArrowRight className="w-3 h-3" style={{ color: "#C9A96E", opacity: 0.5 }} />
+          <ArrowRight className="w-3 h-3" style={{ color: "#CBA47A", opacity: 0.4 }} />
         </motion.button>
       </div>
     </motion.div>

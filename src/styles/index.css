@@ -147,7 +147,7 @@ td, th, li, pre, code {
 
 /* ── Section label chip ── */
 .ik26-section-label {
-  font-family: 'Civil', 'Inter', sans-serif;
+  font-family: 'Civil', 'DM Sans', 'Inter', sans-serif;
   font-size: 0.5625rem;
   text-transform: uppercase;
   letter-spacing: 0.18em;
@@ -162,29 +162,86 @@ td, th, li, pre, code {
   background-clip: text;
 }
 
-/* ── Smooth scrollbar styling ── */
-.main-content-area::-webkit-scrollbar {
-  width: 6px;
+/* ── Immersive ambient background for dashboard sections ── */
+.ik26-ambient-section {
+  position: relative;
 }
-.main-content-area::-webkit-scrollbar-track {
-  background: transparent;
-}
-.main-content-area::-webkit-scrollbar-thumb {
-  background-color: rgba(78,130,130,0.15);
-  border-radius: 3px;
-}
-.main-content-area::-webkit-scrollbar-thumb:hover {
-  background-color: rgba(78,130,130,0.25);
+.ik26-ambient-section::before {
+  content: "";
+  position: absolute;
+  inset: -40px -20px;
+  border-radius: 32px;
+  background: radial-gradient(ellipse at 30% 20%, rgba(78,130,130,0.03) 0%, transparent 60%),
+              radial-gradient(ellipse at 70% 80%, rgba(203,164,122,0.025) 0%, transparent 50%);
+  pointer-events: none;
+  z-index: -1;
 }
 
-/* Haptic-feel button press animation (subtle scale-down) */
-@media (pointer: coarse) {
-  button:active:not(:disabled),
-  [role="button"]:active:not(:disabled),
-  a[href]:active {
-    transform: scale(0.97);
-    transition: transform 0.08s ease-out;
+/* ── Elevated card with warm shadow palette ── */
+.ik26-card-elevated {
+  background: #FFFFFF;
+  border: 1px solid rgba(58, 107, 107, 0.08);
+  border-radius: 16px;
+  box-shadow: 0 1px 3px rgba(46, 79, 82, 0.04), 0 4px 16px rgba(46, 79, 82, 0.03);
+  transition: box-shadow 0.35s cubic-bezier(0.22, 1, 0.36, 1), transform 0.35s cubic-bezier(0.22, 1, 0.36, 1), border-color 0.35s ease;
+}
+@media (pointer: fine) {
+  .ik26-card-elevated:hover {
+    box-shadow: 0 4px 12px rgba(46, 79, 82, 0.06), 0 12px 40px rgba(46, 79, 82, 0.05), 0 0 0 1px rgba(203,164,122,0.08);
+    transform: translateY(-3px);
+    border-color: rgba(203,164,122,0.15);
   }
+  .ik26-card-elevated:active {
+    transform: translateY(-1px);
+    box-shadow: 0 2px 8px rgba(46, 79, 82, 0.05);
+  }
+}
+
+/* ── Gold accent line (decorative) ── */
+.ik26-gold-line {
+  height: 2px;
+  background: linear-gradient(90deg, transparent, rgba(203,164,122,0.4) 15%, rgba(203,164,122,0.5) 50%, rgba(203,164,122,0.4) 85%, transparent);
+  border-radius: 1px;
+}
+
+/* ── Celebration confetti burst ── */
+@keyframes ik26-confetti-fall {
+  0% { transform: translateY(-20px) rotate(0deg) scale(0); opacity: 0; }
+  15% { transform: translateY(0) rotate(45deg) scale(1); opacity: 1; }
+  100% { transform: translateY(120px) rotate(360deg) scale(0.3); opacity: 0; }
+}
+
+.ik26-confetti-particle {
+  position: absolute;
+  width: 6px;
+  height: 6px;
+  border-radius: 1px;
+  animation: ik26-confetti-fall 1.8s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+  pointer-events: none;
+}
+
+/* ── Milestone celebration glow pulse ── */
+@keyframes ik26-celebrate-glow {
+  0% { box-shadow: 0 0 0 0 rgba(203,164,122,0.4); }
+  50% { box-shadow: 0 0 20px 8px rgba(203,164,122,0.15); }
+  100% { box-shadow: 0 0 0 0 rgba(203,164,122,0); }
+}
+
+.ik26-celebrate {
+  animation: ik26-celebrate-glow 1.5s ease-out;
+}
+
+/* ── Section heading with decorative line ── */
+.ik26-section-heading {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.ik26-section-heading::after {
+  content: "";
+  flex: 1;
+  height: 1px;
+  background: linear-gradient(90deg, rgba(203,164,122,0.2), transparent 80%);
 }
 
 /* ── Responsive Modal Sizing ── */

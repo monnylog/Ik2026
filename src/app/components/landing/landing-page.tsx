@@ -25,12 +25,11 @@ import {
 import { ImageWithFallback } from "../figma/ImageWithFallback";
 import istoryaLogo from "../../../imports/Logo_orange.svg";
 import { projectId, publicAnonKey } from "/utils/supabase/info";
+import { bodyFont, headingFont } from "../../lib/fonts";
 
 /* ── Fonts ────────────────────────────────────────────────────────── */
-const hf = {
-  fontFamily: "'Degular', 'Maragsa', 'Playfair Display', serif",
-} as const;
-const bf = { fontFamily: "'Inter', sans-serif" } as const;
+const hf = headingFont;
+const bf = bodyFont;
 
 /* ── Palette ──────────────────────────────────────────────────────── */
 const C = {

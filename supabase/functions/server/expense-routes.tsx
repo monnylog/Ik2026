@@ -17,8 +17,10 @@ function getAdminClient() {
 
 export const EXPENSE_BUCKET = "make-5ed426e6-receipts";
 
-// Ensure receipt bucket exists on startup
-(async () => {
+// Lazy bucket creation (on first use, not on import) to reduce cold-start overhead
+let _receiptBucketReady = false;
+async function ensureReceiptBucket() {
+  if (_receiptBucketReady) return;
   try {
     const admin = getAdminClient();
     const { data: buckets } = await admin.storage.listBuckets();
@@ -27,10 +29,11 @@ export const EXPENSE_BUCKET = "make-5ed426e6-receipts";
       await admin.storage.createBucket(EXPENSE_BUCKET, { public: false });
       console.log(`Created storage bucket: ${EXPENSE_BUCKET}`);
     }
+    _receiptBucketReady = true;
   } catch (err) {
     console.log("Error ensuring receipt bucket:", err);
   }
-})();
+}
 
 // Submit new expense
 expenses.post("/make-server-5ed426e6/expenses", async (c) => {
@@ -48,6 +51,7 @@ expenses.post("/make-server-5ed426e6/expenses", async (c) => {
     // Upload receipt if provided (base64 encoded)
     if (receipt_base64 && receipt_filename) {
       try {
+        await ensureReceiptBucket();
         const admin = getAdminClient();
         const ext = receipt_filename.split(".").pop() || "jpg";
         const filePath = `receipts/${id}.${ext}`;

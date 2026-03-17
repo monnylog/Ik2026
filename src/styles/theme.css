@@ -6,9 +6,9 @@
 
 @theme {
   --font-size: 16px;
-  --font-sans: 'Civil', 'Inter', system-ui, sans-serif;
+  --font-sans: 'Civil', 'DM Sans', 'Inter', system-ui, sans-serif;
   --font-mono: 'JetBrains Mono', monospace;
-  --font-heading: 'Steiner', 'Degular', 'Maragsa', 'Playfair Display', serif;
+  --font-heading: 'Steiner', 'Cormorant Garamond', 'Degular', 'Maragsa', 'Playfair Display', serif;
   --background: #F0F4F6;
   --foreground: #3A4A48;
   --card: #FFFFFF;
@@ -235,6 +235,6 @@ button, a, [role="button"] {
 
   .print-root .print-header h1 {
     font-size: 16pt;
-    font-family: 'Steiner', 'Degular', 'Maragsa', 'Playfair Display', serif;
+    font-family: 'Steiner', 'Cormorant Garamond', 'Degular', 'Maragsa', 'Playfair Display', serif;
   }
 }

@@ -128,11 +128,13 @@ const allergenOptions = [
 interface ChefSubmissionWizardProps {
   onNavigate?: (page: string) => void;
   onClose?: () => void;
+  onCelebrate?: (config: { title: string; subtitle?: string }) => void;
 }
 
 export function ChefSubmissionWizard({
   onNavigate,
   onClose,
+  onCelebrate,
 }: ChefSubmissionWizardProps) {
   const { profile } = useProfile();
   const [currentStep, setCurrentStep] = useState(0);
@@ -261,6 +263,10 @@ export function ChefSubmissionWizard({
     await persistData(form);
     setSubmitted(true);
     toast.success("Menu submission saved! You can update it anytime.");
+    onCelebrate?.({
+      title: "Submission Complete",
+      subtitle: form.dishName ? `"${form.dishName}" is locked in` : "Your menu details have been saved",
+    });
   };
 
   const step = steps[currentStep];

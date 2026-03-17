@@ -35,6 +35,16 @@ interface UpdateItem {
 
 const updates: UpdateItem[] = [
   {
+    id: "u-10",
+    date: "Mar 17",
+    title: "v3.3.0 Experience Polish",
+    description:
+      "Immersive visual refresh: proper web fonts (DM Sans + Cormorant Garamond fallbacks), milestone celebration animations with confetti, enriched Chef Command Center with card grid layout, ambient dashboard sections, gold accent lines, and consistent typography across all views.",
+    icon: Palette,
+    color: "#CBA47A",
+    audience: "all",
+  },
+  {
     id: "u-9",
     date: "Mar 16",
     title: "System Audit Full Page",

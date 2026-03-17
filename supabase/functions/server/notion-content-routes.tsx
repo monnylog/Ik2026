@@ -19,6 +19,33 @@ type NotionContentType = typeof NOTION_CONTENT_TYPES[number];
 
 const CONTENT_CACHE_TTL_MS = 5 * 60 * 1000; // 5 minutes default
 
+// ── In-memory cache for hot paths (reduces KV reads + Notion API calls) ──
+interface MemCache<T> { data: T; ts: number; }
+const MEM_CONTENT_TTL = 60_000; // 60 seconds in-memory
+const _memContentCache: Map<string, MemCache<any[]>> = new Map();
+const MEM_CHANGES_TTL = 90_000; // 90 seconds — check-changes is very expensive
+let _memChangesCache: MemCache<any> | null = null;
+
+function getMemContent(type: string): any[] | null {
+  const cached = _memContentCache.get(type);
+  if (cached && Date.now() - cached.ts < MEM_CONTENT_TTL) return cached.data;
+  return null;
+}
+
+function setMemContent(type: string, data: any[]) {
+  _memContentCache.set(type, { data, ts: Date.now() });
+}
+
+function getMemChanges(): any | null {
+  const cached = _memChangesCache;
+  if (cached && Date.now() - cached.ts < MEM_CHANGES_TTL) return cached.data;
+  return null;
+}
+
+function setMemChanges(data: any) {
+  _memChangesCache = { data, ts: Date.now() };
+}
+
 // ── Notion API key resolution ────────────────────────────────────
 // Module-level key so downstream helpers can access it without threading `c`.
 let _activeNotionKey: string | null = null;
@@ -489,19 +516,31 @@ notionContent.get("/make-server-5ed426e6/notion/content/:type/pull", async (c) =
       return c.json({ items: [], configured: false, error: "Not configured" });
     }
 
+    // 1. Check in-memory cache first (fastest, avoids KV read)
+    if (!forceRefresh) {
+      const memCached = getMemContent(type);
+      if (memCached) {
+        return c.json({ items: memCached, cached: true, stale: false, lastPulled: Date.now(), itemCount: memCached.length, source: "mem" });
+      }
+    }
+
     const cacheKey = `ik26:notion:cache:${type}`;
     const now = Date.now();
 
+    // 2. Check KV cache
     if (!forceRefresh) {
       const cached: any = await kv.get(cacheKey);
       if (cached && now - cached.cachedAt < CONTENT_CACHE_TTL_MS) {
+        setMemContent(type, cached.data); // warm mem cache
         return c.json({ items: cached.data, cached: true, stale: false, lastPulled: cached.cachedAt, itemCount: cached.data.length });
       }
     }
 
+    // 3. Fetch fresh from Notion
     const results = await smartQueryNotionContent(entry, type);
     const items = results.map(extractAllProperties);
     await kv.set(cacheKey, { data: items, cachedAt: now });
+    setMemContent(type, items); // warm mem cache
 
     await appendSyncLog({ type, action: "pulled", itemCount: items.length, timestamp: new Date().toISOString() });
 
@@ -509,7 +548,14 @@ notionContent.get("/make-server-5ed426e6/notion/content/:type/pull", async (c) =
   } catch (err: any) {
     console.log(`Error pulling Notion content (${c.req.param("type")}):`, err);
 
-    const cacheKey = `ik26:notion:cache:${c.req.param("type")}`;
+    // Try in-memory cache first, then KV stale cache
+    const type = c.req.param("type");
+    const memCached = getMemContent(type);
+    if (memCached) {
+      return c.json({ items: memCached, cached: true, stale: true, lastPulled: Date.now(), itemCount: memCached.length, error: `Using mem cache: ${err.message}` });
+    }
+
+    const cacheKey = `ik26:notion:cache:${type}`;
     const stale: any = await kv.get(cacheKey);
     if (stale) {
       return c.json({ items: stale.data, cached: true, stale: true, lastPulled: stale.cachedAt, itemCount: stale.data.length, error: `Using stale cache: ${err.message}` });
@@ -663,13 +709,22 @@ notionContent.post("/make-server-5ed426e6/notion/content/sync-all", async (c) =>
 });
 
 // ── Check for changes (lightweight — uses last_edited_time) ─────
+// Cached in-memory for 90s to prevent repeated heavy Notion API sweeps
 
 notionContent.get("/make-server-5ed426e6/notion/content/check-changes", async (c) => {
   try {
+    // Return cached result if available (avoids 11 Notion API calls)
+    const memCached = getMemChanges();
+    if (memCached) {
+      return c.json({ changes: memCached, cached: true });
+    }
+
     resolveNotionKeyFromHeader(c);
     const config = await ensureDefaultConfig();
     const changes: Record<string, { hasChanges: boolean; latestEdit: string | null }> = {};
 
+    // Only check types that have cached data — skip uncached ones (mark as changed)
+    const typesToCheck: string[] = [];
     for (const type of NOTION_CONTENT_TYPES) {
       const entry = config[type];
       if (!entry) continue;
@@ -679,27 +734,49 @@ notionContent.get("/make-server-5ed426e6/notion/content/check-changes", async (c
 
       if (!cached) {
         changes[type] = { hasChanges: true, latestEdit: null };
-        continue;
-      }
-
-      try {
-        const results = await smartQueryNotionContent(
-          entry, type,
-          [{ timestamp: "last_edited_time", direction: "descending" }],
-        );
-        if (results.length > 0) {
-          const latestEdit = results[0].last_edited_time;
-          const cachedTime = new Date(cached.cachedAt).toISOString();
-          changes[type] = { hasChanges: latestEdit > cachedTime, latestEdit };
-        } else {
-          changes[type] = { hasChanges: false, latestEdit: null };
-        }
-      } catch {
-        changes[type] = { hasChanges: true, latestEdit: null };
+      } else {
+        typesToCheck.push(type);
       }
     }
 
-    return c.json({ changes });
+    // Batch check only cached types (limit to 4 at a time to stay under compute limits)
+    for (let i = 0; i < typesToCheck.length; i += 4) {
+      const batch = typesToCheck.slice(i, i + 4);
+      const results = await Promise.allSettled(
+        batch.map(async (type) => {
+          const entry = config[type];
+          const cacheKey = `ik26:notion:cache:${type}`;
+          const cached: any = await kv.get(cacheKey);
+
+          try {
+            const results = await smartQueryNotionContent(
+              entry, type,
+              [{ timestamp: "last_edited_time", direction: "descending" }],
+            );
+            if (results.length > 0) {
+              const latestEdit = results[0].last_edited_time;
+              const cachedTime = new Date(cached.cachedAt).toISOString();
+              return { type, hasChanges: latestEdit > cachedTime, latestEdit };
+            }
+            return { type, hasChanges: false, latestEdit: null };
+          } catch {
+            return { type, hasChanges: true, latestEdit: null };
+          }
+        })
+      );
+
+      for (const result of results) {
+        if (result.status === "fulfilled") {
+          const { type, ...rest } = result.value;
+          changes[type] = rest;
+        }
+      }
+    }
+
+    // Cache the result in memory for 90 seconds
+    setMemChanges(changes);
+
+    return c.json({ changes, cached: false });
   } catch (err) {
     console.log("Error checking Notion changes:", err);
     return c.json({ error: `Change check failed: ${err}` }, 500);

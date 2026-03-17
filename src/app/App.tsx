@@ -46,6 +46,8 @@ import {
 import { clearDraft } from "./components/onboarding/use-draft";
 import { NotionProvider } from "./lib/notion-context";
 import { usePrefetchPages } from "./lib/use-prefetch";
+import { bodyFont, headingFont } from "./lib/fonts";
+import { useUrlSync } from "./lib/use-url-sync";
 
 import { PasswordGate } from "./components/onboarding/password-gate"; // v3.0.1 fixed imports
 import { OnboardingModal } from "./components/onboarding/onboarding-modal";
@@ -151,6 +153,10 @@ import { WhatsNew } from "./components/dashboard/whats-new";
 import { BackendHealthIndicator } from "./components/dashboard/backend-health";
 import { AuditTrail } from "./components/dashboard/audit-trail";
 import { ContentStudioWidget } from "./components/dashboard/content-studio-widget";
+
+// Dashboard layout helpers
+import { StaggeredWidget, SectionDivider, GoldAccentLine } from "./components/dashboard/dashboard-layout";
+import { MilestoneCelebration, useCelebration } from "./components/ui/milestone-celebration";
 
 // Full pages — lazy loaded for code splitting
 // Retry wrapper: handles transient "Failed to fetch dynamically imported module" errors
@@ -434,12 +440,25 @@ function AppInner() {
   // Guided tour
   const { showTour, completeTour } = useGuidedTour();
 
+  // Milestone celebrations
+  const { celebration, celebrate, dismiss: dismissCelebration } = useCelebration();
+
+  // URL ↔ activePage synchronization for deep linking & browser nav
+  useUrlSync(activePage, (page) => {
+    if (page !== activePage) {
+      trackPage(page);
+      setActivePage(page);
+    }
+  }, dashboardReady);
+
   // Wrapped page navigation with progress bar + recent tracking
   const handleNavigate = (page: string) => {
     if (page === activePage) return;
     startTransition();
     trackPage(page);
     setActivePage(page);
+    // Scroll main content to top on navigation
+    if (mainRef.current) mainRef.current.scrollTop = 0;
     // End transition after animation settles
     setTimeout(() => endTransition(), 350);
   };
@@ -652,7 +671,7 @@ function AppInner() {
           <span
             className="text-[0.75rem] tracking-wider uppercase"
             style={{
-              fontFamily: "'Civil', 'Inter', sans-serif",
+              ...bodyFont,
               color: "#6E8185",
               letterSpacing: "0.15em",
             }}
@@ -891,7 +910,7 @@ function AppInner() {
                               viewMode === "team"
                                 ? "#4A7FB5"
                                 : "#7E9E78",
-                            fontFamily: "'Inter', sans-serif",
+                            ...bodyFont,
                           }}
                         >
                           <span className="hidden sm:inline">
@@ -927,7 +946,7 @@ function AppInner() {
                               color: "#D4AA7C",
                               border:
                                 "1px solid rgba(212,170,124,0.2)",
-                              fontFamily: "'Inter', sans-serif",
+                              ...bodyFont,
                             }}
                             aria-label="Switch view mode"
                             aria-expanded={previewDropdownOpen}
@@ -1032,8 +1051,7 @@ function AppInner() {
                                             color: isActive
                                               ? item.color
                                               : undefined,
-                                            fontFamily:
-                                              "'Inter', sans-serif",
+                                            ...bodyFont,
                                             fontWeight: isActive
                                               ? 600
                                               : 400,
@@ -1078,7 +1096,7 @@ function AppInner() {
                               viewMode === "team"
                                 ? "1px solid rgba(74,127,181,0.2)"
                                 : "1px solid rgba(126,158,120,0.2)",
-                            fontFamily: "'Inter', sans-serif",
+                            ...bodyFont,
                           }}
                           aria-label="Switch back to Manager view"
                         >
@@ -1222,7 +1240,9 @@ function AppInner() {
                         </div>
                       )}
 
-                      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                      <GoldAccentLine />
+
+                      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 ik26-ambient-section">
                         <div className="lg:col-span-2 space-y-6">
                           {isLeadershipView && (
                             <>
@@ -1819,6 +1839,7 @@ function AppInner() {
                               onClose={() =>
                                 handleNavigate("Dashboard")
                               }
+                              onCelebrate={celebrate}
                             />
                           </Suspense>
                         </ErrorBoundary>
@@ -2233,28 +2254,20 @@ function AppInner() {
                       <div className="w-12 h-12 rounded-xl bg-gold/10 border border-gold/20 flex items-center justify-center mb-4">
                         <span
                           className="text-gold text-[1.25rem]"
-                          style={{
-                            fontFamily:
-                              "'Degular', 'Maragsa', 'Playfair Display', sans-serif",
-                          }}
+                          style={headingFont}
                         >
                           {activePage.charAt(0)}
                         </span>
                       </div>
                       <h3
                         className="text-foreground mb-1"
-                        style={{
-                          fontFamily:
-                            "'Degular', 'Maragsa', 'Playfair Display', sans-serif",
-                        }}
+                        style={headingFont}
                       >
                         {activePage}
                       </h3>
                       <p
                         className="text-muted-foreground text-[0.875rem]"
-                        style={{
-                          fontFamily: "'Inter', sans-serif",
-                        }}
+                        style={bodyFont}
                       >
                         This page isn't available in your current view.
                       </p>
@@ -2265,7 +2278,7 @@ function AppInner() {
                           backgroundColor: "rgba(201,169,110,0.1)",
                           color: "#C9A96E",
                           border: "1px solid rgba(201,169,110,0.2)",
-                          fontFamily: "'Inter', sans-serif",
+                          ...bodyFont,
                         }}
                       >
                         Back to Dashboard
@@ -2328,6 +2341,17 @@ function AppInner() {
               viewMode={viewMode}
             />
           )}
+
+          {/* Milestone celebration overlay */}
+          {celebration && (
+            <MilestoneCelebration
+              show={true}
+              title={celebration.title}
+              subtitle={celebration.subtitle}
+              duration={celebration.duration}
+              onComplete={dismissCelebration}
+            />
+          )}
         </div>
       </TooltipWalkthroughProvider>
     </NotionProvider>
@@ -2373,7 +2397,7 @@ export default function App() {
           }
           toastOptions={{
             style: {
-              fontFamily: "'Inter', sans-serif",
+              fontFamily: "'Civil', 'DM Sans', 'Inter', sans-serif",
               fontSize: "0.8125rem",
               borderRadius: "0.75rem",
               border: "1px solid rgba(140,165,135,0.1)",

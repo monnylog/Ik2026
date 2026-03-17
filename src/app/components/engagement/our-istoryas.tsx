@@ -10,8 +10,11 @@ import { bodyFont, headingFont } from "../../lib/fonts";
 
 // Event is considered "post-event" after this date
 const EVENT_DATE = new Date("2026-05-22");
-const TODAY = new Date("2026-03-09");
-const IS_POST_EVENT = TODAY >= EVENT_DATE;
+function getProjectNow() {
+  const now = new Date();
+  return new Date(2026, now.getMonth(), now.getDate(), now.getHours(), now.getMinutes(), now.getSeconds());
+}
+const IS_POST_EVENT = getProjectNow() >= EVENT_DATE;
 
 // Same prompt list from daily-prompt.tsx
 const promptQuestions: Record<string, string> = {
