@@ -11,6 +11,7 @@ import { expenses, EXPENSE_BUCKET as EXPENSE_BUCKET_NAME } from "./expense-route
 import { audit } from "./audit-routes.tsx";
 import { studio } from "./content-studio.tsx";
 import { notionContent, ensureDefaultConfig, resolveNotionKeyFromHeader, getNotionConfig } from "./notion-content-routes.tsx";
+import { instagramSync } from "./instagram-sync-routes.tsx";
 const app = new Hono();
 
 // ─── In-memory cache to reduce KV reads on hot paths ────────────
@@ -1617,5 +1618,6 @@ app.route("/", expenses);
 app.route("/", audit);
 app.route("/", studio);
 app.route("/", notionContent);
+app.route("/", instagramSync);
 
 Deno.serve(app.fetch);
