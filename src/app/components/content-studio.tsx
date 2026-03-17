@@ -182,6 +182,70 @@ export default function ContentStudio({ onNavigate }: ContentStudioProps) {
   const [showNewEntry, setShowNewEntry] = useState(false);
   const [newEntryId, setNewEntryId] = useState("");
 
+  // Access Codes management
+  const [accessCodes, setAccessCodes] = useState<Record<string, string> | null>(null);
+  const [accessCodesLoading, setAccessCodesLoading] = useState(false);
+  const [accessCodesDirty, setAccessCodesDirty] = useState(false);
+  const [accessCodesSaving, setAccessCodesSaving] = useState(false);
+  const [newCode, setNewCode] = useState("");
+  const [newCodeRole, setNewCodeRole] = useState("team");
+  const [showAccessCodes, setShowAccessCodes] = useState(false);
+
+  const loadAccessCodes = useCallback(async () => {
+    setAccessCodesLoading(true);
+    try {
+      const res = await apiFetch("/config/access-codes");
+      setAccessCodes(res.codes || {});
+    } catch (err) {
+      console.error("Failed to load access codes:", err);
+      toast.error("Failed to load access codes");
+    } finally {
+      setAccessCodesLoading(false);
+    }
+  }, []);
+
+  const saveAccessCodes = useCallback(async () => {
+    if (!accessCodes) return;
+    setAccessCodesSaving(true);
+    try {
+      await apiFetch("/config/access-codes", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ codes: accessCodes }),
+      });
+      toast.success(`Access codes saved — ${Object.keys(accessCodes).length} codes`);
+      setAccessCodesDirty(false);
+    } catch (err) {
+      console.error("Failed to save access codes:", err);
+      toast.error("Failed to save access codes");
+    } finally {
+      setAccessCodesSaving(false);
+    }
+  }, [accessCodes]);
+
+  const addAccessCode = useCallback(() => {
+    const code = newCode.trim().toLowerCase();
+    if (!code) return;
+    if (accessCodes && accessCodes[code]) {
+      toast.error(`Code "${code}" already exists`);
+      return;
+    }
+    setAccessCodes((prev) => ({ ...prev, [code]: newCodeRole }));
+    setNewCode("");
+    setAccessCodesDirty(true);
+    toast.success(`Added "${code}" as ${newCodeRole}`);
+  }, [newCode, newCodeRole, accessCodes]);
+
+  const removeAccessCode = useCallback((code: string) => {
+    setAccessCodes((prev) => {
+      if (!prev) return prev;
+      const next = { ...prev };
+      delete next[code];
+      return next;
+    });
+    setAccessCodesDirty(true);
+  }, []);
+
   // ── Fetch overview data ──────────────────────────────────────────
 
   const fetchOverview = useCallback(async () => {
@@ -645,6 +709,153 @@ export default function ContentStudio({ onNavigate }: ContentStudioProps) {
                 </button>
               ))}
             </div>
+          </div>
+
+          {/* Access Code Manager */}
+          <div
+            className="rounded-xl overflow-hidden"
+            style={{ backgroundColor: "var(--card)", border: "1px solid var(--border)" }}
+          >
+            <div className="px-5 py-3.5 flex items-center justify-between" style={{ borderBottom: "1px solid var(--border)" }}>
+              <div className="flex items-center gap-2">
+                <Key className="w-4 h-4" style={{ color: "#8B7EC8" }} />
+                <h3 className="text-foreground text-[0.875rem] font-semibold" style={headingFont}>
+                  Access Codes
+                </h3>
+                {accessCodes && (
+                  <span className="text-[0.625rem] text-muted-foreground px-2 py-0.5 rounded-full" style={{ backgroundColor: "rgba(139,126,200,0.08)", ...bodyFont }}>
+                    {Object.keys(accessCodes).length} codes
+                  </span>
+                )}
+              </div>
+              <div className="flex items-center gap-2">
+                {accessCodesDirty && (
+                  <motion.button
+                    initial={{ scale: 0.9, opacity: 0 }}
+                    animate={{ scale: 1, opacity: 1 }}
+                    whileHover={{ scale: 1.03 }}
+                    whileTap={{ scale: 0.97 }}
+                    onClick={saveAccessCodes}
+                    disabled={accessCodesSaving}
+                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[0.6875rem] font-medium cursor-pointer"
+                    style={{
+                      backgroundColor: "rgba(78,130,130,0.1)",
+                      color: "#4E8282",
+                      border: "1px solid rgba(78,130,130,0.2)",
+                      ...bodyFont,
+                    }}
+                  >
+                    <Save className="w-3 h-3" />
+                    {accessCodesSaving ? "Saving..." : "Save Changes"}
+                  </motion.button>
+                )}
+                <button
+                  onClick={() => {
+                    setShowAccessCodes(!showAccessCodes);
+                    if (!showAccessCodes && !accessCodes) loadAccessCodes();
+                  }}
+                  className="text-[0.6875rem] cursor-pointer flex items-center gap-1"
+                  style={{ color: "#9FB0D4", ...bodyFont }}
+                >
+                  {showAccessCodes ? "Hide" : "Manage"} <ChevronRight className={`w-3 h-3 transition-transform ${showAccessCodes ? "rotate-90" : ""}`} />
+                </button>
+              </div>
+            </div>
+
+            {showAccessCodes && (
+              <div className="p-4 space-y-3">
+                {accessCodesLoading ? (
+                  <div className="flex items-center justify-center py-8">
+                    <RefreshCw className="w-4 h-4 animate-spin text-muted-foreground" />
+                  </div>
+                ) : accessCodes ? (
+                  <>
+                    {/* Add new code */}
+                    <div className="flex items-center gap-2">
+                      <input
+                        type="text"
+                        value={newCode}
+                        onChange={(e) => setNewCode(e.target.value)}
+                        placeholder="New access code..."
+                        className="flex-1 px-3 py-2 rounded-lg text-[0.75rem] bg-secondary/40 text-foreground placeholder:text-muted-foreground/50 outline-none"
+                        style={{ border: "1px solid var(--border)", ...bodyFont }}
+                        onKeyDown={(e) => e.key === "Enter" && addAccessCode()}
+                      />
+                      <select
+                        value={newCodeRole}
+                        onChange={(e) => setNewCodeRole(e.target.value)}
+                        className="px-2 py-2 rounded-lg text-[0.75rem] bg-secondary/40 text-foreground outline-none cursor-pointer"
+                        style={{ border: "1px solid var(--border)", ...bodyFont }}
+                      >
+                        <option value="leadership">Leadership</option>
+                        <option value="team">Team</option>
+                        <option value="chef">Chef</option>
+                        <option value="viewer">Viewer</option>
+                      </select>
+                      <button
+                        onClick={addAccessCode}
+                        disabled={!newCode.trim()}
+                        className="px-3 py-2 rounded-lg text-[0.75rem] font-medium cursor-pointer disabled:opacity-40"
+                        style={{
+                          backgroundColor: "rgba(78,130,130,0.1)",
+                          color: "#4E8282",
+                          border: "1px solid rgba(78,130,130,0.2)",
+                          ...bodyFont,
+                        }}
+                      >
+                        <Plus className="w-3.5 h-3.5" />
+                      </button>
+                    </div>
+
+                    {/* Grouped by role */}
+                    {(["leadership", "team", "chef", "viewer"] as const).map((role) => {
+                      const codes = Object.entries(accessCodes).filter(([, r]) => r === role);
+                      if (codes.length === 0) return null;
+                      const roleColors: Record<string, string> = {
+                        leadership: "#CBA47A",
+                        team: "#4E8282",
+                        chef: "#C08E7E",
+                        viewer: "#9FB0D4",
+                      };
+                      return (
+                        <div key={role}>
+                          <div className="flex items-center gap-2 mb-1.5">
+                            <div className="w-2 h-2 rounded-full" style={{ backgroundColor: roleColors[role] }} />
+                            <span className="text-[0.6875rem] font-medium text-muted-foreground uppercase tracking-wider" style={bodyFont}>
+                              {role} ({codes.length})
+                            </span>
+                          </div>
+                          <div className="flex flex-wrap gap-1.5">
+                            {codes.map(([code]) => (
+                              <span
+                                key={code}
+                                className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-[0.6875rem] group"
+                                style={{
+                                  backgroundColor: `${roleColors[role]}08`,
+                                  border: `1px solid ${roleColors[role]}18`,
+                                  color: roleColors[role],
+                                  ...bodyFont,
+                                }}
+                              >
+                                <Lock className="w-2.5 h-2.5 opacity-40" />
+                                <code className="font-mono">{code}</code>
+                                <button
+                                  onClick={() => removeAccessCode(code)}
+                                  className="opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer ml-0.5"
+                                  title="Remove code"
+                                >
+                                  <X className="w-3 h-3" />
+                                </button>
+                              </span>
+                            ))}
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </>
+                ) : null}
+              </div>
+            )}
           </div>
 
           {/* KV Collections */}

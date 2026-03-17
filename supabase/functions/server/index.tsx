@@ -13,8 +13,7 @@ import { studio } from "./content-studio.tsx";
 import { notionContent, ensureDefaultConfig, resolveNotionKeyFromHeader, getNotionConfig } from "./notion-content-routes.tsx";
 import { notionTasks, setActiveNotionKey } from "./notion-tasks-routes.tsx";
 import { utility, PHOTO_BUCKET } from "./utility-routes.tsx";
-import { instagramSync } from "./instagram-sync-routes.tsx";
-import { websiteCopy } from "./website-copy-routes.tsx";
+
 const app = new Hono();
 
 // ─── In-memory cache to reduce KV reads on hot paths ────────────
@@ -541,7 +540,7 @@ app.get("/make-server-5ed426e6/submission-stats", async (c) => {
 
 // Health check endpoint
 app.get("/make-server-5ed426e6/health", (c) => {
-  return c.json({ status: "ok", timestamp: new Date().toISOString(), version: "3.3.0" });
+  return c.json({ status: "ok", timestamp: new Date().toISOString(), version: "3.4.0" });
 });
 
 // ─── Pre-flight Deployment Validation ──────────────────────────
@@ -647,7 +646,7 @@ app.get("/make-server-5ed426e6/preflight", async (c) => {
 
   const allOk = Object.values(checks).every((ch) => ch.ok);
   const okCount = Object.values(checks).filter((ch) => ch.ok).length;
-  return c.json({ ready: allOk, score: `${okCount}/${Object.keys(checks).length}`, checks, timestamp: new Date().toISOString(), version: "3.3.0" });
+  return c.json({ ready: allOk, score: `${okCount}/${Object.keys(checks).length}`, checks, timestamp: new Date().toISOString(), version: "3.4.0" });
 });
 
 // ─── Logo, Calendar, Photo, Portal, Analytics → utility-routes.tsx ────
@@ -769,7 +768,5 @@ app.route("/", studio);
 app.route("/", notionContent);
 app.route("/", notionTasks);
 app.route("/", utility);
-app.route("/", instagramSync);
-app.route("/ik26/copy", websiteCopy);
 
 Deno.serve(app.fetch);

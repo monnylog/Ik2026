@@ -26,7 +26,6 @@ import { ImageWithFallback } from "../figma/ImageWithFallback";
 import istoryaLogo from "../../../imports/Logo_orange.svg";
 import { projectId, publicAnonKey } from "/utils/supabase/info";
 import { bodyFont, headingFont } from "../../lib/fonts";
-import { useSiteCopy } from "../../lib/use-site-copy";
 
 /* ── Fonts ────────────────────────────────────────────────────────── */
 const hf = headingFont;
@@ -787,7 +786,7 @@ function HeroSection({ persona }: { persona: PersonaRole }) {
             textTransform: "uppercase" as const,
           }}
         >
-          {t("nav.tagline", "May 22, 2026 · Las Vegas")}
+          May 22, 2026 &middot; Las Vegas
         </motion.p>
 
         <motion.h1
@@ -802,7 +801,11 @@ function HeroSection({ persona }: { persona: PersonaRole }) {
             letterSpacing: "-0.02em",
           }}
         >
-          {t("hero.headline", "Isang Kusina 2026")}
+          One Night.
+          <br />
+          One Kitchen.
+          <br />
+          One Story.
         </motion.h1>
 
         <motion.p
@@ -817,7 +820,8 @@ function HeroSection({ persona }: { persona: PersonaRole }) {
             lineHeight: 1.7,
           }}
         >
-          {t("hero.subheadline", "Filipino American: Exploring Identity and Migration Through the Modern Table")}
+          Five Filipino chefs from five cities. One collaborative dinner in
+          Las Vegas. Every course is a chapter.
         </motion.p>
 
         <motion.button
@@ -1023,7 +1027,7 @@ function ChefsSection() {
             fontSize: "clamp(1.75rem, 4vw, 2.75rem)",
           }}
         >
-          {t("chefs.headline", "The Table")}
+          Five chefs. Five cities. One table.
         </motion.h2>
         <motion.p
           initial={{ opacity: 0 }}
@@ -1038,7 +1042,8 @@ function ChefsSection() {
             lineHeight: 1.6,
           }}
         >
-          {t("chefs.subheadline", "Seven chefs. Seven cities. One inheritance.")}
+          From Los Angeles to Juneau, these chefs bring every kitchen they've
+          ever stood in to this one table.
         </motion.p>
 
         {/* City connection line — simplified route visualization */}
@@ -1528,7 +1533,7 @@ function BookingSection({ persona }: { persona: PersonaRole }) {
             fontSize: "clamp(1.75rem, 4vw, 2.5rem)",
           }}
         >
-          {t("tickets.headline", "Join the Table")}
+          Choose your seating.
         </motion.h2>
 
         <motion.div
@@ -1543,14 +1548,14 @@ function BookingSection({ persona }: { persona: PersonaRole }) {
             style={{ ...bf, color: `${C.ecru}59`, fontSize: "0.75rem" }}
           >
             <Calendar className="w-3 h-3" />
-            {t("hero.date", "May 22, 2026")}
+            May 22, 2026
           </span>
           <span
             className="flex items-center gap-1.5"
             style={{ ...bf, color: `${C.ecru}59`, fontSize: "0.75rem" }}
           >
             <MapPin className="w-3 h-3" />
-            {t("hero.venue", "Keep Memory Alive Event Center, Las Vegas")}
+            Keep Memory Alive Event Center
           </span>
           <span
             className="flex items-center gap-1.5"
@@ -2014,7 +2019,7 @@ function LandingFooter() {
           className="text-center"
           style={{ ...bf, color: `${C.ecru}14`, fontSize: "0.5625rem" }}
         >
-          &copy; {t("footer.copyright", "2026 Istorya. All rights reserved.")}
+          &copy; 2026 Istorya, LLC. All rights reserved.
         </p>
 
         {/* Reset persona / back to top */}
@@ -2053,7 +2058,6 @@ function LandingFooter() {
 /*  LandingPage — top-level orchestrator                           */
 /* ═════════════════════════════════════════════════════════════════ */
 export function LandingPage() {
-  const { t } = useSiteCopy();
   const [phase, setPhase] = useState<"splash" | "gate" | "site">(() => {
     const splashSeen = localStorage.getItem("ik26-splash-seen");
     const persona = localStorage.getItem("ik26-persona") as PersonaRole | null;
@@ -2075,7 +2079,8 @@ export function LandingPage() {
 
   // Set document title for landing page
   useEffect(() => {
-    document.title = t("meta.title", "Isang Kusina 2026 — One Kitchen. One Night. One Story.");
+    document.title =
+      "Isang Kusina 2026 — One Kitchen. One Night. One Story.";
 
     // Update meta for the public page
     let metaDesc = document.querySelector('meta[name="description"]');
@@ -2086,13 +2091,14 @@ export function LandingPage() {
     }
     metaDesc.setAttribute(
       "content",
-      t("meta.description", "Five Filipino chefs from five cities. One collaborative dinner in Las Vegas on May 22, 2026. Every course is a chapter. Reserve your seat at isangkusina.com.")
+      "Five Filipino chefs from five cities. One collaborative dinner in Las Vegas on May 22, 2026. Every course is a chapter. Reserve your seat at isangkusina.com."
     );
 
     // Open Graph meta for social sharing
     const ogTags: Record<string, string> = {
-      "og:title": t("meta.title", "Isang Kusina 2026 — One Night. One Kitchen. One Story."),
-      "og:description": t("meta.description", "Five Filipino chefs from five cities. One collaborative dinner in Las Vegas on May 22, 2026. Every course is a chapter."),
+      "og:title": "Isang Kusina 2026 — One Night. One Kitchen. One Story.",
+      "og:description":
+        "Five Filipino chefs from five cities. One collaborative dinner in Las Vegas on May 22, 2026. Every course is a chapter.",
       "og:type": "website",
       "og:url": "https://isangkusina.com",
       "og:site_name": "Isang Kusina 2026",

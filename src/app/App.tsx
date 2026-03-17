@@ -200,6 +200,7 @@ const CommunityPage = lazyRetry(() => import("./components/community-page"), "Co
 const CommsChat = lazyRetry(() => import("./components/comms-chat"), "CommsChat");
 const OurIstoryas = lazyRetry(() => import("./components/engagement/our-istoryas"), "OurIstoryas");
 const ChefRoster = lazyRetry(() => import("./components/chef-roster"), "ChefRoster");
+const ChefJourney = lazyRetry(() => import("./components/chef-journey"), "ChefJourney");
 const EventTimeline = lazyRetry(() => import("./components/event-timeline"), "EventTimeline");
 const TravelLodging = lazyRetry(() => import("./components/travel-lodging"), "TravelLodging");
 const MenuCourses = lazyRetry(() => import("./components/menu-courses"), "MenuCourses");
@@ -1621,6 +1622,31 @@ function AppInner() {
                           >
                             <ChefRoster
                               role={effectiveRole}
+                              viewMode={viewMode}
+                              onNavigate={handleNavigate}
+                            />
+                          </Suspense>
+                        </ErrorBoundary>
+                      </PageWrapper>
+                    </motion.div>
+                  )}
+                {dashboardReady &&
+                  activePage === "Chef Journey" && (
+                    <motion.div
+                      key="chef-journey"
+                      {...pageTransition}
+                    >
+                      <PageWrapper
+                        title="Chef Journey"
+                        onBack={() =>
+                          handleNavigate("Dashboard")
+                        }
+                      >
+                        <ErrorBoundary section="Chef Journey">
+                          <Suspense
+                            fallback={<PageSkeleton />}
+                          >
+                            <ChefJourney
                               viewMode={viewMode}
                               onNavigate={handleNavigate}
                             />

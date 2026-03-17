@@ -14,6 +14,7 @@ const PAGE_TO_SLUG: Record<string, string> = {
   Comms: "/comms",
   "Our Istoryas": "/istoryas",
   "Chef Roster": "/chef-roster",
+  "Chef Journey": "/chef-journey",
   "Event Timeline": "/timeline",
   "Travel & Lodging": "/travel",
   "Menu & Courses": "/menu",

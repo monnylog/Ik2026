@@ -17,6 +17,7 @@ import {
   Activity,
   Plane,
   ScrollText,
+  BookOpen,
 } from "lucide-react";
 import type { UserRole } from "../onboarding/use-auth";
 import { useUserData } from "../../lib/use-user-data";
@@ -34,6 +35,16 @@ interface UpdateItem {
 }
 
 const updates: UpdateItem[] = [
+  {
+    id: "u-11",
+    date: "Mar 17",
+    title: "v3.4.0 Chef Journey & Deep Links",
+    description:
+      "New Chef Journey narrative view with per-chef storytelling, dish inspiration, and milestone timelines. URL deep linking for all 30+ pages — shareable links and browser back/forward. Access codes moved from hardcoded to KV with Content Studio management UI. Chef Command Center gains Journey quick-link.",
+    icon: BookOpen,
+    color: "#4E8282",
+    audience: "all",
+  },
   {
     id: "u-10",
     date: "Mar 17",

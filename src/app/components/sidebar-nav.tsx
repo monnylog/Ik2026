@@ -55,6 +55,7 @@ const allNavItems = [
   { icon: Mic, label: "Our Istoryas" },
   { icon: CalendarDays, label: "Event Timeline" },
   { icon: Users, label: "Chef Roster" },
+  { icon: BookOpen, label: "Chef Journey" },
   { icon: UserCheck, label: "Team Deploy" },
   { icon: Heart, label: "Community" },
   { icon: Shield, label: "Members" },
@@ -88,7 +89,7 @@ interface NavSection {
 
 const navSections: NavSection[] = [
   { label: "Overview", items: ["Dashboard", "Comms", "Our Istoryas", "Event Timeline", "Mission Control"] },
-  { label: "People", items: ["Chef Roster", "Team Deploy", "Community", "Members"] },
+  { label: "People", items: ["Chef Roster", "Chef Journey", "Team Deploy", "Community", "Members"] },
   { label: "Operations", items: ["Travel & Lodging", "Menu & Courses", "Budget & COGS", "Reimbursements", "Expenses", "Finance", "Sponsors & Partners", "Research & Story"] },
   { label: "Planning", items: ["Pre-Event Checklist", "Task Board", "Event Schedule"] },
   { label: "Insights", items: ["Activity Log"] },

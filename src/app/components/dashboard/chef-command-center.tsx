@@ -181,12 +181,27 @@ export function ChefCommandCenter({ onNavigate }: ChefCommandCenterProps) {
       </div>
 
       {/* Brainstorm CTA */}
-      <div className="px-3 pb-4">
+      <div className="px-3 pb-4 flex gap-2">
+        <motion.button
+          whileHover={{ scale: 1.01 }}
+          whileTap={{ scale: 0.98 }}
+          onClick={() => onNavigate("Chef Journey")}
+          className="flex-1 flex items-center justify-center gap-2 py-3 rounded-xl cursor-pointer relative overflow-hidden"
+          style={{
+            background: "linear-gradient(135deg, rgba(78,130,130,0.08) 0%, rgba(78,130,130,0.04) 100%)",
+            border: "1px solid rgba(78,130,130,0.15)",
+          }}
+        >
+          <BookOpen className="w-3.5 h-3.5" style={{ color: "#4E8282" }} />
+          <span className="text-[0.75rem] font-medium" style={{ color: "#4E8282", ...bodyFont }}>
+            Chef Journey
+          </span>
+        </motion.button>
         <motion.button
           whileHover={{ scale: 1.01 }}
           whileTap={{ scale: 0.98 }}
           onClick={() => onNavigate("Our Istoryas")}
-          className="w-full flex items-center justify-center gap-2.5 py-3 rounded-xl cursor-pointer relative overflow-hidden"
+          className="flex-1 flex items-center justify-center gap-2 py-3 rounded-xl cursor-pointer relative overflow-hidden"
           style={{
             background: "linear-gradient(135deg, rgba(203,164,122,0.08) 0%, rgba(192,142,126,0.06) 100%)",
             border: "1px solid rgba(203,164,122,0.15)",
@@ -194,9 +209,8 @@ export function ChefCommandCenter({ onNavigate }: ChefCommandCenterProps) {
         >
           <Sparkles className="w-3.5 h-3.5" style={{ color: "#CBA47A" }} />
           <span className="text-[0.75rem] font-medium" style={{ color: "#CBA47A", ...bodyFont }}>
-            Brainstorm & Share Your Istorya
+            Share Istorya
           </span>
-          <ArrowRight className="w-3 h-3" style={{ color: "#CBA47A", opacity: 0.4 }} />
         </motion.button>
       </div>
     </motion.div>
