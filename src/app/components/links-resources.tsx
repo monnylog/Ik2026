@@ -17,6 +17,7 @@ import {
   Clock,
   ArrowRight,
 } from "lucide-react";
+import { getVisibleNavItems } from "./onboarding/use-auth";
 
 const bodyFont = { fontFamily: "'Inter', sans-serif" };
 const headingFont = { fontFamily: "'Degular', 'Maragsa', 'Playfair Display', sans-serif" };
@@ -34,7 +35,7 @@ interface ResourceLink {
 const resources: ResourceLink[] = [
   {
     title: "Event Overview Deck",
-    description: "The master presentation — event vision, chef lineup, timeline, and logistics at a glance.",
+    description: "Master presentation — vision, lineup, timeline, and logistics.",
     url: "https://www.canva.com/design/DAHDbuedjDg/5FyH2zp979AW7sdKx5BN_w/view?utm_content=DAHDbuedjDg&utm_campaign=designshare&utm_medium=link2&utm_source=uniquelinks&utlId=h376297da25",
     icon: FileText,
     category: "Planning",
@@ -42,15 +43,16 @@ const resources: ResourceLink[] = [
   },
   {
     title: "IK26 Master Notion Workspace",
-    description: "The central hub — all project docs, meeting notes, and task boards live here.",
-    url: "#",
+    description: "Central hub — all project docs, meeting notes, and task boards.",
+    url: "",
     icon: Layout,
     category: "Workspace",
     pinned: true,
+    internalNav: "Notion Admin",
   },
   {
     title: "Event Production Timeline",
-    description: "Gantt chart with all milestones, deadlines, and dependencies from now to event night.",
+    description: "All milestones, deadlines, and dependencies to event night.",
     url: "",
     icon: Calendar,
     category: "Planning",
@@ -59,7 +61,7 @@ const resources: ResourceLink[] = [
   },
   {
     title: "Chef Onboarding Responses",
-    description: "Compiled survey responses from all chefs — dietary, ingredients, storytelling, contact info.",
+    description: "Survey responses — dietary, ingredients, contact info.",
     url: "",
     icon: ClipboardList,
     category: "Onboarding",
@@ -68,7 +70,7 @@ const resources: ResourceLink[] = [
   },
   {
     title: "Menu Development Doc",
-    description: "Working document for all 8 courses — dish concepts, ingredient lists, plating notes.",
+    description: "All 8 courses — concepts, ingredients, plating notes.",
     url: "",
     icon: FileText,
     category: "Menu",
@@ -76,7 +78,7 @@ const resources: ResourceLink[] = [
   },
   {
     title: "Historical Research Library",
-    description: "Shared folder with research per region — articles, books, archival references.",
+    description: "Research per region — articles, books, archival references.",
     url: "",
     icon: BookOpen,
     category: "Research",
@@ -84,22 +86,30 @@ const resources: ResourceLink[] = [
   },
   {
     title: "Brand & Visual Identity Guide",
-    description: "Logo files, color palette, typography specs, and usage guidelines for all IK26 materials.",
+    description: "Logo files, color palette, typography, and usage guidelines.",
     url: "#",
     icon: Image,
     category: "Creative",
   },
   {
     title: "Team Communication Channel",
-    description: "Real-time team chat right here in the hub — #general, #kitchen, #logistics, #creative, and more.",
+    description: "Real-time team chat — #general, #kitchen, #logistics, and more.",
     url: "",
     icon: MessageSquare,
     category: "Communication",
     internalNav: "Comms",
   },
   {
+    title: "IK26 Discord Server",
+    description: "Join the Isang Kusina community on Discord for real-time voice, text, and updates.",
+    url: "https://discord.gg/eQyaK4Pd",
+    icon: MessageSquare,
+    category: "Communication",
+    pinned: true,
+  },
+  {
     title: "Budget Tracking Spreadsheet",
-    description: "Live spreadsheet with all budget lines, purchase orders, receipts, and projections.",
+    description: "Live budget lines, purchase orders, receipts, and projections.",
     url: "",
     icon: ClipboardList,
     category: "Finance",
@@ -107,42 +117,42 @@ const resources: ResourceLink[] = [
   },
   {
     title: "Venue Floor Plan & Kitchen Layout",
-    description: "CAD drawings of the event space — dining room, kitchen stations, service flow paths.",
+    description: "Event space drawings — dining room, kitchen stations, service flow.",
     url: "#",
     icon: FolderOpen,
     category: "Venue",
   },
   {
     title: "Content & Media Folder",
-    description: "Photos, videos, social assets, and press materials. Organized by date and campaign.",
+    description: "Photos, videos, social assets, and press materials.",
     url: "#",
     icon: Video,
     category: "Creative",
   },
   {
     title: "Guest List & RSVP Tracker",
-    description: "Master guest list with RSVP status, dietary restrictions, table assignments.",
+    description: "Guest list with RSVP status, dietary restrictions, table assignments.",
     url: "#",
     icon: ClipboardList,
     category: "Guest Management",
   },
   {
     title: "Vendor Contacts & Contracts",
-    description: "Contact info and signed agreements for all vendors — AV, rentals, florals, printing.",
+    description: "All vendor agreements — AV, rentals, florals, printing.",
     url: "#",
     icon: FileText,
     category: "Vendors",
   },
   {
     title: "IK26 Public Website",
-    description: "The public-facing event page at isangkusina.com — ticket info, chef profiles, event details.",
+    description: "Event page — tickets, chef profiles, event details.",
     url: "https://isangkusina.com",
     icon: Globe,
     category: "Public",
   },
   {
     title: "Team Deployment & Roles",
-    description: "Team member assignments, responsibilities, and day-of coordination roles.",
+    description: "Team assignments, responsibilities, and day-of roles.",
     url: "",
     icon: ClipboardList,
     category: "Team",
@@ -150,7 +160,7 @@ const resources: ResourceLink[] = [
   },
   {
     title: "Team Task Board",
-    description: "View and manage your assigned tasks, deadlines, and progress all in one place.",
+    description: "Assigned tasks, deadlines, and progress at a glance.",
     url: "",
     icon: ClipboardList,
     category: "Team",
@@ -178,13 +188,26 @@ interface LinksResourcesProps {
 export function LinksResources({ role, onNavigate }: LinksResourcesProps) {
   const isChef = role === "chef";
   const isTeam = role === "team";
+  const isLeadership = role === "leadership";
   const [activeFilter, setActiveFilter] = useState<string>("all");
 
+  // Get list of accessible pages for this role
+  const allPageLabels = resources.filter((r) => r.internalNav).map((r) => r.internalNav!);
+  const visiblePages = new Set(getVisibleNavItems(role, allPageLabels));
+  // Always allow Dashboard
+  visiblePages.add("Dashboard");
+
   // Filter resources based on role
+  // For soft launch: hide URL-pending items (#) from non-leadership roles
+  // Also hide items whose internalNav targets pages hidden from this role
   const roleFilteredResources = isChef
-    ? resources.filter((r) => chefCategories.includes(r.category))
+    ? resources.filter((r) => chefCategories.includes(r.category) && (
+        (r.internalNav && visiblePages.has(r.internalNav)) || (!r.internalNav && r.url && r.url !== "#")
+      ))
     : isTeam
-      ? resources.filter((r) => teamCategories.includes(r.category))
+      ? resources.filter((r) => teamCategories.includes(r.category) && (
+          (r.internalNav && visiblePages.has(r.internalNav)) || (!r.internalNav && r.url && r.url !== "#")
+        ))
       : resources;
 
   const pinned = roleFilteredResources.filter((r) => r.pinned);

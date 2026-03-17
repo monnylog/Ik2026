@@ -14,6 +14,11 @@ import {
   Zap,
   Accessibility,
   Type,
+  Rocket,
+  RefreshCw,
+  Activity,
+  Plane,
+  ScrollText,
 } from "lucide-react";
 
 import { useFocusTrap } from "../../lib/use-focus-trap";
@@ -21,7 +26,7 @@ import { useFocusTrap } from "../../lib/use-focus-trap";
 const bodyFont = { fontFamily: "'Inter', sans-serif" };
 const headingFont = { fontFamily: "'Degular', 'Maragsa', 'Playfair Display', sans-serif" };
 
-const CURRENT_VERSION = "2.9.0";
+const CURRENT_VERSION = "2.16.0";
 const STORAGE_KEY = "ik26_changelog_seen_version";
 
 interface ChangelogEntry {
@@ -30,9 +35,82 @@ interface ChangelogEntry {
   description: string;
   color: string;
   tag?: string;
+  date?: string;
 }
 
 const changelog: ChangelogEntry[] = [
+  {
+    icon: ScrollText,
+    title: "Modularization Phase 2 & Audit Trail (v2.8.0)",
+    description:
+      "Server routes further modularized: engagement routes (chat, reactions, prompts, trivia, voice notes, memory wall, flavor fusion, engagement stats) extracted to engagement-routes.tsx, expense routes (CRUD, receipt uploads, summary) to expense-routes.tsx. New Audit Trail system with 5 server endpoints for recording, querying, filtering, and cleaning up audit events with severity levels and rolling summaries. Leadership dashboard now includes an expandable Audit Trail widget with category/severity filters and drill-down detail view. Main server file reduced by ~470 lines.",
+    color: "#C9A96E",
+    tag: "New",
+    date: "Mar 16",
+  },
+  {
+    icon: Sparkles,
+    title: "Config, Discord & Import (v2.7.0)",
+    description:
+      "Form URLs are now server-configurable via KV — leadership can update Google Form/Doc URLs via PUT /form-urls without code changes. Discord webhook integration sends Notion sync summaries to #bot-alerts automatically. New POST /import/restore endpoint accepts full JSON backup for data restoration with merge/overwrite and dry-run modes. Preflight checks now dynamically verify form URL and Discord webhook status.",
+    color: "#C9A96E",
+    tag: "New",
+    date: "Mar 16",
+  },
+  {
+    icon: Plane,
+    title: "Travel & Itinerary Personalization (v2.6.0)",
+    description:
+      "Chefs now see a personalized itinerary page with their flight, lodging, and ground transport details, a Las Vegas visitor guide, key event dates timeline, and emergency contacts. Leadership/team retain the full manager view with inline add/edit forms, Vegas guide editor, and announcement posting — all backed by 6 new /travel/* API routes with KV persistence.",
+    color: "#4A7FB5",
+    tag: "New",
+    date: "Mar 16",
+  },
+  {
+    icon: Rocket,
+    title: "Deployment API Integration (v2.5.0)",
+    description:
+      "Pre-flight deployment validator checks KV store, Auth, Storage, Notion API, content config, and profiles in one click. Clearbit logo proxy with 30-day KV caching and batch lookup. Google Calendar deep link generator for event schedule. Notion key validation endpoint. Full data export/backup. Toast notifications for all API operations via Sonner.",
+    color: "#4A7FB5",
+    tag: "New",
+    date: "Mar 15",
+  },
+  {
+    icon: Activity,
+    title: "Reliability & Recovery (v2.4.0)",
+    description:
+      "Graceful module-load error page replaces hard reloads when lazy imports fail. Backend health check indicator with latency monitoring on the leadership dashboard. Idle-time prefetching of 6 most-visited page modules for instant navigation.",
+    color: "#7E9E78",
+    tag: "New",
+    date: "Mar 15",
+  },
+  {
+    icon: RefreshCw,
+    title: "Lazy-Load Resilience (v2.3.1)",
+    description:
+      "All 25 lazy-loaded page components now use a lazyRetry wrapper that automatically retries failed dynamic imports after 1.5 s, then falls back to a full page reload — eliminating 'Failed to fetch dynamically imported module' errors on flaky connections.",
+    color: "#7E9E78",
+    tag: "Fix",
+    date: "Mar 15",
+  },
+  {
+    icon: Rocket,
+    title: "Pre-Launch Readiness + Version Badge (v2.3.0)",
+    description:
+      "Sidebar footer now displays current build version. Deployment Readiness widget flags placeholder Form URLs as a not-ready blocker. New pre-launch testing checklist widget helps leadership verify all 3 role views end-to-end before distributing access codes.",
+    color: "#7E9E78",
+    tag: "New",
+    date: "Mar 15",
+  },
+  {
+    icon: Zap,
+    title: "What's New Widget on Dashboard (v2.2.2)",
+    description:
+      "The What's New widget is now wired into the right sidebar — shows 2 latest entries with a 'Show all' toggle. Also centralized all Google Form & Doc URLs into a FORM_URLS config object with clear TODO markers for production URL replacement.",
+    color: "#C9A96E",
+    tag: "New",
+    date: "Mar 15",
+  },
   {
     icon: Type,
     title: "Degular Typography Update (v1.2.2)",
@@ -40,6 +118,7 @@ const changelog: ChangelogEntry[] = [
       "Replaced Maragsa/Playfair Display with Degular as the primary heading font across all 94 references in 83 files. Old fonts retained as fallbacks in the stack for graceful degradation.",
     color: "#CDA88A",
     tag: "New",
+    date: "Mar 14",
   },
   {
     icon: Zap,
@@ -48,6 +127,7 @@ const changelog: ChangelogEntry[] = [
       "Completed thorough audit of all motion.* elements across 12+ files — removed remaining transition-colors/transition-all CSS classes that competed with Motion's animation engine. Dashboard widgets now use safe onMouseEnter/onMouseLeave patterns.",
     color: "#C9A96E",
     tag: "Fix",
+    date: "Mar 13",
   },
   {
     icon: Zap,
@@ -56,6 +136,7 @@ const changelog: ChangelogEntry[] = [
       "Resolved Framer Motion errors caused by Tailwind v4 oklab() color values. All motion elements now use explicit rgba() inline styles for buttery-smooth animations.",
     color: "#C9A96E",
     tag: "Fix",
+    date: "Mar 12",
   },
   {
     icon: Accessibility,
@@ -64,14 +145,16 @@ const changelog: ChangelogEntry[] = [
       "Replaced 10+ files worth of hover:bg-* and transition-colors classes on motion elements with proper whileHover props — smoother, more accessible interactions throughout.",
     color: "#7E9E78",
     tag: "Fix",
+    date: "Mar 12",
   },
   {
     icon: Newspaper,
     title: "What's New Changelog Modal",
     description:
-      "You're looking at it! A versioned changelog that shows once per update so you always know what's new.",
+      "A versioned changelog that shows once per update so you always know what changed.",
     color: "#CDA88A",
     tag: "New",
+    date: "Mar 11",
   },
   {
     icon: Volume2,
@@ -80,6 +163,7 @@ const changelog: ChangelogEntry[] = [
       "Hear a gentle chime when new messages arrive in Comms. Toggle on/off in Profile Settings.",
     color: "#7E9E78",
     tag: "New",
+    date: "Mar 11",
   },
   {
     icon: GripVertical,
@@ -87,6 +171,7 @@ const changelog: ChangelogEntry[] = [
     description:
       "Reorder your pinned sidebar pages by dragging them into your preferred order.",
     color: "#7E9E78",
+    date: "Mar 10",
   },
   {
     icon: Timer,
@@ -94,6 +179,7 @@ const changelog: ChangelogEntry[] = [
     description:
       "A gentle reminder appears after 30 minutes of inactivity — stay logged in or sign out safely.",
     color: "#CDA88A",
+    date: "Mar 10",
   },
   {
     icon: Smartphone,
@@ -101,6 +187,7 @@ const changelog: ChangelogEntry[] = [
     description:
       "Redesigned bottom nav with 4 primary tabs and a 'More' overflow panel for all role-appropriate pages.",
     color: "#8B96C4",
+    date: "Mar 9",
   },
   {
     icon: Wifi,
@@ -108,6 +195,7 @@ const changelog: ChangelogEntry[] = [
     description:
       "Automatically detects when you go offline and confirms when you're back online.",
     color: "#C27B6B",
+    date: "Mar 8",
   },
   {
     icon: ArrowUp,
@@ -115,6 +203,7 @@ const changelog: ChangelogEntry[] = [
     description:
       "A floating button appears after scrolling down on the Dashboard for quick return to top.",
     color: "#A3B898",
+    date: "Mar 7",
   },
   {
     icon: Bell,
@@ -122,6 +211,7 @@ const changelog: ChangelogEntry[] = [
     description:
       "Mobile bottom nav now shows an unread notification dot when new chat messages arrive.",
     color: "#C9A96E",
+    date: "Mar 7",
   },
 ];
 
@@ -295,6 +385,14 @@ export function WhatsNewModal({
                               }}
                             >
                               {entry.tag}
+                            </span>
+                          )}
+                          {entry.date && (
+                            <span
+                              className="text-[0.5rem] text-muted-foreground/40"
+                              style={bodyFont}
+                            >
+                              {entry.date}
                             </span>
                           )}
                         </div>

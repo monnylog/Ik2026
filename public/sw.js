@@ -1,7 +1,7 @@
 // Isang Kusina 2026 — Service Worker for offline caching
-// v4 — WKWebView + App Store ready: enhanced offline, precache critical assets
-const CACHE_NAME = "ik26-cache-v4";
-const APP_VERSION = "2.0.0";
+// v5 — WKWebView + App Store ready: enhanced offline, precache critical assets
+const CACHE_NAME = "ik26-cache-v5";
+const APP_VERSION = "2.2.2";
 
 // Critical assets to precache on install for offline-first experience
 const PRECACHE_URLS = [

@@ -3,6 +3,12 @@ import { cors } from "npm:hono/cors";
 import { logger } from "npm:hono/logger";
 import { createClient } from "jsr:@supabase/supabase-js@2.49.8";
 import * as kv from "./kv_store.tsx";
+import { travel } from "./travel-routes.tsx";
+import { crm } from "./crm-routes.tsx";
+import { formDiscord } from "./form-discord-routes.tsx";
+import { engagement } from "./engagement-routes.tsx";
+import { expenses, EXPENSE_BUCKET as EXPENSE_BUCKET_NAME } from "./expense-routes.tsx";
+import { audit } from "./audit-routes.tsx";
 const app = new Hono();
 
 // Enable logger
@@ -481,252 +487,385 @@ app.get("/make-server-5ed426e6/submission-stats", async (c) => {
 
 // Health check endpoint
 app.get("/make-server-5ed426e6/health", (c) => {
-  return c.json({ status: "ok" });
+  return c.json({ status: "ok", timestamp: new Date().toISOString(), version: "2.8.0" });
 });
 
-// ─── Chat Messages ─────────────────────────────────────────────
-// KV key pattern: ik26:msg:{channelId}:{timestamp}
+// ─── Pre-flight Deployment Validation ──────────────────────────
+// Comprehensive check of all dependent services for deployment readiness.
+app.get("/make-server-5ed426e6/preflight", async (c) => {
+  resolveNotionKey(c);
+  const checks: Record<string, { ok: boolean; latencyMs?: number; detail?: string; error?: string }> = {};
+  const now = Date.now();
 
-app.post("/make-server-5ed426e6/messages", async (c) => {
+  // 1. KV Store health
   try {
-    const body = await c.req.json();
-    const { channelId, id, author, avatarId, text, timestamp, userId } = body;
-    if (!channelId || !id || !author || !text) {
-      return c.json({ error: "Missing required fields (channelId, id, author, text)" }, 400);
-    }
-    const key = `ik26:msg:${channelId}:${id}`;
-    await kv.set(key, { channelId, id, author, avatarId, text, timestamp, userId });
-    return c.json({ ok: true });
-  } catch (err) {
-    console.log("Error saving message:", err);
-    return c.json({ error: `Failed to save message: ${err}` }, 500);
+    const t0 = Date.now();
+    await kv.set("ik26:preflight:ping", { ts: now });
+    const val = await kv.get("ik26:preflight:ping");
+    checks.kvStore = { ok: !!val, latencyMs: Date.now() - t0, detail: "read/write OK" };
+  } catch (err: any) {
+    checks.kvStore = { ok: false, error: err.message };
   }
-});
 
-app.get("/make-server-5ed426e6/messages/:channelId", async (c) => {
+  // 2. Supabase Auth
   try {
-    const channelId = c.req.param("channelId");
-    const messages = await kv.getByPrefix(`ik26:msg:${channelId}:`);
-    // Sort by id (timestamp-based)
-    messages.sort((a: any, b: any) => a.id.localeCompare(b.id));
-    return c.json({ messages });
-  } catch (err) {
-    console.log("Error loading messages:", err);
-    return c.json({ error: `Failed to load messages: ${err}` }, 500);
+    const t0 = Date.now();
+    const admin = getAdminClient();
+    const { data, error } = await admin.auth.admin.listUsers({ page: 1, perPage: 1 });
+    checks.supabaseAuth = { ok: !error, latencyMs: Date.now() - t0, detail: error ? error.message : `Auth service OK` };
+  } catch (err: any) {
+    checks.supabaseAuth = { ok: false, error: err.message };
   }
-});
 
-// ─── Tapback Reactions ────────────────────────────────────────
-// KV key pattern: ik26:reactions:{messageId} = { [userId]: reactionType }
-
-app.post("/make-server-5ed426e6/reactions", async (c) => {
+  // 3. Supabase Storage
   try {
-    const { messageId, userId, reaction } = await c.req.json();
-    if (!messageId || !userId) {
-      return c.json({ error: "Missing required fields (messageId, userId)" }, 400);
-    }
-    const key = `ik26:reactions:${messageId}`;
-    const existing: Record<string, string> = (await kv.get(key)) || {};
-    if (!reaction || existing[userId] === reaction) {
-      // Toggle off
-      delete existing[userId];
-    } else {
-      existing[userId] = reaction;
-    }
-    await kv.set(key, existing);
-    return c.json({ ok: true, reactions: existing });
-  } catch (err) {
-    console.log("Error saving reaction:", err);
-    return c.json({ error: `Failed to save reaction: ${err}` }, 500);
+    const t0 = Date.now();
+    const admin = getAdminClient();
+    const { data: buckets, error } = await admin.storage.listBuckets();
+    const bucketNames = (buckets || []).map((b: any) => b.name);
+    const hasPhotoBucket = bucketNames.includes(PHOTO_BUCKET);
+    const hasReceiptBucket = bucketNames.includes(EXPENSE_BUCKET_NAME);
+    checks.supabaseStorage = {
+      ok: !error && hasPhotoBucket && hasReceiptBucket,
+      latencyMs: Date.now() - t0,
+      detail: `Buckets: ${bucketNames.join(", ")}`,
+      error: !hasPhotoBucket ? `Missing ${PHOTO_BUCKET}` : !hasReceiptBucket ? `Missing ${EXPENSE_BUCKET_NAME}` : undefined,
+    };
+  } catch (err: any) {
+    checks.supabaseStorage = { ok: false, error: err.message };
   }
-});
 
-app.get("/make-server-5ed426e6/reactions/:channelId", async (c) => {
-  try {
-    const channelId = c.req.param("channelId");
-    // Get all message IDs for this channel, then get their reactions
-    const messages = await kv.getByPrefix(`ik26:msg:${channelId}:`);
-    const reactionMap: Record<string, Record<string, string>> = {};
-    if (messages.length > 0) {
-      const reactionKeys = messages.map((m: any) => `ik26:reactions:${m.id}`);
-      const reactions = await kv.mget(reactionKeys);
-      reactions.forEach((r: any, i: number) => {
-        if (r && Object.keys(r).length > 0) {
-          reactionMap[messages[i].id] = r;
-        }
+  // 4. Notion API
+  const notionKey = _activeNotionKey || Deno.env.get("NOTION_API_KEY");
+  if (notionKey) {
+    try {
+      const t0 = Date.now();
+      const resp = await fetch("https://api.notion.com/v1/users/me", {
+        headers: { Authorization: `Bearer ${notionKey}`, "Notion-Version": "2022-06-28" },
       });
+      const data = await resp.json();
+      checks.notionApi = {
+        ok: resp.ok,
+        latencyMs: Date.now() - t0,
+        detail: resp.ok ? `Bot: ${data.name || data.bot?.owner?.user?.name || "connected"}` : `HTTP ${resp.status}`,
+        error: resp.ok ? undefined : data?.message,
+      };
+    } catch (err: any) {
+      checks.notionApi = { ok: false, error: err.message };
     }
-    return c.json({ reactions: reactionMap });
-  } catch (err) {
-    console.log("Error loading reactions:", err);
-    return c.json({ error: `Failed to load reactions: ${err}` }, 500);
+  } else {
+    checks.notionApi = { ok: false, error: "NOTION_API_KEY not set" };
   }
-});
 
-// ─── Daily Prompt Responses ────────────────────────────────────
-// KV key pattern: ik26:prompt-resp:{promptId}:{uniqueId}
-
-app.post("/make-server-5ed426e6/prompt-responses", async (c) => {
+  // 5. Notion Content Config
   try {
-    const body = await c.req.json();
-    const { promptId, id, author, avatarId, text, timestamp, userId } = body;
-    if (!promptId || !id || !text) {
-      return c.json({ error: "Missing required fields for prompt response" }, 400);
+    const config = await ensureDefaultConfig();
+    const configuredCount = Object.values(config).filter((v: any) => v?.databaseId).length;
+    checks.notionContent = {
+      ok: configuredCount >= 8,
+      detail: `${configuredCount}/11 content types configured`,
+    };
+  } catch (err: any) {
+    checks.notionContent = { ok: false, error: err.message };
+  }
+
+  // 6. Profile count
+  try {
+    const profiles = await kv.getByPrefix("ik26:profile:");
+    const roles: Record<string, number> = {};
+    for (const p of profiles) {
+      const role = (p as any)?.role || "unknown";
+      roles[role] = (roles[role] || 0) + 1;
     }
-    const key = `ik26:prompt-resp:${promptId}:${id}`;
-    await kv.set(key, { promptId, id, author, avatarId, text, timestamp, userId });
-    return c.json({ ok: true });
-  } catch (err) {
-    console.log("Error saving prompt response:", err);
-    return c.json({ error: `Failed to save prompt response: ${err}` }, 500);
+    checks.profiles = {
+      ok: profiles.length > 0,
+      detail: `${profiles.length} profiles — ${Object.entries(roles).map(([r, c]) => `${c} ${r}`).join(", ")}`,
+    };
+  } catch (err: any) {
+    checks.profiles = { ok: false, error: err.message };
   }
+
+  // 7. Form URLs status (dynamic — checks KV for production URLs)
+  try {
+    const formUrls: Record<string, string> | null = await kv.get("ik26:config:form-urls");
+    const urls = formUrls || {};
+    const placeholderMarkers = ["Example", "1FAIpQLSfExample"];
+    const allUrls = Object.values(urls);
+    const placeholderCount = allUrls.filter((u: string) =>
+      placeholderMarkers.some((m) => u.includes(m))
+    ).length;
+    const totalConfigured = allUrls.length;
+    checks.formUrls = {
+      ok: totalConfigured >= 6 && placeholderCount === 0,
+      detail: totalConfigured === 0
+        ? "No form URLs configured yet — update via Settings or PUT /form-urls"
+        : placeholderCount > 0
+          ? `${placeholderCount}/${totalConfigured} URLs still using placeholder IDs`
+          : `All ${totalConfigured} form URLs are production-ready`,
+      error: placeholderCount > 0 ? `${placeholderCount} placeholder URLs remain` : undefined,
+    };
+  } catch {
+    checks.formUrls = { ok: false, error: "Failed to check form URLs" };
+  }
+
+  // 8. Discord webhook status
+  const discordUrl = Deno.env.get("DISCORD_WEBHOOK_URL");
+  checks.discordWebhook = {
+    ok: !!discordUrl,
+    detail: discordUrl ? "Webhook URL configured" : "DISCORD_WEBHOOK_URL not set (optional)",
+  };
+
+  const allOk = Object.values(checks).every((c) => c.ok);
+  const okCount = Object.values(checks).filter((c) => c.ok).length;
+
+  return c.json({
+    ready: allOk,
+    score: `${okCount}/${Object.keys(checks).length}`,
+    checks,
+    timestamp: new Date().toISOString(),
+    version: "2.8.0",
+  });
 });
 
-app.get("/make-server-5ed426e6/prompt-responses/:promptId", async (c) => {
-  try {
-    const promptId = c.req.param("promptId");
-    const responses = await kv.getByPrefix(`ik26:prompt-resp:${promptId}:`);
-    responses.sort((a: any, b: any) => a.id.localeCompare(b.id));
-    return c.json({ responses });
-  } catch (err) {
-    console.log("Error loading prompt responses:", err);
-    return c.json({ error: `Failed to load prompt responses: ${err}` }, 500);
+// ─── Clearbit Logo Proxy (with KV caching) ────────────────────
+// Proxies logo.clearbit.com requests through the server to avoid CORS
+// and caches results in KV for 30 days.
+
+app.get("/make-server-5ed426e6/logo/:domain", async (c) => {
+  const domain = c.req.param("domain");
+  if (!domain || domain.length < 3) {
+    return c.json({ error: "Invalid domain" }, 400);
   }
-});
 
-// ─── All prompt responses (for Our Istoryas recap) ─────────────
+  const cacheKey = `ik26:logo:${domain.toLowerCase()}`;
+  const LOGO_CACHE_TTL = 30 * 24 * 60 * 60 * 1000; // 30 days
 
-app.get("/make-server-5ed426e6/all-prompt-responses", async (c) => {
+  // Check cache
   try {
-    const responses = await kv.getByPrefix("ik26:prompt-resp:");
-    responses.sort((a: any, b: any) => (a.id || "").localeCompare(b.id || ""));
-    return c.json({ responses });
-  } catch (err) {
-    console.log("Error loading all prompt responses:", err);
-    return c.json({ error: `Failed to load all prompt responses: ${err}` }, 500);
-  }
-});
-
-// ─── Trivia Answers ────────────────────────────────────────────
-// KV key pattern: ik26:trivia-ans:{triviaId}:{uniqueId}
-
-app.post("/make-server-5ed426e6/trivia-answers", async (c) => {
-  try {
-    const body = await c.req.json();
-    const { triviaId, id, author, avatarId, answerId, userId } = body;
-    if (!triviaId || !id || !answerId) {
-      return c.json({ error: "Missing required fields for trivia answer" }, 400);
+    const cached: any = await kv.get(cacheKey);
+    if (cached && Date.now() - cached.cachedAt < LOGO_CACHE_TTL) {
+      if (cached.notFound) {
+        return c.json({ url: null, cached: true });
+      }
+      return c.json({ url: cached.url, cached: true });
     }
-    const key = `ik26:trivia-ans:${triviaId}:${id}`;
-    await kv.set(key, { triviaId, id, author, avatarId, answerId, userId });
-    return c.json({ ok: true });
-  } catch (err) {
-    console.log("Error saving trivia answer:", err);
-    return c.json({ error: `Failed to save trivia answer: ${err}` }, 500);
-  }
-});
+  } catch { /* ignore cache miss */ }
 
-app.get("/make-server-5ed426e6/trivia-answers/:triviaId", async (c) => {
+  // Fetch from Clearbit
   try {
-    const triviaId = c.req.param("triviaId");
-    const answers = await kv.getByPrefix(`ik26:trivia-ans:${triviaId}:`);
-    return c.json({ answers });
-  } catch (err) {
-    console.log("Error loading trivia answers:", err);
-    return c.json({ error: `Failed to load trivia answers: ${err}` }, 500);
-  }
-});
+    const clearbitUrl = `https://logo.clearbit.com/${domain}?size=128`;
+    const resp = await fetch(clearbitUrl, { redirect: "follow" });
 
-// ─── Voice Notes (Istoryas) ────────────────────────────────────
-// KV key pattern: ik26:voice:{uniqueId}
-// Audio stored as base64 in the value along with metadata
-
-app.post("/make-server-5ed426e6/voice-notes", async (c) => {
-  try {
-    const body = await c.req.json();
-    const { id, author, avatarId, caption, audioBase64, durationSec, timestamp, userId } = body;
-    if (!id || !author || !audioBase64) {
-      return c.json({ error: "Missing required fields for voice note (id, author, audioBase64)" }, 400);
+    if (resp.ok && resp.headers.get("content-type")?.includes("image")) {
+      await kv.set(cacheKey, { url: clearbitUrl, cachedAt: Date.now() });
+      return c.json({ url: clearbitUrl, cached: false });
+    } else {
+      await kv.set(cacheKey, { notFound: true, cachedAt: Date.now() });
+      return c.json({ url: null, cached: false });
     }
-    const key = `ik26:voice:${id}`;
-    await kv.set(key, { id, author, avatarId, caption, audioBase64, durationSec, timestamp, userId });
-    return c.json({ ok: true });
-  } catch (err) {
-    console.log("Error saving voice note:", err);
-    return c.json({ error: `Failed to save voice note: ${err}` }, 500);
+  } catch (err: any) {
+    console.log(`Clearbit logo fetch error for ${domain}:`, err.message);
+    return c.json({ url: null, error: err.message }, 200);
   }
 });
 
-app.get("/make-server-5ed426e6/voice-notes", async (c) => {
+// Batch logo lookup (up to 20 domains at once)
+app.post("/make-server-5ed426e6/logos/batch", async (c) => {
   try {
-    const notes = await kv.getByPrefix("ik26:voice:");
-    notes.sort((a: any, b: any) => (b.id || "").localeCompare(a.id || ""));
-    return c.json({ notes });
-  } catch (err) {
-    console.log("Error loading voice notes:", err);
-    return c.json({ error: `Failed to load voice notes: ${err}` }, 500);
-  }
-});
-
-// ─── Memory Wall ───────────────────────────────────────────────
-// KV key pattern: ik26:memory-wall:{uniqueId}
-
-app.post("/make-server-5ed426e6/memory-wall", async (c) => {
-  try {
-    const body = await c.req.json();
-    const { id, author, avatarId, text, tagId, timestamp, userId } = body;
-    if (!id || !author || !text) {
-      return c.json({ error: "Missing required fields for memory wall post (id, author, text)" }, 400);
+    const { domains } = await c.req.json();
+    if (!Array.isArray(domains) || domains.length === 0) {
+      return c.json({ error: "domains array required" }, 400);
     }
-    const key = `ik26:memory-wall:${id}`;
-    await kv.set(key, { id, author, avatarId, text, tagId, timestamp, userId });
-    return c.json({ ok: true });
-  } catch (err) {
-    console.log("Error saving memory wall post:", err);
-    return c.json({ error: `Failed to save memory wall post: ${err}` }, 500);
-  }
-});
 
-app.get("/make-server-5ed426e6/memory-wall", async (c) => {
-  try {
-    const posts = await kv.getByPrefix("ik26:memory-wall:");
-    posts.sort((a: any, b: any) => (b.id || "").localeCompare(a.id || ""));
-    return c.json({ posts });
-  } catch (err) {
-    console.log("Error loading memory wall posts:", err);
-    return c.json({ error: `Failed to load memory wall posts: ${err}` }, 500);
-  }
-});
+    const results: Record<string, string | null> = {};
+    const uncached: string[] = [];
 
-// ─── Flavor Fusion ─────────────────────────────────────────────
-// KV key pattern: ik26:flavor-fusion:{uniqueId}
-
-app.post("/make-server-5ed426e6/flavor-fusion", async (c) => {
-  try {
-    const body = await c.req.json();
-    const { id, ingredientA, ingredientB, author, avatarId, idea, timestamp, userId } = body;
-    if (!id || !author || !idea) {
-      return c.json({ error: "Missing required fields for flavor fusion idea (id, author, idea)" }, 400);
+    for (const domain of domains.slice(0, 20)) {
+      const d = domain.toLowerCase();
+      try {
+        const cached: any = await kv.get(`ik26:logo:${d}`);
+        if (cached && Date.now() - cached.cachedAt < 30 * 24 * 60 * 60 * 1000) {
+          results[d] = cached.notFound ? null : cached.url;
+        } else {
+          uncached.push(d);
+        }
+      } catch {
+        uncached.push(d);
+      }
     }
-    const key = `ik26:flavor-fusion:${id}`;
-    await kv.set(key, { id, ingredientA, ingredientB, author, avatarId, idea, timestamp, userId });
-    return c.json({ ok: true });
+
+    for (const domain of uncached) {
+      try {
+        const clearbitUrl = `https://logo.clearbit.com/${domain}?size=128`;
+        const resp = await fetch(clearbitUrl, { redirect: "follow" });
+
+        if (resp.ok && resp.headers.get("content-type")?.includes("image")) {
+          results[domain] = clearbitUrl;
+          await kv.set(`ik26:logo:${domain}`, { url: clearbitUrl, cachedAt: Date.now() });
+        } else {
+          results[domain] = null;
+          await kv.set(`ik26:logo:${domain}`, { notFound: true, cachedAt: Date.now() });
+        }
+
+        if (uncached.indexOf(domain) < uncached.length - 1) {
+          await new Promise((r) => setTimeout(r, 200));
+        }
+      } catch {
+        results[domain] = null;
+      }
+    }
+
+    return c.json({ logos: results, cached: domains.length - uncached.length, fetched: uncached.length });
   } catch (err) {
-    console.log("Error saving flavor fusion idea:", err);
-    return c.json({ error: `Failed to save flavor fusion idea: ${err}` }, 500);
+    console.log("Batch logo error:", err);
+    return c.json({ error: `Batch logo lookup failed: ${err}` }, 500);
   }
 });
 
-app.get("/make-server-5ed426e6/flavor-fusion", async (c) => {
+// ─── Google Calendar Event Deep Link Generator ─────────────────
+
+app.post("/make-server-5ed426e6/calendar/create-link", async (c) => {
   try {
-    const ideas = await kv.getByPrefix("ik26:flavor-fusion:");
-    ideas.sort((a: any, b: any) => (a.id || "").localeCompare(b.id || ""));
-    return c.json({ ideas });
+    const { title, description, location, startDate, endDate, allDay } = await c.req.json();
+
+    if (!title || !startDate) {
+      return c.json({ error: "Missing required: title, startDate" }, 400);
+    }
+
+    const formatGCalDate = (dateStr: string, isAllDay: boolean) => {
+      const d = new Date(dateStr);
+      if (isAllDay) return d.toISOString().replace(/[-:]/g, "").split("T")[0];
+      return d.toISOString().replace(/[-:]/g, "").replace(/\.\d{3}/, "");
+    };
+
+    const start = formatGCalDate(startDate, !!allDay);
+    const end = endDate
+      ? formatGCalDate(endDate, !!allDay)
+      : allDay
+        ? formatGCalDate(new Date(new Date(startDate).getTime() + 86400000).toISOString(), true)
+        : formatGCalDate(new Date(new Date(startDate).getTime() + 3600000).toISOString(), false);
+
+    const params = new URLSearchParams({
+      action: "TEMPLATE",
+      text: title,
+      dates: `${start}/${end}`,
+    });
+
+    if (description) params.set("details", description);
+    if (location) params.set("location", location);
+
+    return c.json({ url: `https://calendar.google.com/calendar/render?${params.toString()}` });
   } catch (err) {
-    console.log("Error loading flavor fusion ideas:", err);
-    return c.json({ error: `Failed to load flavor fusion ideas: ${err}` }, 500);
+    console.log("Calendar link error:", err);
+    return c.json({ error: `Failed to create calendar link: ${err}` }, 500);
   }
 });
+
+// Batch calendar links for the full event schedule
+app.post("/make-server-5ed426e6/calendar/batch-links", async (c) => {
+  try {
+    const { events } = await c.req.json();
+    if (!Array.isArray(events)) {
+      return c.json({ error: "events array required" }, 400);
+    }
+
+    const links = events.map((evt: any) => {
+      const formatGCalDate = (dateStr: string, isAllDay: boolean) => {
+        const d = new Date(dateStr);
+        if (isAllDay) return d.toISOString().replace(/[-:]/g, "").split("T")[0];
+        return d.toISOString().replace(/[-:]/g, "").replace(/\.\d{3}/, "");
+      };
+
+      const start = formatGCalDate(evt.startDate, !!evt.allDay);
+      const end = evt.endDate
+        ? formatGCalDate(evt.endDate, !!evt.allDay)
+        : evt.allDay
+          ? formatGCalDate(new Date(new Date(evt.startDate).getTime() + 86400000).toISOString(), true)
+          : formatGCalDate(new Date(new Date(evt.startDate).getTime() + 3600000).toISOString(), false);
+
+      const params = new URLSearchParams({
+        action: "TEMPLATE",
+        text: evt.title || "IK26 Event",
+        dates: `${start}/${end}`,
+      });
+      if (evt.description) params.set("details", evt.description);
+      if (evt.location) params.set("location", evt.location || "Isang Kusina 2026 Venue");
+
+      return { id: evt.id, title: evt.title, url: `https://calendar.google.com/calendar/render?${params.toString()}` };
+    });
+
+    return c.json({ links });
+  } catch (err) {
+    console.log("Batch calendar error:", err);
+    return c.json({ error: `Failed: ${err}` }, 500);
+  }
+});
+
+// ─── Notion API Key Validation ─────────────────────────────────
+
+app.post("/make-server-5ed426e6/notion/validate-key", async (c) => {
+  try {
+    const { apiKey } = await c.req.json();
+    if (!apiKey || (!apiKey.startsWith("ntn_") && !apiKey.startsWith("secret_"))) {
+      return c.json({ valid: false, error: "Invalid key format. Must start with ntn_ or secret_" }, 400);
+    }
+
+    const resp = await fetch("https://api.notion.com/v1/users/me", {
+      headers: { Authorization: `Bearer ${apiKey}`, "Notion-Version": "2022-06-28" },
+    });
+
+    if (!resp.ok) {
+      const data = await resp.json();
+      return c.json({ valid: false, error: data?.message || `HTTP ${resp.status}` });
+    }
+
+    const data = await resp.json();
+    _activeNotionKey = apiKey;
+
+    return c.json({ valid: true, botName: data.name || data.bot?.owner?.user?.name || "Unknown Bot", botId: data.id, type: data.type });
+  } catch (err: any) {
+    return c.json({ valid: false, error: err.message }, 500);
+  }
+});
+
+// ─── Export / Backup ───────────────────────────────────────────
+
+app.get("/make-server-5ed426e6/export/full", async (c) => {
+  try {
+    const [profiles, expenses, messages, memoryPosts, fusionIdeas, voiceNotes, promptResponses] = await Promise.all([
+      kv.getByPrefix("ik26:profile:"),
+      kv.getByPrefix("ik26:expense:"),
+      kv.getByPrefix("ik26:msg:"),
+      kv.getByPrefix("ik26:memory-wall:"),
+      kv.getByPrefix("ik26:flavor-fusion:"),
+      kv.getByPrefix("ik26:voice:"),
+      kv.getByPrefix("ik26:prompt-resp:"),
+    ]);
+
+    const notionConfig = await getNotionConfig();
+
+    return c.json({
+      exportedAt: new Date().toISOString(),
+      version: "2.8.0",
+      counts: {
+        profiles: profiles.length,
+        expenses: expenses.length,
+        messages: messages.length,
+        memoryPosts: memoryPosts.length,
+        fusionIdeas: fusionIdeas.length,
+        voiceNotes: voiceNotes.length,
+        promptResponses: promptResponses.length,
+      },
+      data: { profiles, expenses, messages, memoryPosts, fusionIdeas, voiceNotes, promptResponses, notionConfig },
+    });
+  } catch (err) {
+    console.log("Export error:", err);
+    return c.json({ error: `Export failed: ${err}` }, 500);
+  }
+});
+
+// ─── Engagement routes extracted to engagement-routes.tsx ───────
+// (messages, reactions, prompts, trivia, voice notes, memory wall, flavor fusion, engagement stats)
 
 // ─── User-specific data (per-user content) ─────────────────────
 
@@ -1287,56 +1426,7 @@ app.post("/make-server-5ed426e6/upload-photo/:userId", async (c) => {
   }
 });
 
-// ─── Engagement Stats (aggregated for manager dashboard) ────────
-// Counts real entries from KV for each engagement type
-
-app.get("/make-server-5ed426e6/engagement-stats", async (c) => {
-  try {
-    const [promptResponses, allMessages, memoryPosts, fusionIdeas] = await Promise.all([
-      kv.getByPrefix("ik26:prompt-resp:"),
-      Promise.all([
-        kv.getByPrefix("ik26:msg:general:"),
-        kv.getByPrefix("ik26:msg:kitchen-prep:"),
-        kv.getByPrefix("ik26:msg:logistics:"),
-        kv.getByPrefix("ik26:msg:introductions:"),
-      ]).then((arrs) => arrs.flat()),
-      kv.getByPrefix("ik26:memory-wall:"),
-      kv.getByPrefix("ik26:flavor-fusion:"),
-    ]);
-
-    // Recipe Roulette spins are stored per-user as user-data
-    // We count all users who have recipe-roulette data
-    const allUserData = await kv.getByPrefix("ik26:user-data:");
-    const recipeSpins = allUserData.filter(
-      (d: any) => d && typeof d === "object" && d.spins !== undefined
-    ).reduce((sum: number, d: any) => sum + (d.spins || 0), 0);
-
-    // Get unique prompt respondents
-    const uniquePromptAuthors = new Set(
-      promptResponses.map((r: any) => r.userId || r.author).filter(Boolean)
-    );
-
-    // Get message count per channel
-    const channelCounts: Record<string, number> = {};
-    for (const msg of allMessages) {
-      const ch = (msg as any).channelId || "unknown";
-      channelCounts[ch] = (channelCounts[ch] || 0) + 1;
-    }
-
-    return c.json({
-      promptResponses: promptResponses.length,
-      promptRespondents: uniquePromptAuthors.size,
-      chatMessages: allMessages.length,
-      channelCounts,
-      memoryWallPosts: memoryPosts.length,
-      flavorFusionIdeas: fusionIdeas.length,
-      recipeRouletteSpins: recipeSpins,
-    });
-  } catch (err) {
-    console.log("Error loading engagement stats:", err);
-    return c.json({ error: `Failed to load engagement stats: ${err}` }, 500);
-  }
-});
+// ─── Engagement Stats moved to engagement-routes.tsx ───────────
 
 // ─── Portal Inquiry Form ───────────────────────────────────────
 // Public endpoint — no auth required (visitor-facing form)
@@ -2119,6 +2209,40 @@ app.post("/make-server-5ed426e6/notion/content/sync-all", async (c) => {
       }
     }
 
+    // Send Discord notification if webhook is configured
+    const discordUrl = Deno.env.get("DISCORD_WEBHOOK_URL");
+    if (discordUrl) {
+      try {
+        const successCount = Object.values(results).filter((r: any) => r.success).length;
+        const failCount = Object.values(results).filter((r: any) => !r.success).length;
+        const totalItems = Object.values(results)
+          .filter((r: any) => r.success)
+          .reduce((s: number, r: any) => s + (r.itemCount || 0), 0);
+
+        await fetch(discordUrl, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            username: "IK26 Ops Bot",
+            embeds: [{
+              title: "Notion Sync Complete",
+              description: `Synced ${successCount} content types (${totalItems} total items)${failCount > 0 ? ` — ${failCount} failed` : ""}`,
+              color: failCount > 0 ? 0xc27b6b : 0x7e9e78,
+              fields: Object.entries(results).map(([type, r]: [string, any]) => ({
+                name: type,
+                value: r.success ? `${r.itemCount} items` : `Error: ${r.error}`,
+                inline: true,
+              })),
+              timestamp: new Date().toISOString(),
+              footer: { text: "Isang Kusina 2026 Bot" },
+            }],
+          }),
+        });
+      } catch (discordErr) {
+        console.log("Discord notification failed (non-blocking):", discordErr);
+      }
+    }
+
     return c.json({ results, syncedAt: new Date().toISOString() });
   } catch (err) {
     console.log("Error syncing all Notion content:", err);
@@ -2252,351 +2376,15 @@ app.delete("/make-server-5ed426e6/notion/content/:type/configure", async (c) => 
   }
 });
 
-// ─── Expense & Reimbursement System ────────────────────────────
-// KV key pattern: ik26:expense:{id}
-// Receipt files stored in Supabase Storage bucket
+// ─── Expense routes extracted to expense-routes.tsx ─────────────
+// (expense CRUD, status updates, receipt uploads, summary)
 
-const EXPENSE_BUCKET = "make-5ed426e6-receipts";
-
-// Ensure receipt bucket exists on startup
-(async () => {
-  try {
-    const admin = getAdminClient();
-    const { data: buckets } = await admin.storage.listBuckets();
-    const bucketExists = buckets?.some((b: any) => b.name === EXPENSE_BUCKET);
-    if (!bucketExists) {
-      await admin.storage.createBucket(EXPENSE_BUCKET, { public: false });
-      console.log(`Created storage bucket: ${EXPENSE_BUCKET}`);
-    }
-  } catch (err) {
-    console.log("Error ensuring receipt bucket:", err);
-  }
-})();
-
-// Submit new expense
-app.post("/make-server-5ed426e6/expenses", async (c) => {
-  try {
-    const body = await c.req.json();
-    const { user_id, submitted_by, role_team, expense_category, description, amount, receipt_base64, receipt_filename, date_submitted, notes } = body;
-
-    if (!submitted_by || !expense_category || !amount) {
-      return c.json({ error: "Missing required fields: submitted_by, expense_category, amount" }, 400);
-    }
-
-    const id = crypto.randomUUID();
-    let receipt_url = "";
-
-    // Upload receipt if provided (base64 encoded)
-    if (receipt_base64 && receipt_filename) {
-      try {
-        const admin = getAdminClient();
-        const ext = receipt_filename.split(".").pop() || "jpg";
-        const filePath = `receipts/${id}.${ext}`;
-
-        // Decode base64 to Uint8Array
-        const binaryString = atob(receipt_base64);
-        const bytes = new Uint8Array(binaryString.length);
-        for (let i = 0; i < binaryString.length; i++) {
-          bytes[i] = binaryString.charCodeAt(i);
-        }
-
-        const contentTypes: Record<string, string> = {
-          jpg: "image/jpeg", jpeg: "image/jpeg", png: "image/png",
-          webp: "image/webp", gif: "image/gif", pdf: "application/pdf",
-        };
-        const contentType = contentTypes[ext.toLowerCase()] || "application/octet-stream";
-
-        const { error: uploadError } = await admin.storage
-          .from(EXPENSE_BUCKET)
-          .upload(filePath, bytes, { contentType, upsert: true });
-
-        if (uploadError) {
-          console.log("Receipt upload error:", uploadError);
-        } else {
-          const { data: signedData } = await admin.storage
-            .from(EXPENSE_BUCKET)
-            .createSignedUrl(filePath, 60 * 60 * 24 * 365);
-          if (signedData) receipt_url = signedData.signedUrl;
-        }
-      } catch (uploadErr) {
-        console.log("Receipt upload failed:", uploadErr);
-      }
-    }
-
-    const expense = {
-      id,
-      user_id: user_id || "",
-      submitted_by,
-      role_team: role_team || "",
-      expense_category,
-      description: description || "",
-      amount: parseFloat(amount),
-      receipt_url,
-      status: "Pending",
-      approved_by: "",
-      date_submitted: date_submitted || new Date().toISOString(),
-      date_paid: "",
-      notes: notes || "",
-      created_at: new Date().toISOString(),
-    };
-
-    await kv.set(`ik26:expense:${id}`, expense);
-    console.log(`Expense saved: ${id} by ${submitted_by} ($${amount})`);
-
-    return c.json({ success: true, expense });
-  } catch (err) {
-    console.log("Error saving expense:", err);
-    return c.json({ error: `Failed to save expense: ${err}` }, 500);
-  }
-});
-
-// Get all expenses
-app.get("/make-server-5ed426e6/expenses", async (c) => {
-  try {
-    const expenses = await kv.getByPrefix("ik26:expense:");
-    const sorted = (expenses || [])
-      .filter(Boolean)
-      .sort((a: any, b: any) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
-    return c.json({ expenses: sorted });
-  } catch (err) {
-    console.log("Error loading expenses:", err);
-    return c.json({ error: `Failed to load expenses: ${err}` }, 500);
-  }
-});
-
-// Get expenses by user
-app.get("/make-server-5ed426e6/expenses/user/:userId", async (c) => {
-  try {
-    const userId = c.req.param("userId");
-    const expenses = await kv.getByPrefix("ik26:expense:");
-    const filtered = (expenses || [])
-      .filter((e: any) => e && (e.user_id === userId || e.submitted_by === userId))
-      .sort((a: any, b: any) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
-    return c.json({ expenses: filtered });
-  } catch (err) {
-    console.log("Error loading user expenses:", err);
-    return c.json({ error: `Failed to load user expenses: ${err}` }, 500);
-  }
-});
-
-// Update expense status (leadership: approve/deny/pay)
-app.put("/make-server-5ed426e6/expenses/:id/status", async (c) => {
-  try {
-    const id = c.req.param("id");
-    const { status, approved_by, notes } = await c.req.json();
-
-    if (!status || !["Pending", "Approved", "Denied", "Paid"].includes(status)) {
-      return c.json({ error: "Invalid status. Must be: Pending, Approved, Denied, Paid" }, 400);
-    }
-
-    const expense = await kv.get(`ik26:expense:${id}`);
-    if (!expense) {
-      return c.json({ error: "Expense not found" }, 404);
-    }
-
-    (expense as any).status = status;
-    if (approved_by) (expense as any).approved_by = approved_by;
-    if (notes !== undefined) (expense as any).notes = notes;
-    if (status === "Paid") (expense as any).date_paid = new Date().toISOString();
-
-    await kv.set(`ik26:expense:${id}`, expense);
-    console.log(`Expense ${id} status updated to ${status}`);
-
-    return c.json({ success: true, expense });
-  } catch (err) {
-    console.log("Error updating expense status:", err);
-    return c.json({ error: `Failed to update expense: ${err}` }, 500);
-  }
-});
-
-// Delete expense
-app.delete("/make-server-5ed426e6/expenses/:id", async (c) => {
-  try {
-    const id = c.req.param("id");
-    await kv.del(`ik26:expense:${id}`);
-    console.log(`Expense ${id} deleted`);
-    return c.json({ success: true });
-  } catch (err) {
-    console.log("Error deleting expense:", err);
-    return c.json({ error: `Failed to delete expense: ${err}` }, 500);
-  }
-});
-
-// Expense summary (for finance dashboard cards)
-app.get("/make-server-5ed426e6/expenses/summary", async (c) => {
-  try {
-    const expenses = await kv.getByPrefix("ik26:expense:");
-    const all = (expenses || []).filter(Boolean);
-
-    let totalAmount = 0, pendingAmount = 0, approvedAmount = 0, paidAmount = 0, deniedAmount = 0;
-    let pendingCount = 0, approvedCount = 0, paidCount = 0, deniedCount = 0;
-    const byCategory: Record<string, number> = {};
-    const byPerson: Record<string, { total: number; pending: number; approved: number; paid: number; denied: number; count: number }> = {};
-
-    for (const e of all) {
-      const exp = e as any;
-      const amt = exp.amount || 0;
-      totalAmount += amt;
-
-      if (exp.status === "Pending") { pendingAmount += amt; pendingCount++; }
-      else if (exp.status === "Approved") { approvedAmount += amt; approvedCount++; }
-      else if (exp.status === "Paid") { paidAmount += amt; paidCount++; }
-      else if (exp.status === "Denied") { deniedAmount += amt; deniedCount++; }
-
-      const cat = exp.expense_category || "Misc";
-      byCategory[cat] = (byCategory[cat] || 0) + amt;
-
-      const person = exp.submitted_by || "Unknown";
-      if (!byPerson[person]) {
-        byPerson[person] = { total: 0, pending: 0, approved: 0, paid: 0, denied: 0, count: 0 };
-      }
-      byPerson[person].total += amt;
-      byPerson[person].count++;
-      if (exp.status === "Pending") byPerson[person].pending += amt;
-      else if (exp.status === "Approved") byPerson[person].approved += amt;
-      else if (exp.status === "Paid") byPerson[person].paid += amt;
-      else if (exp.status === "Denied") byPerson[person].denied += amt;
-    }
-
-    return c.json({
-      total: all.length,
-      totalAmount,
-      pending: { count: pendingCount, amount: pendingAmount },
-      approved: { count: approvedCount, amount: approvedAmount },
-      paid: { count: paidCount, amount: paidAmount },
-      denied: { count: deniedCount, amount: deniedAmount },
-      byCategory,
-      byPerson,
-    });
-  } catch (err) {
-    console.log("Error loading expense summary:", err);
-    return c.json({ error: `Failed to load expense summary: ${err}` }, 500);
-  }
-});
-
-// ─── IK26 CRM Integration Routes ──────────────────────────────────
-// Support for Organizations, Contacts, Opportunities, Activities sync
-// Used by Google Apps Script flows and Figma Make app
-
-// Upsert IK26 sponsors table (confirmed opportunities only)
-app.post("/make-server-5ed426e6/ik26/sponsors/upsert", async (c) => {
-  try {
-    const body = await c.req.json();
-    const { sponsors } = body; // Array of sponsor objects
-
-    if (!Array.isArray(sponsors) || sponsors.length === 0) {
-      return c.json({ error: "sponsors array is required" }, 400);
-    }
-
-    const admin = getAdminClient();
-    const now = new Date().toISOString();
-
-    // Upsert each sponsor
-    const results = [];
-    for (const sponsor of sponsors) {
-      const { error } = await admin
-        .from("ik26_sponsors")
-        .upsert({
-          id: sponsor.id,
-          org_name: sponsor.org_name,
-          type: sponsor.type,
-          partner_tier: sponsor.partner_tier,
-          logo_url: sponsor.logo_url || null,
-          story_blurb: sponsor.story_blurb || null,
-          visibility_score: sponsor.visibility_score || null,
-          confirmed_date: sponsor.confirmed_date || now,
-          synced_at: now,
-        }, { onConflict: 'id' });
-
-      if (error) {
-        console.log(`Error upserting sponsor ${sponsor.id}:`, error);
-        results.push({ id: sponsor.id, success: false, error: error.message });
-      } else {
-        results.push({ id: sponsor.id, success: true });
-      }
-    }
-
-    return c.json({ success: true, results, count: results.filter(r => r.success).length });
-  } catch (err) {
-    console.log("Error upserting IK26 sponsors:", err);
-    return c.json({ error: `Sponsor upsert failed: ${err}` }, 500);
-  }
-});
-
-// Upsert IK26 organizations table
-app.post("/make-server-5ed426e6/ik26/orgs/upsert", async (c) => {
-  try {
-    const body = await c.req.json();
-    const { orgs } = body; // Array of organization objects
-
-    if (!Array.isArray(orgs) || orgs.length === 0) {
-      return c.json({ error: "orgs array is required" }, 400);
-    }
-
-    const admin = getAdminClient();
-    const now = new Date().toISOString();
-
-    const results = [];
-    for (const org of orgs) {
-      const { error } = await admin
-        .from("ik26_orgs")
-        .upsert({
-          id: org.id,
-          name: org.name,
-          type: org.type,
-          region: org.region || null,
-          ik_chapter: org.ik_chapter || null,
-          community_impact: org.community_impact || [],
-          synced_at: now,
-        }, { onConflict: 'id' });
-
-      if (error) {
-        console.log(`Error upserting org ${org.id}:`, error);
-        results.push({ id: org.id, success: false, error: error.message });
-      } else {
-        results.push({ id: org.id, success: true });
-      }
-    }
-
-    return c.json({ success: true, results, count: results.filter(r => r.success).length });
-  } catch (err) {
-    console.log("Error upserting IK26 orgs:", err);
-    return c.json({ error: `Org upsert failed: ${err}` }, 500);
-  }
-});
-
-// Get all confirmed sponsors (for public-facing app)
-app.get("/make-server-5ed426e6/ik26/sponsors", async (c) => {
-  try {
-    const anon = getAnonClient();
-    const { data, error } = await anon
-      .from("ik26_sponsors")
-      .select("*")
-      .order("confirmed_date", { ascending: false });
-
-    if (error) throw error;
-    return c.json({ sponsors: data || [] });
-  } catch (err) {
-    console.log("Error fetching IK26 sponsors:", err);
-    return c.json({ error: `Failed to fetch sponsors: ${err}` }, 500);
-  }
-});
-
-// Get all organizations
-app.get("/make-server-5ed426e6/ik26/orgs", async (c) => {
-  try {
-    const anon = getAnonClient();
-    const { data, error } = await anon
-      .from("ik26_orgs")
-      .select("*")
-      .order("name", { ascending: true });
-
-    if (error) throw error;
-    return c.json({ orgs: data || [] });
-  } catch (err) {
-    console.log("Error fetching IK26 orgs:", err);
-    return c.json({ error: `Failed to fetch orgs: ${err}` }, 500);
-  }
-});
+// ─── Mount extracted route modules ───────────────────────────────
+app.route("/", crm);
+app.route("/", travel);
+app.route("/", formDiscord);
+app.route("/", engagement);
+app.route("/", expenses);
+app.route("/", audit);
 
 Deno.serve(app.fetch);

@@ -244,9 +244,9 @@ export function clearSession() {
 // Sidebar visibility per role
 const hiddenNavItems: Record<UserRole, string[]> = {
   leadership: [],
-  team: ["Budget & COGS", "Finance", "Sponsors & Partners", "Members", "Inquiries", "Notion Admin", "Mission Control"],
-  chef: ["Team Deploy", "Budget & COGS", "Finance", "Sponsors & Partners", "Research & Story", "Members", "Inquiries", "Notion Admin", "Mission Control"],
-  viewer: ["Team Deploy", "Budget & COGS", "Finance", "Sponsors & Partners", "Research & Story", "Members", "Inquiries", "Notion Admin", "Mission Control"],
+  team: ["Budget & COGS", "Finance", "Sponsors & Partners", "Members", "Inquiries", "Notion Admin", "Mission Control", "Activity Log", "Expenses", "Reimbursements", "System Audit"],
+  chef: ["Team Deploy", "Budget & COGS", "Finance", "Sponsors & Partners", "Research & Story", "Members", "Inquiries", "Notion Admin", "Mission Control", "Activity Log", "Expenses", "Reimbursements", "Pre-Event Checklist", "Task Board", "System Audit"],
+  viewer: ["Team Deploy", "Budget & COGS", "Finance", "Sponsors & Partners", "Research & Story", "Members", "Inquiries", "Notion Admin", "Mission Control", "Activity Log", "Expenses", "Reimbursements", "Pre-Event Checklist", "Task Board", "System Audit"],
 };
 
 export function getVisibleNavItems(role: UserRole, allItems: string[]): string[] {
@@ -266,10 +266,10 @@ export function getRoleLabel(role: UserRole): string {
 export type ViewMode = "leadership" | "team" | "chef";
 
 // Pages hidden in chef view (used by leadership when previewing chef experience)
-export const leadershipOnlyPages = ["Team Deploy", "Budget & COGS", "Finance", "Sponsors & Partners", "Research & Story", "Members", "Inquiries", "Notion Admin", "Mission Control"];
+export const leadershipOnlyPages = ["Team Deploy", "Budget & COGS", "Finance", "Sponsors & Partners", "Research & Story", "Members", "Inquiries", "Notion Admin", "Mission Control", "Activity Log", "Expenses", "Reimbursements", "Pre-Event Checklist", "Task Board", "System Audit"];
 
 // Pages hidden in team view
-export const teamHiddenPages = ["Budget & COGS", "Finance", "Sponsors & Partners", "Members", "Inquiries", "Notion Admin", "Mission Control"];
+export const teamHiddenPages = ["Budget & COGS", "Finance", "Sponsors & Partners", "Members", "Inquiries", "Notion Admin", "Mission Control", "Activity Log", "Expenses", "Reimbursements", "System Audit"];
 
 export function getVisibleNavItemsForView(viewMode: ViewMode, allItems: string[]): string[] {
   if (viewMode === "leadership") return allItems;

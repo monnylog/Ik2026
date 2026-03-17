@@ -136,7 +136,7 @@ function TeamDeploySimplified({ onNavigate, members, isFromNotion }: { onNavigat
           </h1>
         </div>
         <p className="text-muted-foreground text-[1rem] leading-relaxed" style={bodyFont}>
-          Your team at a glance — see who&rsquo;s working on what and update task status.
+          See who&rsquo;s working on what and update task status.
         </p>
       </motion.div>
 
@@ -384,7 +384,7 @@ function TeamDeployFull({ onNavigate, members, isFromNotion }: { onNavigate?: (p
           <NotionSyncBadge isLive={isFromNotion} itemCount={isFromNotion ? members.length : undefined} />
         </div>
         <p className="text-muted-foreground text-[0.875rem]" style={bodyFont}>
-          Team assignments, shift schedules, and open roles for IK26.
+          Team assignments, shifts, and open roles.
         </p>
       </motion.div>
 

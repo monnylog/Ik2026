@@ -1,3 +1,4 @@
+// Chef Roster — v2.3.0
 import { useState } from "react";
 import { motion, AnimatePresence } from "motion/react";
 import {
@@ -447,7 +448,7 @@ function ChefRosterTeamView({ onNavigate }: { onNavigate?: (page: string) => voi
                   Cuisine Focus
                 </p>
                 <div className="flex flex-wrap gap-1.5">
-                  {chef.specialties.map((s) => (
+                  {(chef.specialties || []).map((s) => (
                     <span
                       key={s}
                       className="text-[0.8125rem] px-2.5 py-1 rounded-lg"
@@ -634,7 +635,7 @@ function ChefRosterFullView({ role, onNavigate }: { role: UserRole; onNavigate?:
         </div>
         <div className="flex items-center justify-between">
           <p className="text-muted-foreground text-[0.875rem]" style={bodyFont}>
-            A Filipino Chefs Collaboration — 7 chefs from across the US coming together in Las Vegas, May 22, 2026
+            7 chefs from across the US — Las Vegas, May 22, 2026.
           </p>
           {showDetails && (
             <button
@@ -881,7 +882,7 @@ function ChefRosterFullView({ role, onNavigate }: { role: UserRole; onNavigate?:
                             </span>
                           </div>
                           <div className="flex flex-wrap gap-1.5">
-                            {chef.specialties.map((s) => (
+                            {(chef.specialties || []).map((s) => (
                               <span key={s} className="text-[0.625rem] bg-secondary text-muted-foreground px-2 py-0.5 rounded-full" style={bodyFont}>
                                 {s}
                               </span>
@@ -894,7 +895,7 @@ function ChefRosterFullView({ role, onNavigate }: { role: UserRole; onNavigate?:
                             </span>
                             <div className="flex flex-wrap gap-1.5">
                               {(chefCourseAssignments[chef.id] || []).length > 0 ? (
-                                chefCourseAssignments[chef.id].map((course) => (
+                                (chefCourseAssignments[chef.id] || []).map((course) => (
                                   <span
                                     key={course}
                                     className="text-[0.625rem] px-2.5 py-1 rounded-full"
@@ -914,14 +915,14 @@ function ChefRosterFullView({ role, onNavigate }: { role: UserRole; onNavigate?:
                             <UtensilsCrossed className="w-3 h-3 text-gold shrink-0" />
                             <span className="text-muted-foreground">{chef.signatureDish}</span>
                           </div>
-                          {chef.accolades.length > 0 && (
+                          {(chef.accolades?.length ?? 0) > 0 && (
                             <div className="space-y-1">
                               <div className="flex items-center gap-1.5 text-[0.6875rem]" style={{ color: "#D4AF37", ...bodyFont }}>
                                 <Award className="w-3 h-3 shrink-0" />
                                 <span className="font-medium">Accolades</span>
                               </div>
                               <div className="flex flex-wrap gap-1">
-                                {chef.accolades.map((a, i) => (
+                                {(chef.accolades || []).map((a, i) => (
                                   <span key={i} className="text-[0.5625rem] px-2 py-0.5 rounded-full" style={{ backgroundColor: "rgba(212,175,55,0.06)", color: "rgba(212,175,55,0.8)", border: "1px solid rgba(212,175,55,0.12)", ...bodyFont }}>
                                     {a}
                                   </span>
@@ -1053,14 +1054,14 @@ function ChefRosterFullView({ role, onNavigate }: { role: UserRole; onNavigate?:
                 </div>
 
                 {/* Accolades */}
-                {selectedChef.accolades.length > 0 && (
+                {(selectedChef.accolades?.length ?? 0) > 0 && (
                   <div className="p-4 rounded-xl" style={{ backgroundColor: "rgba(212,175,55,0.04)", border: "1px solid rgba(212,175,55,0.12)" }}>
                     <div className="flex items-center gap-2 mb-2.5">
                       <Award className="w-4 h-4" style={{ color: "#D4AF37" }} />
                       <span className="text-foreground text-[0.875rem] font-medium" style={headingFont}>Accolades & Recognition</span>
                     </div>
                     <div className="space-y-1.5">
-                      {selectedChef.accolades.map((a, i) => (
+                      {(selectedChef.accolades || []).map((a, i) => (
                         <div key={i} className="flex items-start gap-2">
                           <Star className="w-3 h-3 shrink-0 mt-0.5" style={{ color: "#D4AF37", fill: selectedChef.jamesBearStatus === "winner" && i === 0 ? "#D4AF37" : "none" }} />
                           <span className="text-[0.8125rem] text-muted-foreground" style={bodyFont}>{a}</span>
@@ -1096,7 +1097,7 @@ function ChefRosterFullView({ role, onNavigate }: { role: UserRole; onNavigate?:
                 <div>
                   <h4 className="text-foreground text-[0.875rem] mb-2" style={headingFont}>Specialties</h4>
                   <div className="flex flex-wrap gap-2">
-                    {selectedChef.specialties.map((s) => (
+                    {(selectedChef.specialties || []).map((s) => (
                       <span key={s} className="text-[0.75rem] bg-gold/8 text-gold px-3 py-1 rounded-full" style={bodyFont}>
                         {s}
                       </span>

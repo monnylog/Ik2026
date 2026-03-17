@@ -1,9 +1,9 @@
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "motion/react";
-import istoryaLogo from "@/assets/b55bcac066687e563f77685fc31f20ef43e81d5d.png";
+import istoryaLogo from "figma:asset/b55bcac066687e563f77685fc31f20ef43e81d5d.png";
 
-const headingFont = { fontFamily: "'Degular', 'Maragsa', 'Playfair Display', sans-serif" };
-const bodyFont = { fontFamily: "'Inter', sans-serif" };
+const headingFont = { fontFamily: "'Steiner', 'Degular', 'Maragsa', 'Playfair Display', serif" };
+const bodyFont = { fontFamily: "'Civil', 'Inter', sans-serif" };
 
 interface SplashScreenProps {
   onComplete: () => void;
@@ -41,8 +41,8 @@ export function SplashScreen({ onComplete, minDuration = 1800 }: SplashScreenPro
         transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
         className="fixed inset-0 z-[9999] flex items-center justify-center"
         style={{
-          backgroundColor: "rgba(43, 68, 64, 1)",
-          background: "radial-gradient(ellipse at 50% 40%, rgba(126,158,120,0.25) 0%, rgba(61,82,77,1) 70%)",
+          backgroundColor: "rgba(46, 79, 82, 1)",
+          background: "radial-gradient(ellipse at 50% 40%, rgba(78,130,130,0.25) 0%, rgba(46,79,82,1) 70%)",
           paddingTop: "env(safe-area-inset-top)",
           paddingBottom: "env(safe-area-inset-bottom)",
         }}
@@ -53,7 +53,7 @@ export function SplashScreen({ onComplete, minDuration = 1800 }: SplashScreenPro
         <div
           className="absolute inset-0 pointer-events-none"
           style={{
-            background: "radial-gradient(circle at 50% 50%, rgba(201,169,110,0.06) 0%, transparent 60%)",
+            background: "radial-gradient(circle at 50% 50%, rgba(203,164,122,0.06) 0%, transparent 60%)",
           }}
         />
 
@@ -77,7 +77,7 @@ export function SplashScreen({ onComplete, minDuration = 1800 }: SplashScreenPro
               transition={{ delay: 0.4, duration: 1, ease: "easeOut" }}
               className="absolute inset-0 rounded-full"
               style={{
-                background: "radial-gradient(circle, rgba(201,169,110,0.2) 0%, transparent 70%)",
+                background: "radial-gradient(circle, rgba(203,164,122,0.2) 0%, transparent 70%)",
                 width: 100,
                 height: 100,
                 top: -14,
@@ -90,7 +90,7 @@ export function SplashScreen({ onComplete, minDuration = 1800 }: SplashScreenPro
               className="w-[72px] h-[72px] relative z-10"
               width={72}
               height={72}
-              style={{ filter: "drop-shadow(0 4px 20px rgba(201,169,110,0.3))" }}
+              style={{ filter: "drop-shadow(0 4px 20px rgba(203,164,122,0.3))" }}
             />
           </motion.div>
 
@@ -107,17 +107,17 @@ export function SplashScreen({ onComplete, minDuration = 1800 }: SplashScreenPro
                 ...headingFont,
                 fontSize: "1.75rem",
                 lineHeight: 1.2,
-                color: "rgba(192, 209, 177, 0.95)",
+                color: "rgba(205, 218, 230, 0.95)",
               }}
             >
               Isang Kusina{" "}
-              <span style={{ color: "rgba(212, 168, 67, 0.95)" }}>2026</span>
+              <span style={{ color: "rgba(203, 164, 122, 0.95)" }}>2026</span>
             </h1>
             <p
               className="text-[0.8125rem]"
               style={{
                 ...bodyFont,
-                color: "rgba(192, 209, 177, 0.5)",
+                color: "rgba(205, 218, 230, 0.5)",
               }}
             >
               A Filipino Chefs Collaboration Dinner
@@ -145,7 +145,7 @@ export function SplashScreen({ onComplete, minDuration = 1800 }: SplashScreenPro
                   ease: "easeInOut",
                 }}
                 className="w-1.5 h-1.5 rounded-full"
-                style={{ backgroundColor: "rgba(212, 168, 67, 0.6)" }}
+                style={{ backgroundColor: "rgba(203, 164, 122, 0.6)" }}
               />
             ))}
           </motion.div>
@@ -162,7 +162,7 @@ export function SplashScreen({ onComplete, minDuration = 1800 }: SplashScreenPro
             className="text-[0.625rem] uppercase tracking-[0.2em]"
             style={{
               ...bodyFont,
-              color: "rgba(192, 209, 177, 0.2)",
+              color: "rgba(205, 218, 230, 0.2)",
             }}
           >
             Istorya Creative

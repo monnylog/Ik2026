@@ -199,7 +199,7 @@ export function MenuCourses({ role, onNavigate }: MenuCoursesProps) {
           </h2>
         </div>
         <p className="text-muted-foreground text-[0.875rem]" style={bodyFont}>
-          8 courses tracing Filipino presence in America — from 1587 to today. Click any course for full detail.
+          8 courses tracing Filipino presence in America — 1587 to today.
         </p>
       </motion.div>
 

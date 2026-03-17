@@ -19,6 +19,7 @@ import {
   RefreshCw,
   Send as SendIcon,
   Flame,
+  FileText,
 } from "lucide-react";
 import { useNotion } from "../../lib/notion-context";
 import { apiFetch } from "../../lib/supabase";
@@ -55,6 +56,7 @@ export function DeploymentReadiness({ onNavigate }: DeploymentReadinessProps) {
   const [submissionRate, setSubmissionRate] = useState<number | null>(null);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
+  const [formUrlStatus, setFormUrlStatus] = useState<{ placeholderCount: number; allProduction: boolean } | null>(null);
   const [invitesSent, setInvitesSent] = useState<Record<string, boolean>>(() => {
     try {
       const raw = localStorage.getItem("ik26-invites-sent");
@@ -64,9 +66,10 @@ export function DeploymentReadiness({ onNavigate }: DeploymentReadinessProps) {
 
   const fetchStats = useCallback(async () => {
     try {
-      const [profileData, submissionData] = await Promise.allSettled([
+      const [profileData, submissionData, formUrlData] = await Promise.allSettled([
         apiFetch("/admin/profiles"),
         apiFetch("/submission-stats"),
+        apiFetch("/form-urls"),
       ]);
 
       if (profileData.status === "fulfilled") {
@@ -79,6 +82,13 @@ export function DeploymentReadiness({ onNavigate }: DeploymentReadinessProps) {
 
       if (submissionData.status === "fulfilled") {
         setSubmissionRate(submissionData.value?.completionRate ?? 0);
+      }
+
+      if (formUrlData.status === "fulfilled") {
+        setFormUrlStatus({
+          placeholderCount: formUrlData.value?.placeholderCount ?? 6,
+          allProduction: formUrlData.value?.allProduction ?? false,
+        });
       }
     } catch (e) {
       console.error("Deployment readiness fetch error:", e);
@@ -138,9 +148,9 @@ export function DeploymentReadiness({ onNavigate }: DeploymentReadinessProps) {
       id: "access",
       label: "Access Codes Active",
       description:
-        "Password gate configured with team and chef access codes",
+        "Password gate configured with leadership, team, and chef access codes",
       status: "ready",
-      detail: "2 roles: leadership + chef. Codes distributed.",
+      detail: "3 roles: leadership, team, chef. All codes ready to distribute.",
       icon: Shield,
       color: "#7E9E78",
     },
@@ -244,6 +254,19 @@ export function DeploymentReadiness({ onNavigate }: DeploymentReadinessProps) {
         submissionRate && submissionRate >= 50 ? "#7E9E78" : "#CDA88A",
       navigateTo: "Menu & Courses",
     },
+    {
+      id: "forms",
+      label: "Forms & Agreements",
+      description:
+        formUrlStatus?.placeholderCount > 0
+          ? `${formUrlStatus.placeholderCount} Google Form/Doc URLs still using placeholder IDs — swap before distributing access codes`
+          : "All forms and agreements are using production URLs",
+      status: formUrlStatus === null ? "partial" : formUrlStatus.placeholderCount > 0 ? "not-ready" : "ready",
+      detail: formUrlStatus === null ? "Checking form URL status..." : formUrlStatus.placeholderCount > 0 ? "Update via Settings → PUT /form-urls or the admin panel" : undefined,
+      icon: FileText,
+      color: formUrlStatus?.placeholderCount > 0 ? "#CDA88A" : "#7E9E78",
+      navigateTo: "Forms & Agreements",
+    },
   ];
 
   const readyCount = items.filter((i) => i.status === "ready").length;
@@ -263,12 +286,20 @@ export function DeploymentReadiness({ onNavigate }: DeploymentReadinessProps) {
       copyValue: "https://isangkusina.com",
     },
     {
-      id: "team-code",
-      label: "Team Code",
+      id: "leadership-code",
+      label: "Leadership Code",
       value: "northstar222",
       copyValue: "northstar222",
       badge: "Leadership",
       badgeColor: "#DDA15E",
+    },
+    {
+      id: "team-code",
+      label: "Team Code",
+      value: "teamik26",
+      copyValue: "teamik26",
+      badge: "Team",
+      badgeColor: "#4A7FB5",
     },
     {
       id: "chef-code",

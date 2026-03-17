@@ -52,6 +52,7 @@ interface SearchableItem {
   color: string;
   category: "page" | "action" | "chef" | "resource" | "engagement" | "checklist";
   navigateTo: string; // page to navigate to
+  url?: string; // external URL to open
 }
 
 const pageItems: SearchableItem[] = [
@@ -63,7 +64,7 @@ const pageItems: SearchableItem[] = [
   { label: "Team Deploy", description: "Team assignments and deployment plan", keywords: ["team", "assign", "deploy", "staff", "roles"], icon: UserCheck, color: "#4A7FB5", category: "page", navigateTo: "Team Deploy" },
   { label: "Community", description: "Participant connections and icebreakers", keywords: ["community", "connections", "icebreaker", "people", "network"], icon: Heart, color: "#C9A96E", category: "page", navigateTo: "Community" },
   { label: "Members", description: "User management and access control", keywords: ["members", "users", "admin", "manage", "access"], icon: Shield, color: "#C75B3F", category: "page", navigateTo: "Members" },
-  { label: "Travel & Lodging", description: "Flight bookings, hotel info, and logistics", keywords: ["travel", "flight", "hotel", "lodging", "airport", "booking"], icon: Plane, color: "#4A7FB5", category: "page", navigateTo: "Travel & Lodging" },
+  { label: "Travel & Lodging", description: "Flight bookings, hotel info, and logistics", keywords: ["travel", "flight", "hotel", "lodging", "airport", "booking", "itinerary", "vegas", "trip"], icon: Plane, color: "#4A7FB5", category: "page", navigateTo: "Travel & Lodging" },
   { label: "Menu & Courses", description: "Multi-course dinner menu development", keywords: ["menu", "course", "dinner", "food", "dish", "recipe"], icon: UtensilsCrossed, color: "#7E9E78", category: "page", navigateTo: "Menu & Courses" },
   { label: "Submit Menu", description: "Submit your dish concept and creative brief", keywords: ["submit", "wizard", "dish", "brief", "submission"], icon: UtensilsCrossed, color: "#CDA88A", category: "page", navigateTo: "Submit Menu" },
   { label: "Budget & COGS", description: "Financial tracking and cost analysis", keywords: ["budget", "cost", "money", "finance", "expense", "cogs"], icon: DollarSign, color: "#CDA88A", category: "page", navigateTo: "Budget & COGS" },
@@ -111,6 +112,7 @@ const resourceItems: SearchableItem[] = [
   { label: "Venue Floor Plan", description: "CAD drawings of event space and kitchen layout", keywords: ["venue", "floor", "plan", "kitchen", "layout", "cad"], icon: FileText, color: "#6B7F8E", category: "resource", navigateTo: "Links & Resources" },
   { label: "Guest List & RSVP", description: "Guest tracking and dietary restrictions", keywords: ["guest", "rsvp", "dietary", "table", "seating"], icon: FileText, color: "#4A7FB5", category: "resource", navigateTo: "Links & Resources" },
   { label: "Vendor Contacts", description: "AV, rentals, florals, and printing contacts", keywords: ["vendor", "contract", "av", "rental", "floral"], icon: FileText, color: "#CDA88A", category: "resource", navigateTo: "Links & Resources" },
+  { label: "IK26 Discord Server", description: "Join the Isang Kusina community for real-time voice, text, and updates", keywords: ["discord", "server", "voice", "community", "invite", "join"], icon: MessageCircle, color: "#5865F2", category: "resource", navigateTo: "Community", url: "https://discord.gg/eQyaK4Pd" },
 ];
 
 // Engagement searchable items
@@ -212,19 +214,25 @@ export function GlobalSearch({ role, onNavigate, viewMode }: GlobalSearchProps) 
 
   // Determine visible items based on role
   const visibleItems = useMemo(() => {
+    // Get all visible page labels for this view mode
+    const visiblePageSet = new Set(visibleLabels);
+    visiblePageSet.add("Submit Menu"); // always accessible
+    visiblePageSet.add("Settings"); // always accessible
+    visiblePageSet.add("Dashboard"); // always accessible
+
     return allSearchItems.filter((i) => {
       // For page items, check visibility
       if (i.category === "page") {
-        return visibleLabels.includes(i.label) || i.label === "Submit Menu";
+        return visiblePageSet.has(i.label);
       }
-      // Actions always visible
-      if (i.category === "action") return true;
+      // Filter out items that navigate to hidden pages
+      if (i.navigateTo && !visiblePageSet.has(i.navigateTo)) {
+        return false;
+      }
       // Chef items visible to all
       if (i.category === "chef") return true;
       // Resources visible to leadership and team
       if (i.category === "resource") return role !== "chef";
-      // Checklist items visible to all
-      if (i.category === "checklist") return true;
       // Engagement visible to all
       if (i.category === "engagement") return true;
       return true;
@@ -294,7 +302,11 @@ export function GlobalSearch({ role, onNavigate, viewMode }: GlobalSearchProps) 
 
   const handleSelect = useCallback(
     (item: SearchableItem) => {
-      onNavigate(item.navigateTo);
+      if (item.url) {
+        window.open(item.url, "_blank");
+      } else {
+        onNavigate(item.navigateTo);
+      }
       setOpen(false);
     },
     [onNavigate]

@@ -479,7 +479,7 @@ export function TaskBoard({ role, onNavigate }: TaskBoardProps) {
           </div>
         </div>
         <p className="text-muted-foreground text-[0.875rem]" style={bodyFont}>
-          Collaborative task management — drag cards between columns to update status.
+          Drag cards between columns to update status.
         </p>
         <p className="text-muted-foreground/40 text-[0.6875rem] mt-1 hidden sm:block" style={bodyFont}>
           <kbd className="px-1 py-0.5 rounded text-[0.5625rem] bg-secondary border border-border mr-0.5">Alt</kbd>+<kbd className="px-1 py-0.5 rounded text-[0.5625rem] bg-secondary border border-border mx-0.5">↑↓</kbd> reorder within column · <kbd className="px-1 py-0.5 rounded text-[0.5625rem] bg-secondary border border-border mx-0.5">Alt</kbd>+<kbd className="px-1 py-0.5 rounded text-[0.5625rem] bg-secondary border border-border mx-0.5">←→</kbd> move between columns

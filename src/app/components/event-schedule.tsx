@@ -8,6 +8,7 @@ import {
   Loader2,
   ChevronDown,
   CalendarDays,
+  CalendarPlus,
   UtensilsCrossed,
   Users,
   Camera,
@@ -29,6 +30,19 @@ import type { UserRole } from "./onboarding/use-auth";
 import { useNotionDatabase } from "../lib/notion-sync";
 import { NotionSyncBadge } from "./ui/notion-sync-badge";
 import { transformScheduleBlock } from "../lib/notion-transforms";
+import { createCalendarLinkLocal } from "../lib/api-tools";
+
+// Convert "7:00 AM" → "07:00:00" for ISO date construction
+function parseTimeToISO(time: string): string {
+  const match = time.match(/(\d+):(\d+)\s*(AM|PM)/i);
+  if (!match) return "00:00:00";
+  let h = parseInt(match[1]);
+  const m = match[2];
+  const p = match[3].toUpperCase();
+  if (p === "PM" && h !== 12) h += 12;
+  if (p === "AM" && h === 12) h = 0;
+  return `${String(h).padStart(2, "0")}:${m}:00`;
+}
 
 const bodyFont = { fontFamily: "'Inter', sans-serif" };
 const headingFont = { fontFamily: "'Degular', 'Maragsa', 'Playfair Display', sans-serif" };
@@ -753,6 +767,29 @@ ${activeSchedule.map((b) => `
                                 {detail}
                               </div>
                             ))}
+                            {/* Google Calendar deep link */}
+                            <a
+                              href={createCalendarLinkLocal({
+                                title: `IK26: ${block.title}`,
+                                description: `${block.description}\n\nTeam: ${block.team}`,
+                                location: block.location,
+                                startDate: `2026-06-14T${parseTimeToISO(block.time)}`,
+                                endDate: `2026-06-14T${parseTimeToISO(block.endTime)}`,
+                              })}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              onClick={(e) => e.stopPropagation()}
+                              className="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-[0.6875rem] mt-2 cursor-pointer"
+                              style={{
+                                backgroundColor: "rgba(74,127,181,0.06)",
+                                color: "#4A7FB5",
+                                border: "1px solid rgba(74,127,181,0.12)",
+                                ...bodyFont,
+                              }}
+                            >
+                              <CalendarPlus className="w-3 h-3" />
+                              Add to Google Calendar
+                            </a>
                           </div>
                         </motion.div>
                       )}

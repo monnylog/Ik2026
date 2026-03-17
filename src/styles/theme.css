@@ -6,55 +6,55 @@
 
 @theme {
   --font-size: 16px;
-  --font-sans: 'Inter', system-ui, sans-serif;
+  --font-sans: 'Civil', 'Inter', system-ui, sans-serif;
   --font-mono: 'JetBrains Mono', monospace;
-  --font-heading: 'Degular', 'Maragsa', 'Playfair Display', sans-serif;
-  --background: #F8F4EE;
-  --foreground: #3A4A3F;
+  --font-heading: 'Steiner', 'Degular', 'Maragsa', 'Playfair Display', serif;
+  --background: #F0F4F6;
+  --foreground: #3A4A48;
   --card: #FFFFFF;
-  --card-foreground: #3A4A3F;
+  --card-foreground: #3A4A48;
   --popover: #FFFFFF;
-  --popover-foreground: #3A4A3F;
-  --primary: #8AAD84;
-  --primary-foreground: #FDFAF6;
-  --secondary: #F2DDD9;
-  --secondary-foreground: #3A4A3F;
-  --muted: #F0EBE3;
-  --muted-foreground: #8A857F;
-  --accent: #DEBB96;
-  --accent-foreground: #3A4A3F;
-  --destructive: #D0897A;
+  --popover-foreground: #3A4A48;
+  --primary: #4E8282;
+  --primary-foreground: #F6FAFB;
+  --secondary: #CDD8E8;
+  --secondary-foreground: #3A4A48;
+  --muted: #E4EBF0;
+  --muted-foreground: #6E8185;
+  --accent: #CBA47A;
+  --accent-foreground: #3A4A48;
+  --destructive: #C08E7E;
   --destructive-foreground: #ffffff;
-  --border: rgba(140, 165, 135, 0.10);
+  --border: rgba(58, 107, 107, 0.10);
   --input: transparent;
-  --input-background: #F0EBE3;
-  --switch-background: #DDD6CB;
+  --input-background: #E4EBF0;
+  --switch-background: #C5D0D8;
   --font-weight-medium: 500;
   --font-weight-normal: 400;
-  --ring: #8AAD84;
-  --chart-1: #8AAD84;
-  --chart-2: #D4A67D;
-  --chart-3: #F2DDD9;
-  --chart-4: #B3C8A8;
-  --chart-5: #9BA6D1;
+  --ring: #4E8282;
+  --chart-1: #4E8282;
+  --chart-2: #CBA47A;
+  --chart-3: #9FB0D4;
+  --chart-4: #5D9B8A;
+  --chart-5: #C08E7E;
   --radius: 0.625rem;
-  --sidebar: #475D56;
-  --sidebar-foreground: #FDFAF6;
-  --sidebar-primary: #DEBB96;
-  --sidebar-primary-foreground: #3A4A3F;
-  --sidebar-accent: #5A7A6E;
-  --sidebar-accent-foreground: #FDFAF6;
-  --sidebar-border: rgba(200, 215, 190, 0.12);
-  --sidebar-ring: #D4B896;
-  --success: #8AAD84;
-  --warning: #D4A67D;
-  --info: #9BA6D1;
-  --gold: #CEB47A;
-  --gold-light: #DDE7D2;
-  --navy: #9BA6D1;
-  --storytelling: #DEBB96;
-  --chapter-navy: #9BA6D1;
-  --chapter-amber: #D4A67D;
+  --sidebar: #2E4F52;
+  --sidebar-foreground: #F0F4F6;
+  --sidebar-primary: #CBA47A;
+  --sidebar-primary-foreground: #2E4F52;
+  --sidebar-accent: #3D6B6B;
+  --sidebar-accent-foreground: #F0F4F6;
+  --sidebar-border: rgba(200, 220, 220, 0.12);
+  --sidebar-ring: #CBA47A;
+  --success: #4E8282;
+  --warning: #CBA47A;
+  --info: #9FB0D4;
+  --gold: #CBA47A;
+  --gold-light: #D6DDE8;
+  --navy: #9FB0D4;
+  --storytelling: #CBA47A;
+  --chapter-navy: #9FB0D4;
+  --chapter-amber: #CBA47A;
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --color-card: var(--card);
@@ -108,7 +108,7 @@
 
 /* ── Accessibility: Global Focus Styles ── */
 *:focus-visible {
-  outline: 2px solid #C9A96E;
+  outline: 2px solid #CBA47A;
   outline-offset: 2px;
   border-radius: 4px;
 }
@@ -126,14 +126,14 @@ select:focus-visible,
 textarea:focus-visible,
 [role="button"]:focus-visible,
 [tabindex]:focus-visible {
-  outline: 2px solid #C9A96E;
+  outline: 2px solid #CBA47A;
   outline-offset: 2px;
 }
 
 /* Sidebar elements get contrasting focus ring */
 [class*="sidebar"] button:focus-visible,
 [class*="sidebar"] a:focus-visible {
-  outline-color: #C9A96E;
+  outline-color: #CBA47A;
 }
 
 /* Ensure minimum touch target size */

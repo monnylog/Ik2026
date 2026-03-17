@@ -21,8 +21,8 @@ import {
 import { BUILD_ID } from "../../lib/version";
 import { useFocusTrap } from "../../lib/use-focus-trap";
 
-const bodyFont = { fontFamily: "'Inter', sans-serif" };
-const headingFont = { fontFamily: "'Degular', 'Maragsa', 'Playfair Display', sans-serif" };
+const bodyFont = { fontFamily: "'Civil', 'Inter', sans-serif" };
+const headingFont = { fontFamily: "'Steiner', 'Degular', 'Maragsa', 'Playfair Display', serif" };
 
 interface ShortcutItem {
   keys: string[];

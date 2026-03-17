@@ -182,7 +182,7 @@ export function MissionControl({ onNavigate }: { onNavigate?: (page: string) => 
           </div>
         </div>
         <p className="text-muted-foreground text-[0.875rem]" style={bodyFont}>
-          Critical alerts, blockers, and escalations requiring immediate leadership attention.
+          Critical alerts, blockers, and escalations for leadership.
         </p>
       </motion.div>
 

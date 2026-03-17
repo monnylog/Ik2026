@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "motion/react";
 import {
   FileText,
@@ -16,6 +16,8 @@ import {
   Maximize2,
   Minimize2,
 } from "lucide-react";
+import type { UserRole } from "./onboarding/use-auth";
+import { apiFetch } from "../lib/supabase";
 
 const bodyFont = { fontFamily: "'Inter', sans-serif" };
 const headingFont = {
@@ -42,82 +44,135 @@ interface LegalDoc {
   parties: string;
 }
 
-const forms: FormItem[] = [
-  {
-    id: "chef-onboarding",
-    title: "Chef Onboarding Form",
-    description:
-      "Collect travel, dietary, and logistics info from each confirmed chef for event planning.",
-    embedUrl:
-      "https://docs.google.com/forms/d/e/1EsE6Gmz5PKAvVcTG3GnWyLwngzCx65AEmXr7SYXGplc/viewform?embedded=true",
-    icon: ChefHat,
-    color: "#C9A96E",
-    audience: "Chefs",
-  },
-  {
-    id: "team-feedback",
-    title: "Team Feedback Form",
-    description:
-      "Anonymous feedback channel for team members to share thoughts, concerns, and suggestions.",
-    embedUrl:
-      "https://docs.google.com/forms/d/e/1aKHuwRWkSvuKZssSnjGM-fLm-Ncr6L1Z5_hhOMXyA-0/viewform?embedded=true",
-    icon: Users,
-    color: "#5DA06B",
-    audience: "All Team",
-  },
-  {
-    id: "team-rsvp",
-    title: "Team RSVP Form",
-    description:
-      "Confirm attendance, roles, and availability for May 22 event night and prep days.",
-    embedUrl:
-      "https://docs.google.com/forms/d/e/1fAi97LKQVvOBtjxwdCG-Mvpy7nRfFVFHDAWzVZEHFKo/viewform?embedded=true",
-    icon: UserCheck,
-    color: "#4A7FB5",
-    audience: "All Team",
-  },
-];
+// ──────────────────────────────────────────────────────────────
+// FORM_URLS — default fallback config for all Google Form & Doc URLs.
+// Production URLs are loaded from the server (KV) at runtime.
+// Leadership can update via PUT /form-urls without code changes.
+// ──────────────────────────────────────────────────────────────
+const DEFAULT_FORM_URLS = {
+  // Google Forms (embedded)
+  chefOnboarding:
+    "https://docs.google.com/forms/d/e/1FAIpQLSfExampleChefOnboarding/viewform?embedded=true",
+  teamFeedback:
+    "https://docs.google.com/forms/d/e/1FAIpQLSfExampleTeamFeedback/viewform?embedded=true",
+  teamRsvp:
+    "https://docs.google.com/forms/d/e/1FAIpQLSfExampleTeamRSVP/viewform?embedded=true",
 
-const legalDocs: LegalDoc[] = [
-  {
-    id: "chef-agreement",
-    title: "Featured Chef Agreement",
-    description:
-      "Participation terms, compensation details, IP rights, and responsibilities for featured chefs at Isang Kusina 2026.",
-    url: "https://docs.google.com/document/d/1p2lTUEU6oOoAvllQoBSWsHIcuFlVksqaxE7aDFwnLGE/edit",
-    icon: ChefHat,
-    color: "#C9A96E",
-    parties: "Istorya LV x Featured Chef",
-  },
-  {
-    id: "volunteer-waiver",
-    title: "Volunteer Waiver & Release",
-    description:
-      "Liability waiver, safety acknowledgment, and release of claims for all event volunteers and team members.",
-    url: "https://docs.google.com/document/d/1xpalF17ElEDC0tQdfcs0dyQCfcPgg8TkVjNLkANlm6c/edit",
-    icon: Shield,
-    color: "#7E9E78",
-    parties: "Istorya LV x Volunteer",
-  },
-  {
-    id: "vendor-agreement",
-    title: "Vendor Agreement",
-    description:
-      "Terms of service, deliverables, payment schedule, and liability provisions for third-party vendors and suppliers.",
-    url: "https://docs.google.com/document/d/10gnZ2v0Ls_5Yyf5rjf4c6kbJOv-PUxhY3Hr1LveUo6U/edit",
-    icon: Handshake,
-    color: "#CDA88A",
-    parties: "Istorya LV x Vendor",
-  },
-];
+  // Google Docs (view/edit links)
+  chefAgreement:
+    "https://docs.google.com/document/d/1ExampleChefAgreement/edit",
+  volunteerWaiver:
+    "https://docs.google.com/document/d/1ExampleVolunteerWaiver/edit",
+  vendorAgreement:
+    "https://docs.google.com/document/d/1ExampleVendorAgreement/edit",
+};
+
+// Static arrays removed — forms and legal docs are now built dynamically
+// inside the component using live URLs from KV (see liveForms / liveLegalDocs).
 
 interface FormsAgreementsProps {
   onNavigate?: (page: string) => void;
+  role?: UserRole;
 }
 
-export function FormsAgreements({ onNavigate }: FormsAgreementsProps) {
+export function FormsAgreements({ onNavigate, role }: FormsAgreementsProps) {
   const [activeForm, setActiveForm] = useState<FormItem | null>(null);
   const [isFullscreen, setIsFullscreen] = useState(false);
+  const [formUrls, setFormUrls] = useState(DEFAULT_FORM_URLS);
+
+  // Fetch production form URLs from server on mount
+  useEffect(() => {
+    apiFetch("/form-urls")
+      .then((res) => {
+        if (res.urls && typeof res.urls === "object") {
+          setFormUrls((prev) => ({ ...prev, ...res.urls }));
+        }
+      })
+      .catch((err) =>
+        console.warn(
+          "Failed to load form URLs from server, using defaults:",
+          err
+        )
+      );
+  }, []);
+
+  // Build forms/docs arrays from live URLs
+  const liveForms: FormItem[] = [
+    {
+      id: "chef-onboarding",
+      title: "Chef Onboarding Form",
+      description: "Travel, dietary, and logistics info for event planning.",
+      embedUrl: formUrls.chefOnboarding,
+      icon: ChefHat,
+      color: "#C9A96E",
+      audience: "Chefs",
+    },
+    {
+      id: "team-feedback",
+      title: "Team Feedback Form",
+      description: "Anonymous feedback for sharing thoughts and suggestions.",
+      embedUrl: formUrls.teamFeedback,
+      icon: Users,
+      color: "#5DA06B",
+      audience: "All Team",
+    },
+    {
+      id: "team-rsvp",
+      title: "Team RSVP Form",
+      description: "Confirm attendance and availability for May 22.",
+      embedUrl: formUrls.teamRsvp,
+      icon: UserCheck,
+      color: "#4A7FB5",
+      audience: "All Team",
+    },
+  ];
+
+  const liveLegalDocs: LegalDoc[] = [
+    {
+      id: "chef-agreement",
+      title: "Featured Chef Agreement",
+      description:
+        "Participation terms, compensation, and IP rights for featured chefs.",
+      url: formUrls.chefAgreement,
+      icon: ChefHat,
+      color: "#C9A96E",
+      parties: "Istorya LV x Featured Chef",
+    },
+    {
+      id: "volunteer-waiver",
+      title: "Volunteer Waiver & Release",
+      description:
+        "Liability waiver and safety acknowledgment for volunteers.",
+      url: formUrls.volunteerWaiver,
+      icon: Shield,
+      color: "#7E9E78",
+      parties: "Istorya LV x Volunteer",
+    },
+    {
+      id: "vendor-agreement",
+      title: "Vendor Agreement",
+      description:
+        "Terms, deliverables, and payment schedule for vendors.",
+      url: formUrls.vendorAgreement,
+      icon: Handshake,
+      color: "#CDA88A",
+      parties: "Istorya LV x Vendor",
+    },
+  ];
+
+  // Role-based form filtering
+  const visibleForms = role === "chef"
+    ? liveForms.filter((f) => f.audience === "Chefs")
+    : role === "team"
+      ? liveForms.filter((f) => f.audience === "All Team")
+      : liveForms;
+
+  // Role-based legal doc filtering
+  const visibleLegalDocs = role === "chef"
+    ? liveLegalDocs.filter((d) => d.id === "chef-agreement")
+    : role === "team"
+      ? liveLegalDocs.filter((d) => d.id === "volunteer-waiver")
+      : liveLegalDocs;
 
   return (
     <div className="space-y-8">
@@ -127,7 +182,7 @@ export function FormsAgreements({ onNavigate }: FormsAgreementsProps) {
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.4 }}
       >
-        <div className="flex items-center gap-2.5 mb-2">
+        <div className="flex items-center gap-2.5 mb-1">
           <ClipboardList
             className="w-6 h-6"
             style={{ color: "#C9A96E" }}
@@ -140,14 +195,6 @@ export function FormsAgreements({ onNavigate }: FormsAgreementsProps) {
             Forms & Agreements
           </h1>
         </div>
-        <p
-          className="text-muted-foreground text-[0.9375rem] leading-relaxed max-w-2xl"
-          style={bodyFont}
-        >
-          Onboarding forms, team RSVPs, and legal agreements for Isang Kusina
-          2026. Forms can be filled out directly below. Legal documents open in
-          Google Docs.
-        </p>
       </motion.div>
 
       {/* ===== FORMS SECTION ===== */}
@@ -175,13 +222,21 @@ export function FormsAgreements({ onNavigate }: FormsAgreementsProps) {
               ...bodyFont,
             }}
           >
-            {forms.length} forms
+            {visibleForms.length} {visibleForms.length === 1 ? "form" : "forms"}
           </span>
         </div>
 
         {/* Form selector cards */}
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-4">
-          {forms.map((form, idx) => {
+        <div
+          className={`grid grid-cols-1 ${
+            visibleForms.length === 1
+              ? "sm:grid-cols-1 max-w-md"
+              : visibleForms.length === 2
+              ? "sm:grid-cols-2"
+              : "sm:grid-cols-3"
+          } gap-3 mb-4`}
+        >
+          {visibleForms.map((form, idx) => {
             const isActive = activeForm?.id === form.id;
             const FormIcon = form.icon;
             return (
@@ -348,14 +403,40 @@ export function FormsAgreements({ onNavigate }: FormsAgreementsProps) {
                   style={{
                     height: isFullscreen ? "85vh" : "680px",
                     transition: "height 0.3s ease",
+                    position: "relative",
                   }}
                 >
+                  {/* Fallback message behind iframe in case it fails to load */}
+                  <div
+                    className="absolute inset-0 flex flex-col items-center justify-center gap-3 text-center p-6"
+                    style={{ backgroundColor: "#fff", zIndex: 0 }}
+                  >
+                    <div
+                      className="w-10 h-10 rounded-xl flex items-center justify-center"
+                      style={{ backgroundColor: `${activeForm.color}12`, border: `1px solid ${activeForm.color}20` }}
+                    >
+                      <ExternalLink className="w-5 h-5" style={{ color: activeForm.color }} />
+                    </div>
+                    <p className="text-[0.875rem] text-gray-500" style={bodyFont}>
+                      If the form doesn't load, you can{" "}
+                      <a
+                        href={activeForm.embedUrl.replace("?embedded=true", "")}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="underline font-medium"
+                        style={{ color: activeForm.color }}
+                      >
+                        open it in a new tab
+                      </a>
+                      .
+                    </p>
+                  </div>
                   <iframe
                     src={activeForm.embedUrl}
                     width="100%"
                     height="100%"
-                    className="border-0"
-                    style={{ backgroundColor: "#fff", borderRadius: "0 0 0.75rem 0.75rem" }}
+                    className="border-0 relative"
+                    style={{ backgroundColor: "#fff", borderRadius: "0 0 0.75rem 0.75rem", zIndex: 1 }}
                     title={activeForm.title}
                     loading="lazy"
                     allow="autoplay"
@@ -394,12 +475,20 @@ export function FormsAgreements({ onNavigate }: FormsAgreementsProps) {
               ...bodyFont,
             }}
           >
-            {legalDocs.length} documents
+            {visibleLegalDocs.length} {visibleLegalDocs.length === 1 ? "document" : "documents"}
           </span>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-          {legalDocs.map((doc, idx) => {
+        <div
+          className={`grid grid-cols-1 ${
+            visibleLegalDocs.length === 1
+              ? "sm:grid-cols-1 max-w-lg"
+              : visibleLegalDocs.length === 2
+              ? "sm:grid-cols-2"
+              : "sm:grid-cols-3"
+          } gap-3`}
+        >
+          {visibleLegalDocs.map((doc, idx) => {
             const DocIcon = doc.icon;
             return (
               <motion.a
@@ -481,31 +570,30 @@ export function FormsAgreements({ onNavigate }: FormsAgreementsProps) {
           })}
         </div>
 
-        {/* Legal disclaimer */}
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.35 }}
-          className="mt-4 p-3.5 rounded-xl flex items-start gap-3"
-          style={{
-            backgroundColor: "rgba(107,127,142,0.04)",
-            border: "1px solid rgba(107,127,142,0.08)",
-          }}
-        >
-          <Scale
-            className="w-4 h-4 shrink-0 mt-0.5"
-            style={{ color: "#6B7F8E" }}
-          />
-          <p
-            className="text-[0.6875rem] text-muted-foreground/70 leading-relaxed"
-            style={bodyFont}
+        {/* Legal disclaimer — leadership only */}
+        {(!role || role === "leadership") && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.35 }}
+            className="mt-4 p-3.5 rounded-xl flex items-start gap-3"
+            style={{
+              backgroundColor: "rgba(107,127,142,0.04)",
+              border: "1px solid rgba(107,127,142,0.08)",
+            }}
           >
-            All legal documents are maintained in Google Docs by the Istorya
-            leadership team. Contact Walbert or Monny for questions about
-            specific agreements. Signed copies should be uploaded to the shared
-            Google Drive.
-          </p>
-        </motion.div>
+            <Scale
+              className="w-4 h-4 shrink-0 mt-0.5"
+              style={{ color: "#6B7F8E" }}
+            />
+            <p
+              className="text-[0.6875rem] text-muted-foreground/70 leading-relaxed"
+              style={bodyFont}
+            >
+              Signed copies should be uploaded to the shared Google Drive.
+            </p>
+          </motion.div>
+        )}
       </motion.section>
     </div>
   );

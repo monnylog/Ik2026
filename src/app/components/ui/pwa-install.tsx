@@ -26,16 +26,16 @@ function generateAppIcon(size: number): string {
   ctx.quadraticCurveTo(0, 0, r, 0);
   ctx.closePath();
 
-  // Gradient background (deep forest → sage)
+  // Gradient background (deep teal → coastal)
   const bg = ctx.createLinearGradient(0, 0, size, size);
-  bg.addColorStop(0, "#2B4440");
-  bg.addColorStop(0.5, "#3D524D");
-  bg.addColorStop(1, "#4D6A5E");
+  bg.addColorStop(0, "#2E4F52");
+  bg.addColorStop(0.5, "#3D6B6B");
+  bg.addColorStop(1, "#4E8282");
   ctx.fillStyle = bg;
   ctx.fill();
 
   // Subtle inner border glow
-  ctx.strokeStyle = "rgba(201,169,110,0.15)";
+  ctx.strokeStyle = "rgba(203,164,122,0.15)";
   ctx.lineWidth = size * 0.01;
   ctx.stroke();
 

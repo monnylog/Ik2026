@@ -16,6 +16,11 @@ export interface TransformedChef {
   storySnippet: string;
   logoUrl?: string;
   restaurant?: string;
+  restaurantUrl: string;
+  restaurantLogoUrl: string;
+  instagram: string;
+  accolades: string[];
+  jamesBearStatus: "winner" | "finalist" | null;
   _notionId: string;
   _url: string;
 }
@@ -215,6 +220,16 @@ export function transformChef(item: Record<string, any>): TransformedChef {
     storySnippet: findPropStr(item, "Story", "Story Snippet", "Quote", "storySnippet"),
     logoUrl: findPropStr(item, "Logo", "Logo URL", "Photo", "Image") || undefined,
     restaurant: findPropStr(item, "Restaurant", "restaurant") || undefined,
+    restaurantUrl: findPropStr(item, "Restaurant URL", "RestaurantUrl", "Website", "restaurant_url") || "",
+    restaurantLogoUrl: findPropStr(item, "Restaurant Logo", "RestaurantLogo", "restaurant_logo") || "",
+    instagram: findPropStr(item, "Instagram", "IG", "instagram") || "",
+    accolades: findPropArr(item, "Accolades", "Awards", "accolades"),
+    jamesBearStatus: (() => {
+      const jb = findPropStr(item, "James Beard", "JamesBeerd", "JB Status", "james_beard").toLowerCase();
+      if (jb.includes("winner")) return "winner" as const;
+      if (jb.includes("finalist")) return "finalist" as const;
+      return null;
+    })(),
     _notionId: item._notionId || "",
     _url: item._url || "",
   };

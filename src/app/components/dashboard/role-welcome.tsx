@@ -21,7 +21,7 @@ const roleConfig = {
   leadership: {
     icon: Shield,
     greeting: "Command Center",
-    subtitle: "Full visibility across all event operations",
+    subtitle: "68 days to event night",
     color: "#C9A96E",
     bg: "rgba(201,169,110,0.05)",
     border: "rgba(201,169,110,0.10)",
@@ -30,7 +30,7 @@ const roleConfig = {
   team: {
     icon: Users,
     greeting: "Team Hub",
-    subtitle: "Your tasks, deadlines, and team coordination",
+    subtitle: "Your tasks and coordination",
     color: "#6B9EC2",
     bg: "rgba(107,158,194,0.05)",
     border: "rgba(107,158,194,0.10)",
@@ -39,7 +39,7 @@ const roleConfig = {
   chef: {
     icon: ChefHat,
     greeting: "Creative Space",
-    subtitle: "Your course, submissions, and culinary journey",
+    subtitle: "Your culinary journey starts here",
     color: "#8AAD84",
     bg: "rgba(138,173,132,0.05)",
     border: "rgba(138,173,132,0.10)",

@@ -5,11 +5,11 @@
 /* ── Pre-JS splash: prevent white flash before React mounts ── */
 /* Sets the initial background to match the branded splash screen */
 html {
-  background-color: #2B4440;
+  background-color: #2E4F52;
 }
 
 body {
-  background-color: #2B4440;
+  background-color: #2E4F52;
 }
 
 /* Once the app mounts and applies theme, these are overridden by Tailwind's bg-background */
@@ -19,7 +19,7 @@ body {
   position: fixed;
   inset: 0;
   z-index: 9999;
-  background: radial-gradient(ellipse at 50% 40%, rgba(126,158,120,0.25) 0%, rgba(43,68,64,1) 70%);
+  background: radial-gradient(ellipse at 50% 40%, rgba(78,130,130,0.25) 0%, rgba(46,79,82,1) 70%);
 }
 
 /* ── Mobile Safari PWA / iOS Safe Area fixes ── */
@@ -142,21 +142,21 @@ td, th, li, pre, code {
 /* ── Section divider with fade ── */
 .ik26-divider {
   height: 1px;
-  background: linear-gradient(90deg, transparent, rgba(140,165,135,0.1) 20%, rgba(140,165,135,0.1) 80%, transparent);
+  background: linear-gradient(90deg, transparent, rgba(78,130,130,0.1) 20%, rgba(78,130,130,0.1) 80%, transparent);
 }
 
 /* ── Section label chip ── */
 .ik26-section-label {
-  font-family: 'Inter', sans-serif;
+  font-family: 'Civil', 'Inter', sans-serif;
   font-size: 0.5625rem;
   text-transform: uppercase;
   letter-spacing: 0.18em;
-  color: rgba(138, 133, 127, 0.5);
+  color: rgba(110, 129, 133, 0.5);
 }
 
 /* ── Gradient text utility ── */
 .ik26-gradient-text {
-  background: linear-gradient(135deg, #C9A96E, #DDA15E);
+  background: linear-gradient(135deg, #CBA47A, #C08E7E);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -170,11 +170,11 @@ td, th, li, pre, code {
   background: transparent;
 }
 .main-content-area::-webkit-scrollbar-thumb {
-  background-color: rgba(140,165,135,0.15);
+  background-color: rgba(78,130,130,0.15);
   border-radius: 3px;
 }
 .main-content-area::-webkit-scrollbar-thumb:hover {
-  background-color: rgba(140,165,135,0.25);
+  background-color: rgba(78,130,130,0.25);
 }
 
 /* Haptic-feel button press animation (subtle scale-down) */
@@ -266,21 +266,21 @@ td, th, li, pre, code {
 
 /* Gold focus ring for all interactive elements (WCAG AA) */
 *:focus-visible {
-  outline: 2px solid #C9A96E;
+  outline: 2px solid #CBA47A;
   outline-offset: 2px;
   border-radius: 4px;
 }
 
 /* Skip-to-content link enhancement */
 .skip-to-main:focus {
-  outline: 3px solid #C9A96E;
+  outline: 3px solid #CBA47A;
   outline-offset: 0;
 }
 
 /* Ensure minimum text contrast for muted text (WCAG AA 4.5:1) */
 /* Override any muted-foreground that's too light on light backgrounds */
 .a11y-text-muted {
-  color: #5A6A5C; /* 4.8:1 contrast on #F5F0E8 */
+  color: #4E6466; /* 4.8:1 contrast on #F0F4F6 */
 }
 
 /* ── IK26 Skeleton pulse with warm palette ── */

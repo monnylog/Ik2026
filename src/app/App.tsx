@@ -1,3 +1,4 @@
+import type React from "react";
 import {
   useState,
   useEffect,
@@ -44,6 +45,7 @@ import {
 } from "./components/onboarding/use-theme";
 import { clearDraft } from "./components/onboarding/use-draft";
 import { NotionProvider } from "./lib/notion-context";
+import { usePrefetchPages } from "./lib/use-prefetch";
 
 import { PasswordGate } from "./components/onboarding/password-gate";
 import { OnboardingModal } from "./components/onboarding/onboarding-modal";
@@ -94,6 +96,8 @@ import {
 } from "./components/ui/guided-tour";
 import { AppErrorBoundary } from "./components/ui/app-error-boundary";
 import { SWUpdateToast } from "./components/ui/sw-update-toast";
+import { ModuleLoadError } from "./components/ui/module-load-error";
+import { moduleRetryToast } from "./lib/api-toast";
 
 import { LandingPage } from "./components/landing/landing-page";
 
@@ -129,6 +133,8 @@ import { SponsorPipeline } from "./components/dashboard/sponsor-pipeline";
 import { ManagerWelcomeTour } from "./components/dashboard/manager-welcome-tour";
 import { ManagerAnalytics } from "./components/dashboard/manager-analytics";
 import { DeploymentReadiness } from "./components/dashboard/deployment-readiness";
+import { PreLaunchChecklist } from "./components/dashboard/prelaunch-checklist";
+import { PreflightPanel } from "./components/dashboard/preflight-panel";
 
 // Team dashboard
 import { TeamWelcomeTour } from "./components/dashboard/team-welcome-tour";
@@ -141,133 +147,74 @@ import { ChefProgress } from "./components/dashboard/chef-progress";
 import { ChefProfileCard } from "./components/dashboard/chef-profile-card";
 import { ChefArrivalKit } from "./components/dashboard/chef-arrival-kit";
 import { ChefCommandCenter } from "./components/dashboard/chef-command-center";
+import { WhatsNew } from "./components/dashboard/whats-new";
+import { BackendHealthIndicator } from "./components/dashboard/backend-health";
+import { AuditTrail } from "./components/dashboard/audit-trail";
 
 // Full pages — lazy loaded for code splitting
-const CommunityPage = lazy(() =>
-  import("./components/community-page").then((m) => ({
-    default: m.CommunityPage,
-  })),
-);
-const CommsChat = lazy(() =>
-  import("./components/comms-chat").then((m) => ({
-    default: m.CommsChat,
-  })),
-);
-const OurIstoryas = lazy(() =>
-  import("./components/engagement/our-istoryas").then((m) => ({
-    default: m.OurIstoryas,
-  })),
-);
-const ChefRoster = lazy(() =>
-  import("./components/chef-roster").then((m) => ({
-    default: m.ChefRoster,
-  })),
-);
-const EventTimeline = lazy(() =>
-  import("./components/event-timeline").then((m) => ({
-    default: m.EventTimeline,
-  })),
-);
-const TravelLodging = lazy(() =>
-  import("./components/travel-lodging").then((m) => ({
-    default: m.TravelLodging,
-  })),
-);
-const MenuCourses = lazy(() =>
-  import("./components/menu-courses").then((m) => ({
-    default: m.MenuCourses,
-  })),
-);
-const TeamDeploy = lazy(() =>
-  import("./components/team-deploy").then((m) => ({
-    default: m.TeamDeploy,
-  })),
-);
-const ResearchStory = lazy(() =>
-  import("./components/research-story").then((m) => ({
-    default: m.ResearchStory,
-  })),
-);
-const BudgetCogs = lazy(() =>
-  import("./components/budget-cogs").then((m) => ({
-    default: m.BudgetCogs,
-  })),
-);
-const LinksResources = lazy(() =>
-  import("./components/links-resources").then((m) => ({
-    default: m.LinksResources,
-  })),
-);
-const ChefSubmissionWizard = lazy(() =>
-  import("./components/chef-submission-wizard").then((m) => ({
-    default: m.ChefSubmissionWizard,
-  })),
-);
-const UserManagement = lazy(() =>
-  import("./components/user-management").then((m) => ({
-    default: m.UserManagement,
-  })),
-);
-const PreEventChecklist = lazy(() =>
-  import("./components/pre-event-checklist").then((m) => ({
-    default: m.PreEventChecklist,
-  })),
-);
-const TaskBoard = lazy(() =>
-  import("./components/task-board").then((m) => ({
-    default: m.TaskBoard,
-  })),
-);
-const EventSchedule = lazy(() =>
-  import("./components/event-schedule").then((m) => ({
-    default: m.EventSchedule,
-  })),
-);
-const ActivityLog = lazy(() =>
-  import("./components/activity-log").then((m) => ({
-    default: m.ActivityLog,
-  })),
-);
-const PortalPage = lazy(() =>
-  import("./components/portal-page").then((m) => ({
-    default: m.PortalPage,
-  })),
-);
-const ShareInvite = lazy(() =>
-  import("./components/share-invite").then((m) => ({
-    default: m.ShareInvite,
-  })),
-);
-const PortalInquiries = lazy(() =>
-  import("./components/portal-inquiries").then((m) => ({
-    default: m.PortalInquiries,
-  })),
-);
-const NotionAdmin = lazy(() =>
-  import("./components/notion-admin").then((m) => ({
-    default: m.NotionAdmin,
-  })),
-);
-const SponsorsPartners = lazy(() =>
-  import("./components/sponsors-partners").then((m) => ({
-    default: m.SponsorsPartners,
-  })),
-);
-const ExpenseTracker = lazy(() =>
-  import("./components/expense-tracker").then((m) => ({
-    default: m.ExpenseTracker,
-  })),
-);
-const FinanceDashboard = lazy(() =>
-  import("./components/finance-dashboard").then((m) => ({
-    default: m.FinanceDashboard,
-  })),
-);
-const MissionControlPage = lazy(() =>
-  import("./components/mission-control").then((m) => ({
-    default: m.MissionControl,
-  })),
-);
+// Retry wrapper: handles transient "Failed to fetch dynamically imported module" errors
+function lazyRetry<T extends Record<string, any>>(
+  factory: () => Promise<T>,
+  namedExport: keyof T,
+): React.LazyExoticComponent<React.ComponentType<any>> {
+  return lazy(() =>
+    factory()
+      .then((m) => ({ default: m[namedExport] as React.ComponentType<any> }))
+      .catch((err: unknown) => {
+        console.warn("[LazyRetry] Module fetch failed, retrying…", err);
+        return new Promise<{ default: React.ComponentType<any> }>((resolve) =>
+          setTimeout(
+            () =>
+              factory()
+                .then((m) => {
+                  moduleRetryToast(String(namedExport));
+                  resolve({ default: m[namedExport] as React.ComponentType<any> });
+                })
+                .catch((retryErr: unknown) => {
+                  console.error("[LazyRetry] Module fetch failed after retry:", retryErr);
+                  // Show graceful error UI instead of hard-reloading
+                  resolve({
+                    default: (() => (
+                      <ModuleLoadError
+                        moduleName={String(namedExport)}
+                        onRetry={() => window.location.reload()}
+                      />
+                    )) as unknown as React.ComponentType<any>,
+                  });
+                }),
+            1500,
+          ),
+        );
+      }),
+  );
+}
+
+const CommunityPage = lazyRetry(() => import("./components/community-page"), "CommunityPage");
+const CommsChat = lazyRetry(() => import("./components/comms-chat"), "CommsChat");
+const OurIstoryas = lazyRetry(() => import("./components/engagement/our-istoryas"), "OurIstoryas");
+const ChefRoster = lazyRetry(() => import("./components/chef-roster"), "ChefRoster");
+const EventTimeline = lazyRetry(() => import("./components/event-timeline"), "EventTimeline");
+const TravelLodging = lazyRetry(() => import("./components/travel-lodging"), "TravelLodging");
+const MenuCourses = lazyRetry(() => import("./components/menu-courses"), "MenuCourses");
+const TeamDeploy = lazyRetry(() => import("./components/team-deploy"), "TeamDeploy");
+const ResearchStory = lazyRetry(() => import("./components/research-story"), "ResearchStory");
+const BudgetCogs = lazyRetry(() => import("./components/budget-cogs"), "BudgetCogs");
+const LinksResources = lazyRetry(() => import("./components/links-resources"), "LinksResources");
+const ChefSubmissionWizard = lazyRetry(() => import("./components/chef-submission-wizard"), "ChefSubmissionWizard");
+const UserManagement = lazyRetry(() => import("./components/user-management"), "UserManagement");
+const PreEventChecklist = lazyRetry(() => import("./components/pre-event-checklist"), "PreEventChecklist");
+const TaskBoard = lazyRetry(() => import("./components/task-board"), "TaskBoard");
+const EventSchedule = lazyRetry(() => import("./components/event-schedule"), "EventSchedule");
+const ActivityLog = lazyRetry(() => import("./components/activity-log"), "ActivityLog");
+const PortalPage = lazyRetry(() => import("./components/portal-page"), "PortalPage");
+const ShareInvite = lazyRetry(() => import("./components/share-invite"), "ShareInvite");
+const PortalInquiries = lazyRetry(() => import("./components/portal-inquiries"), "PortalInquiries");
+const NotionAdmin = lazyRetry(() => import("./components/notion-admin"), "NotionAdmin");
+const SponsorsPartners = lazyRetry(() => import("./components/sponsors-partners"), "SponsorsPartners");
+const ExpenseTracker = lazyRetry(() => import("./components/expense-tracker"), "ExpenseTracker");
+const FinanceDashboard = lazyRetry(() => import("./components/finance-dashboard"), "FinanceDashboard");
+const MissionControlPage = lazyRetry(() => import("./components/mission-control"), "MissionControl");
+const AuditLogPage = lazyRetry(() => import("./components/audit-log-page"), "AuditLogPage");
 
 type AppState = "password" | "onboarding" | "dashboard";
 
@@ -317,6 +264,9 @@ function AppInner() {
   const badgeCounts =
     inquiryNewCount > 0 ? { Inquiries: inquiryNewCount } : {};
 
+  // Prefetch popular page modules on idle
+  usePrefetchPages(dashboardReady);
+
   // PWA manifest injection
   usePWAManifest();
 
@@ -335,7 +285,7 @@ function AppInner() {
         canvas.height = 630;
         const ctx = canvas.getContext("2d");
         if (!ctx) return null;
-        ctx.fillStyle = "#2B4440";
+        ctx.fillStyle = "#2E4F52";
         ctx.fillRect(0, 0, 1200, 630);
         const glow = ctx.createRadialGradient(
           600,
@@ -345,35 +295,35 @@ function AppInner() {
           280,
           500,
         );
-        glow.addColorStop(0, "rgba(126,158,120,0.12)");
-        glow.addColorStop(1, "rgba(43,68,64,0)");
+        glow.addColorStop(0, "rgba(78,130,130,0.15)");
+        glow.addColorStop(1, "rgba(46,79,82,0)");
         ctx.fillStyle = glow;
         ctx.fillRect(0, 0, 1200, 630);
         ctx.font = "bold 140px serif";
         ctx.textAlign = "center";
         ctx.textBaseline = "middle";
         const tg = ctx.createLinearGradient(480, 220, 720, 340);
-        tg.addColorStop(0, "#C9A96E");
-        tg.addColorStop(1, "#DDA15E");
+        tg.addColorStop(0, "#CBA47A");
+        tg.addColorStop(1, "#C08E7E");
         ctx.fillStyle = tg;
         ctx.fillText("IK", 600, 260);
         ctx.font = "300 36px sans-serif";
-        ctx.fillStyle = "rgba(201,169,110,0.5)";
+        ctx.fillStyle = "rgba(203,164,122,0.5)";
         ctx.fillText("2026", 600, 340);
         ctx.font = "400 22px sans-serif";
-        ctx.fillStyle = "rgba(192,209,177,0.55)";
+        ctx.fillStyle = "rgba(159,176,212,0.55)";
         ctx.fillText(
           "A Filipino Chefs Collaboration Dinner",
           600,
           410,
         );
         ctx.font = "300 16px sans-serif";
-        ctx.fillStyle = "rgba(192,209,177,0.3)";
+        ctx.fillStyle = "rgba(159,176,212,0.3)";
         ctx.fillText("May 22, 2026 \u00b7 Las Vegas", 600, 450);
         ctx.beginPath();
         ctx.moveTo(400, 175);
         ctx.lineTo(800, 175);
-        ctx.strokeStyle = "rgba(201,169,110,0.2)";
+        ctx.strokeStyle = "rgba(203,164,122,0.2)";
         ctx.lineWidth = 2;
         ctx.stroke();
         return canvas.toDataURL("image/png");
@@ -405,7 +355,7 @@ function AppInner() {
       metaTheme.setAttribute("name", "theme-color");
       document.head.appendChild(metaTheme);
     }
-    metaTheme.setAttribute("content", "#3D524D");
+    metaTheme.setAttribute("content", "#2E4F52");
 
     // Open Graph meta tags for social sharing
     const ogTags: Record<string, string> = {
@@ -458,7 +408,7 @@ function AppInner() {
       svgFavicon.href =
         "data:image/svg+xml," +
         encodeURIComponent(
-          "<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='6' fill='%233D524D'/><text x='16' y='22' text-anchor='middle' font-size='18' font-family='serif' fill='%23C9A96E'>IK</text></svg>",
+          "<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='6' fill='%232E4F52'/><text x='16' y='22' text-anchor='middle' font-size='18' font-family='serif' fill='%23CBA47A'>IK</text></svg>",
         );
       document.head.appendChild(svgFavicon);
     }
@@ -473,7 +423,7 @@ function AppInner() {
       appleIcon.href =
         "data:image/svg+xml," +
         encodeURIComponent(
-          "<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 180 180'><rect width='180' height='180' rx='36' fill='%233D524D'/><text x='90' y='120' text-anchor='middle' font-size='90' font-family='serif' fill='%23C9A96E'>IK</text></svg>",
+          "<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 180 180'><rect width='180' height='180' rx='36' fill='%232E4F52'/><text x='90' y='120' text-anchor='middle' font-size='90' font-family='serif' fill='%23CBA47A'>IK</text></svg>",
         );
       document.head.appendChild(appleIcon);
     }
@@ -675,7 +625,7 @@ function AppInner() {
     return (
       <div
         className="fixed inset-0 flex items-center justify-center"
-        style={{ backgroundColor: "#F8F4EE" }}
+        style={{ backgroundColor: "#F0F4F6" }}
         role="status"
         aria-label="Loading application"
       >
@@ -700,8 +650,8 @@ function AppInner() {
           <span
             className="text-[0.75rem] tracking-wider uppercase"
             style={{
-              fontFamily: "'Inter', sans-serif",
-              color: "#8A857F",
+              fontFamily: "'Civil', 'Inter', sans-serif",
+              color: "#6E8185",
               letterSpacing: "0.15em",
             }}
           >
@@ -749,8 +699,8 @@ function AppInner() {
             href="#main-content"
             className="sr-only focus:not-sr-only focus:fixed focus:top-2 focus:left-2 focus:z-[100] focus:px-4 focus:py-2 focus:rounded-lg focus:text-[0.875rem] focus:outline-none focus:shadow-lg skip-to-main"
             style={{
-              fontFamily: "'Inter', sans-serif",
-              backgroundColor: "#C9A96E",
+              fontFamily: "'Civil', 'Inter', sans-serif",
+              backgroundColor: "#CBA47A",
               color: "#FFFDF5",
             }}
           >
@@ -1264,7 +1214,8 @@ function AppInner() {
                         </motion.div>
                       )}
                       {isLeadershipView && (
-                        <div className="flex justify-end">
+                        <div className="flex items-center justify-end gap-3">
+                          <BackendHealthIndicator />
                           <NotionSyncIndicator />
                         </div>
                       )}
@@ -1286,6 +1237,15 @@ function AppInner() {
                               <ErrorBoundary section="Deployment Readiness">
                                 <DeploymentReadiness
                                   onNavigate={handleNavigate}
+                                />
+                              </ErrorBoundary>
+                              <ErrorBoundary section="Pre-flight Check">
+                                <PreflightPanel />
+                              </ErrorBoundary>
+                              <ErrorBoundary section="Pre-Launch Checklist">
+                                <PreLaunchChecklist
+                                  onNavigate={handleNavigate}
+                                  onViewModeChange={setViewMode}
                                 />
                               </ErrorBoundary>
                             </>
@@ -1356,7 +1316,7 @@ function AppInner() {
                           <ErrorBoundary section="Course Lineup">
                             <CourseLineup collapsible />
                           </ErrorBoundary>
-                          {!isTeamView && (
+                          {isLeadershipView && (
                             <>
                               <ErrorBoundary section="Planning Hub">
                                 <PlanningHub
@@ -1390,6 +1350,23 @@ function AppInner() {
                             initial={{ opacity: 0, y: 10 }}
                             animate={{ opacity: 1, y: 0 }}
                             transition={{
+                              delay: 0.24,
+                              duration: 0.4,
+                              ease: [0.22, 1, 0.36, 1],
+                            }}
+                            className="ik26-card-hover rounded-xl"
+                          >
+                            <ErrorBoundary section="What's New">
+                              <WhatsNew
+                                role={effectiveRole}
+                                onNavigate={handleNavigate}
+                              />
+                            </ErrorBoundary>
+                          </motion.div>
+                          <motion.div
+                            initial={{ opacity: 0, y: 10 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{
                               delay: 0.28,
                               duration: 0.4,
                               ease: [0.22, 1, 0.36, 1],
@@ -1402,23 +1379,25 @@ function AppInner() {
                               />
                             </ErrorBoundary>
                           </motion.div>
-                          <motion.div
-                            initial={{ opacity: 0, y: 10 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            transition={{
-                              delay: 0.52,
-                              duration: 0.4,
-                              ease: [0.22, 1, 0.36, 1],
-                            }}
-                            className="ik26-card-hover rounded-xl"
-                          >
-                            <ErrorBoundary section="Outreach Pipeline">
-                              <OutreachPipeline
-                                role={effectiveRole}
-                                onNavigate={handleNavigate}
-                              />
-                            </ErrorBoundary>
-                          </motion.div>
+                          {!isChefView && (
+                            <motion.div
+                              initial={{ opacity: 0, y: 10 }}
+                              animate={{ opacity: 1, y: 0 }}
+                              transition={{
+                                delay: 0.52,
+                                duration: 0.4,
+                                ease: [0.22, 1, 0.36, 1],
+                              }}
+                              className="ik26-card-hover rounded-xl"
+                            >
+                              <ErrorBoundary section="Outreach Pipeline">
+                                <OutreachPipeline
+                                  role={effectiveRole}
+                                  onNavigate={handleNavigate}
+                                />
+                              </ErrorBoundary>
+                            </motion.div>
+                          )}
                           {isLeadershipView && (
                             <motion.div
                               initial={{ opacity: 0, y: 10 }}
@@ -1452,6 +1431,22 @@ function AppInner() {
                                 <LandingAnalytics
                                   onNavigate={handleNavigate}
                                 />
+                              </ErrorBoundary>
+                            </motion.div>
+                          )}
+                          {isLeadershipView && (
+                            <motion.div
+                              initial={{ opacity: 0, y: 10 }}
+                              animate={{ opacity: 1, y: 0 }}
+                              transition={{
+                                delay: 0.64,
+                                duration: 0.4,
+                                ease: [0.22, 1, 0.36, 1],
+                              }}
+                              className="ik26-card-hover rounded-xl"
+                            >
+                              <ErrorBoundary section="Audit Trail">
+                                <AuditTrail onNavigate={handleNavigate} />
                               </ErrorBoundary>
                             </motion.div>
                           )}
@@ -2074,6 +2069,7 @@ function AppInner() {
                           <Suspense fallback={<PageSkeleton />}>
                             <FormsAgreements
                               onNavigate={handleNavigate}
+                              role={effectiveRole}
                             />
                           </Suspense>
                         </ErrorBoundary>
@@ -2127,6 +2123,30 @@ function AppInner() {
                     </motion.div>
                   )}
                 {dashboardReady &&
+                  activePage === "System Audit" &&
+                  role === "leadership" &&
+                  viewMode === "leadership" && (
+                    <motion.div
+                      key="system-audit"
+                      {...pageTransition}
+                    >
+                      <PageWrapper
+                        title="System Audit"
+                        onBack={() =>
+                          handleNavigate("Dashboard")
+                        }
+                      >
+                        <ErrorBoundary section="System Audit">
+                          <Suspense fallback={<PageSkeleton />}>
+                            <AuditLogPage
+                              onNavigate={handleNavigate}
+                            />
+                          </Suspense>
+                        </ErrorBoundary>
+                      </PageWrapper>
+                    </motion.div>
+                  )}
+                {dashboardReady &&
                   ![
                     "Dashboard",
                     "Settings",
@@ -2157,6 +2177,7 @@ function AppInner() {
                     "Sponsors & Partners",
                     "Reimbursements",
                     "Mission Control",
+                    "System Audit",
                   ].includes(activePage) && (
                     <motion.div
                       key={activePage}
@@ -2192,8 +2213,20 @@ function AppInner() {
                           fontFamily: "'Inter', sans-serif",
                         }}
                       >
-                        This section is under development.
+                        This page isn't available in your current view.
                       </p>
+                      <button
+                        onClick={() => handleNavigate("Dashboard")}
+                        className="mt-3 px-4 py-2 rounded-xl text-[0.8125rem] cursor-pointer transition-colors hover:opacity-80"
+                        style={{
+                          backgroundColor: "rgba(201,169,110,0.1)",
+                          color: "#C9A96E",
+                          border: "1px solid rgba(201,169,110,0.2)",
+                          fontFamily: "'Inter', sans-serif",
+                        }}
+                      >
+                        Back to Dashboard
+                      </button>
                     </motion.div>
                   )}
               </AnimatePresence>

@@ -1,6 +1,50 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&display=swap');
 @import url('https://fonts.cdnfonts.com/css/degular');
 
+/* Superior Type — Civil (geometric sans-serif) */
+/* Self-host Civil Bold for body / UI text */
+@font-face {
+  font-family: 'Civil';
+  src: local('Civil Bold'), local('Civil-Bold');
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Civil';
+  src: local('Civil Regular'), local('Civil-Regular');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Civil';
+  src: local('Civil Medium'), local('Civil-Medium');
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* Superior Type — Steiner (high-contrast serif / display) */
+/* Self-host Steiner Black for headings */
+@font-face {
+  font-family: 'Steiner';
+  src: local('Steiner Black'), local('Steiner-Black');
+  font-weight: 900;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Steiner';
+  src: local('Steiner Black Italic'), local('Steiner-BlackItalic');
+  font-weight: 900;
+  font-style: italic;
+  font-display: swap;
+}
+
 @font-face {
   font-family: 'Maragsa';
   src: url('https://monnylog.github.io/istorya-fonts/MaragsaDisplay-GO6PD.otf') format('opentype');

@@ -37,13 +37,15 @@ import {
   FileText,
   Wallet,
   Flame,
+  ScrollText,
 } from "lucide-react";
 import type { UserRole } from "./onboarding/use-auth";
 import { getVisibleNavItemsForView, type ViewMode } from "./onboarding/use-auth";
 import { getAvatar } from "./engagement/avatars";
-import istoryaLogo from "@/assets/b55bcac066687e563f77685fc31f20ef43e81d5d.png";
+import istoryaLogo from "figma:asset/b55bcac066687e563f77685fc31f20ef43e81d5d.png";
 import { type RecentPage, getPageIcon, formatRecentTime } from "./ui/recent-pages";
 import type { FavoritePage } from "./ui/favorites";
+import { APP_VERSION } from "../lib/version";
 
 const allNavItems = [
   { icon: LayoutDashboard, label: "Dashboard" },
@@ -73,6 +75,7 @@ const allNavItems = [
   { icon: FileText, label: "Forms & Agreements", shortLabel: "Forms" },
   { icon: Wallet, label: "Reimbursements" },
   { icon: Flame, label: "Mission Control" },
+  { icon: ScrollText, label: "System Audit" },
 ];
 
 interface NavSection {
@@ -88,7 +91,7 @@ const navSections: NavSection[] = [
   { label: "Insights", items: ["Activity Log"] },
   { label: "Reference", items: ["Links & Resources", "Forms & Agreements"] },
   { label: "Showcase", items: ["Portal", "Share Invite", "Inquiries"] },
-  { label: "Admin", items: ["Notion Admin"] },
+  { label: "Admin", items: ["Notion Admin", "System Audit"] },
 ];
 
 const bodyFont = { fontFamily: "'Inter', sans-serif" };
@@ -548,13 +551,6 @@ export function SidebarNav({ role, activePage, onNavigate, displayName, avatarId
             </div>
 
             {/* View mode toggle removed — now in top bar dropdown */}
-
-            <p
-              className="text-sidebar-foreground/30 text-[0.6875rem] italic"
-              style={{ fontFamily: "'Degular', 'Maragsa', 'Playfair Display', sans-serif" }}
-            >
-              "A Filipino Chefs Collaboration Dinner"
-            </p>
           </div>
         ) : (
           <div className="flex flex-col items-center gap-2">
@@ -572,6 +568,17 @@ export function SidebarNav({ role, activePage, onNavigate, displayName, avatarId
             >
               <Settings className="w-3 h-3 text-sidebar-foreground/40" />
             </button>
+          </div>
+        )}
+        {/* Version badge */}
+        {!collapsed && (
+          <div className="mt-2 px-2.5">
+            <span
+              className="text-[0.5625rem] text-sidebar-foreground/25 tracking-wider"
+              style={bodyFont}
+            >
+              v{APP_VERSION}
+            </span>
           </div>
         )}
       </div>
