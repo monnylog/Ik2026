@@ -3,7 +3,7 @@ import { motion } from "motion/react";
 import type { UserRole } from "./use-auth";
 import { useProfile } from "../../lib/profile-context";
 import { getConfirmedChef } from "./chef-directory";
-import istoryaLogo from "figma:asset/b55bcac066687e563f77685fc31f20ef43e81d5d.png";
+const istoryaLogo = "/istorya-logo.png";
 
 import { bodyFont, headingFont } from "../../lib/fonts";
 

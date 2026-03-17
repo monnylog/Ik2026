@@ -43,7 +43,7 @@ import {
 import type { UserRole } from "./onboarding/use-auth";
 import { getVisibleNavItemsForView, type ViewMode } from "./onboarding/use-auth";
 import { getAvatar } from "./engagement/avatars";
-import istoryaLogo from "figma:asset/b55bcac066687e563f77685fc31f20ef43e81d5d.png";
+const istoryaLogo = "/istorya-logo.png";
 import { type RecentPage, getPageIcon, formatRecentTime } from "./ui/recent-pages";
 import type { FavoritePage } from "./ui/favorites";
 import { APP_VERSION } from "../lib/version";
