@@ -2,8 +2,11 @@
 // IK26 OPS CENTER — FLOW E: Gmail → Activities (Optional)
 // ════════════════════════════════════════════════════════════════
 // Auto-creates Activity records in Notion when known contacts reply
+// SCOPE: Only processes emails labeled "IK26" in Gmail.
+//        Apply the IK26 label manually or via a Gmail filter rule.
+//        This ensures NO personal or non-IK26 emails are ever read.
 // Requires: Gmail API scope (gmail.readonly)
-// Trigger: Time-driven every 15 minutes (optional)
+// Trigger: Time-driven every 1 hour (optional)
 // Owner: Monica Blanco (monica.istorya@gmail.com)
 // ════════════════════════════════════════════════════════════════
 
@@ -49,9 +52,12 @@ function syncGmailToActivities() {
       }
     });
     
-    // Get unread emails from the last hour
+    // Get unread emails from the last hour — SCOPED TO IK26 LABEL ONLY
+    // IMPORTANT: Only emails with the Gmail label "IK26" are processed.
+    // To set this up: In Gmail, create a filter (Settings → Filters) that
+    // automatically applies the "IK26" label to emails from known IK26 contacts.
     const oneHourAgo = new Date(Date.now() - 60 * 60 * 1000);
-    const query = `is:unread after:${Math.floor(oneHourAgo.getTime() / 1000)} from:(-me)`;
+    const query = `label:IK26 is:unread after:${Math.floor(oneHourAgo.getTime() / 1000)} from:(-me)`;
     const threads = GmailApp.search(query, 0, 50);
     
     Logger.log(`Found ${threads.length} unread threads`);
