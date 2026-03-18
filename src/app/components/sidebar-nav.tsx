@@ -57,7 +57,7 @@ const allNavItems = [
   { icon: Users, label: "Chef Roster" },
   { icon: BookOpen, label: "Chef Journey" },
   { icon: UserCheck, label: "Team Deploy" },
-  { icon: Heart, label: "Community" },
+
   { icon: Shield, label: "Members" },
   { icon: Plane, label: "Travel & Lodging", shortLabel: "Travel" },
   { icon: UtensilsCrossed, label: "Menu & Courses", shortLabel: "Menu" },
@@ -75,10 +75,10 @@ const allNavItems = [
   { icon: Inbox, label: "Inquiries" },
   { icon: Database, label: "Notion Admin" },
   { icon: Handshake, label: "Sponsors & Partners", shortLabel: "Sponsors" },
-  { icon: FileText, label: "Forms & Agreements", shortLabel: "Forms" },
-  { icon: Wallet, label: "Reimbursements" },
+
+
   { icon: Flame, label: "Mission Control" },
-  { icon: ScrollText, label: "System Audit" },
+
   { icon: PenTool, label: "Content Studio" },
 ];
 
@@ -89,13 +89,13 @@ interface NavSection {
 
 const navSections: NavSection[] = [
   { label: "Overview", items: ["Dashboard", "Comms", "Our Istoryas", "Event Timeline", "Mission Control"] },
-  { label: "People", items: ["Chef Roster", "Chef Journey", "Team Deploy", "Community", "Members"] },
-  { label: "Operations", items: ["Travel & Lodging", "Menu & Courses", "Budget & COGS", "Reimbursements", "Expenses", "Finance", "Sponsors & Partners", "Research & Story"] },
+  { label: "People", items: ["Chef Roster", "Chef Journey", "Team Deploy", "Members"] },
+  { label: "Operations", items: ["Travel & Lodging", "Menu & Courses", "Budget & COGS", "Expenses", "Finance", "Sponsors & Partners", "Research & Story"] },
   { label: "Planning", items: ["Pre-Event Checklist", "Task Board", "Event Schedule"] },
   { label: "Insights", items: ["Activity Log"] },
-  { label: "Reference", items: ["Links & Resources", "Forms & Agreements"] },
+  { label: "Reference", items: ["Links & Resources"] },
   { label: "Showcase", items: ["Portal", "Share Invite", "Inquiries"] },
-  { label: "Admin", items: ["Notion Admin", "System Audit", "Content Studio"] },
+  { label: "Admin", items: ["Notion Admin", "Content Studio"] },
 ];
 
 interface SidebarNavProps {

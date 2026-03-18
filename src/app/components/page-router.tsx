@@ -56,7 +56,6 @@ function lazyRetry<T extends Record<string, any>>(
 }
 
 // ── Lazy page components ─────────────────────────────────────────
-const CommunityPage = lazyRetry(() => import("./community-page"), "CommunityPage");
 const CommsChat = lazyRetry(() => import("./comms-chat"), "CommsChat");
 const OurIstoryas = lazyRetry(() => import("./engagement/our-istoryas"), "OurIstoryas");
 const ChefRoster = lazyRetry(() => import("./chef-roster"), "ChefRoster");
@@ -82,10 +81,7 @@ const SponsorsPartners = lazyRetry(() => import("./sponsors-partners"), "Sponsor
 const ExpenseTracker = lazyRetry(() => import("./expense-tracker"), "ExpenseTracker");
 const FinanceDashboard = lazyRetry(() => import("./finance-dashboard"), "FinanceDashboard");
 const MissionControlPage = lazyRetry(() => import("./mission-control"), "MissionControl");
-const AuditLogPage = lazyRetry(() => import("./audit-log-page"), "AuditLogPage");
 const ContentStudio = lazyRetry(() => import("./content-studio"), "ContentStudio");
-const FormsAgreements = lazyRetry(() => import("./forms-agreements"), "FormsAgreements");
-const Reimbursements = lazyRetry(() => import("./reimbursements"), "Reimbursements");
 
 // ── Types ────────────────────────────────────────────────────────
 
@@ -101,14 +97,13 @@ interface PageRouterProps {
 // ── Known pages list (for fallback detection) ────────────────────
 
 const KNOWN_PAGES = [
-  "Dashboard", "Settings", "Community", "Comms", "Our Istoryas",
+  "Dashboard", "Settings", "Comms", "Our Istoryas",
   "Chef Roster", "Chef Journey", "Event Timeline", "Travel & Lodging",
   "Menu & Courses", "Team Deploy", "Research & Story", "Budget & COGS",
   "Sponsors & Partners", "Links & Resources", "Submit Menu", "Members",
   "Pre-Event Checklist", "Task Board", "Event Schedule", "Activity Log",
   "Portal", "Share Invite", "Inquiries", "Notion Admin", "Expenses",
-  "Finance", "Forms & Agreements", "Reimbursements",
-  "Mission Control", "System Audit", "Content Studio",
+  "Finance", "Mission Control", "Content Studio",
 ];
 
 // ══════════════════════════════════════════════════════════════════
@@ -166,13 +161,6 @@ export function PageRouter({
 
   switch (activePage) {
     // ── Custom layout pages ──────────────────────────────────
-    case "Community":
-      if (!role) return null;
-      return wrapBare("community", <PageSkeleton />,
-        <CommunityPage role={effectiveRole} viewMode={viewMode} onBack={goBack} onNavigate={onNavigate} />,
-        "Community",
-      );
-
     case "Comms":
       return wrapBare("comms", <CommsSkeleton />,
         <CommsChat role={effectiveRole} onBack={goBack} onNavigate={onNavigate} />,
@@ -267,16 +255,6 @@ export function PageRouter({
         "Expense Tracker",
       );
 
-    case "Forms & Agreements":
-      return wrap("forms-agreements", "Forms & Agreements", <PageSkeleton />,
-        <FormsAgreements onNavigate={onNavigate} role={effectiveRole} />,
-      );
-
-    case "Reimbursements":
-      return wrap("reimbursements", "Reimbursements", <PageSkeleton />,
-        <Reimbursements onNavigate={onNavigate} />,
-      );
-
     // ── View-mode gated pages ───────────────────────────────
     case "Team Deploy":
       if (!isLeadershipOrTeam) return null;
@@ -326,12 +304,6 @@ export function PageRouter({
       if (!isLeadership) return null;
       return wrap("mission-control", "Mission Control", <PageSkeleton />,
         <MissionControlPage onNavigate={onNavigate} />,
-      );
-
-    case "System Audit":
-      if (!isLeadership) return null;
-      return wrap("system-audit", "System Audit", <PageSkeleton />,
-        <AuditLogPage onNavigate={onNavigate} />,
       );
 
     case "Content Studio":
