@@ -121,33 +121,10 @@ const DISCORD_INVITE_URL = "https://discord.gg/eQyaK4Pd";
    ═══════════════════════════════════════════════════════════════════ */
 
 const sampleMessages: Record<string, ChatMessage[]> = {
-  general: [
-    { id: "seed-g1", channelId: "general", avatarId: "coconut", author: "Walbert", text: "Team — we are officially in Week 1. Concept is locked: 7 chefs, 7 cities, 7 courses. Let's make Year 3 the best one yet.", timestamp: "Mar 7, 9:00 AM", userId: "walbert" },
-    { id: "seed-g2", channelId: "general", avatarId: "mango", author: "Monny", text: "Save-the-date graphic is live on IG and Facebook! Huge thanks to Denise and Kara for the quick turnaround. Looks incredible.", timestamp: "Mar 7, 10:30 AM", userId: "monny" },
-    { id: "seed-g3", channelId: "general", avatarId: "leaf", author: "Denise", text: "Thank you! Kara nailed the typography. We kept the Allure 2023 palette — Fern Green and Antique Brass. Wanted it to feel warm and inviting.", timestamp: "Mar 7, 11:15 AM", userId: "denise" },
-    { id: "seed-g4", channelId: "general", avatarId: "coconut", author: "Walbert", text: "Chef participation agreements go out today. $500 honorarium, travel covered, dish deadline April 29th. Sending via DocuSign.", timestamp: "Mar 11, 8:00 AM", userId: "walbert" },
-    { id: "seed-g5", channelId: "general", avatarId: "mango", author: "Monny", text: "Reminder: F&B Director assignment is CRITICAL — we need this locked by tomorrow. Mariana is our top candidate. Who's reaching out?", timestamp: "Mar 11, 2:45 PM", userId: "monny" },
-    { id: "seed-g6", channelId: "general", avatarId: "coconut", author: "Walbert", text: "I'll call Mariana tonight. If she's in, we can finalize the kitchen org chart this weekend.", timestamp: "Mar 11, 3:10 PM", userId: "walbert" },
-  ],
-  "kitchen-prep": [
-    { id: "seed-k1", channelId: "kitchen-prep", avatarId: "coconut", author: "Walbert", text: "Kitchen walkthrough at KMA is set for March 23rd. Need to count stations, check cold storage capacity, and map out the loading dock flow.", timestamp: "Mar 8, 11:00 AM", userId: "walbert" },
-    { id: "seed-k2", channelId: "kitchen-prep", avatarId: "star", author: "Chef Dio", text: "I can help coordinate the walkthrough since I'm local. I've cooked at KMA before — the main kitchen has 6 stations but the prep area is tight.", timestamp: "Mar 8, 12:30 PM", userId: "dio" },
-    { id: "seed-k3", channelId: "kitchen-prep", avatarId: "mango", author: "Monny", text: "Good to know, Dio. Let's plan for shared prep times so nobody's waiting. Each chef gets a 2-hour window for their mise en place.", timestamp: "Mar 8, 1:15 PM", userId: "monny" },
-    { id: "seed-k4", channelId: "kitchen-prep", avatarId: "sun", author: "Chef Rachel", text: "Quick question — is there a smoker available at the venue? My Smoked Salmon Sinigang needs about 3 hours of cold smoke for the salmon.", timestamp: "Mar 9, 9:45 AM", userId: "rachel" },
-    { id: "seed-k5", channelId: "kitchen-prep", avatarId: "coconut", author: "Walbert", text: "We'll check during the walkthrough, Rachel. If not, we can rent a portable smoker. Adding it to the equipment list.", timestamp: "Mar 9, 10:20 AM", userId: "walbert" },
-  ],
-  logistics: [
-    { id: "seed-l1", channelId: "logistics", avatarId: "leaf", author: "Sarah", text: "Hotel block confirmed at The Venetian — 10 rooms at group rate, May 17-24. Confirmation numbers coming to each traveler by end of week.", timestamp: "Mar 8, 2:00 PM", userId: "sarah" },
-    { id: "seed-l2", channelId: "logistics", avatarId: "mango", author: "Monny", text: "Chef Renato is flying in from Manila — arriving May 17, two days early. Can we arrange kitchen access for him on May 18 so he can test his prep?", timestamp: "Mar 9, 10:00 AM", userId: "monny" },
-    { id: "seed-l3", channelId: "logistics", avatarId: "leaf", author: "Sarah", text: "On it. I'll coordinate with KMA for early kitchen access. Also, Maria offered to do the airport pickup for Renato since she's local.", timestamp: "Mar 9, 10:30 AM", userId: "sarah" },
-    { id: "seed-l4", channelId: "logistics", avatarId: "coconut", author: "Walbert", text: "Still waiting on Christina Q's flight booking. She's between Spirit and Southwest out of New Orleans. Travel team — can you send her the booking link?", timestamp: "Mar 10, 11:00 AM", userId: "walbert" },
-  ],
-  introductions: [
-    { id: "seed-i1", channelId: "introductions", avatarId: "coconut", author: "Walbert", text: "Welcome everyone to the Isang Kusina 2026 team channel! Let's do quick intros. I'm Walbert — co-founder and operations lead. Year 3, let's go!", timestamp: "Mar 7, 8:30 AM", userId: "walbert" },
-    { id: "seed-i2", channelId: "introductions", avatarId: "mango", author: "Monny", text: "Hey team! Monny here — co-founder, handling partnerships, budget, and making sure we don't lose money this year. Excited for what's ahead.", timestamp: "Mar 7, 8:45 AM", userId: "monny" },
-    { id: "seed-i3", channelId: "introductions", avatarId: "star", author: "Chef Dio", text: "Chef Dio here, representing Las Vegas — Course 1. My lola's kare-kare is getting a fine dining makeover this year. Salamat for having me back!", timestamp: "Mar 7, 10:00 AM", userId: "dio" },
-    { id: "seed-i4", channelId: "introductions", avatarId: "sun", author: "Chef Rachel", text: "Kumusta! Chef Rachel from Alaska. Course 2 — bringing the intersection of Filipino and Indigenous Alaskan food traditions. Honored to be here.", timestamp: "Mar 7, 10:30 AM", userId: "rachel" },
-  ],
+  general: [],
+  "kitchen-prep": [],
+  logistics: [],
+  introductions: [],
 };
 
 /* ═══════════════════════════════════════════════════════════════════

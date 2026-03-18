@@ -134,16 +134,8 @@ export function NotionCommsTracker({ isOpen, onClose }: NotionCommsTrackerProps)
     setRefreshing(false);
   };
 
-  // Fallback data when Notion isn't configured
-  const fallbackContacts: TransformedCommsContact[] = [
-    { id: "gina", name: "Gina", contact: "KMA Event Center", communicationType: "Email/Text", status: "Waiting", lastContact: "2026-03-10", nextAction: "Follow up on venue quote", priority: "high", owner: "Walbert", followUpDate: "2026-03-14", workstream: "Venue", emailThread: "", notes: "Building budget this week, her number is the anchor", confirmed: false, responseDeadline: "2026-03-14", suggestedBy: "", source: "", tier: "", estValue: "", _notionId: "", _url: "" },
-    { id: "kasama", name: "Timothy Flores", contact: "Kasama Chicago", communicationType: "Intro via Max", status: "In Progress", lastContact: "2026-03-08", nextAction: "Route through Max's Chicago connection", priority: "high", owner: "Walbert", followUpDate: "2026-03-25", workstream: "Chefs", emailThread: "", notes: "Dual option: keynote or cooking", confirmed: false, responseDeadline: "2026-03-25", suggestedBy: "Max", source: "Referral", tier: "", estValue: "", _notionId: "", _url: "" },
-    { id: "denise", name: "Denise", contact: "Creative Team", communicationType: "Message", status: "Needs Follow-Up", lastContact: "2026-03-07", nextAction: "Save-the-date graphic", priority: "high", owner: "Kara", followUpDate: "2026-03-12", workstream: "Marketing", emailThread: "", notes: "Need: 'May 22 / Las Vegas / Isang Kusina: Year Three'", confirmed: false, responseDeadline: "2026-03-12", suggestedBy: "", source: "", tier: "", estValue: "", _notionId: "", _url: "" },
-    { id: "andrew", name: "Andrew Dizon", contact: "Research Lead", communicationType: "WhatsApp", status: "Pending", lastContact: "2026-03-09", nextAction: "Confirm availability for Y3", priority: "medium", owner: "JJ", followUpDate: "2026-03-11", workstream: "Research", emailThread: "", notes: "If unavailable, JJ absorbs all pairings", confirmed: false, responseDeadline: "2026-03-11", suggestedBy: "", source: "", tier: "", estValue: "", _notionId: "", _url: "" },
-    { id: "mariana", name: "Mariana", contact: "Events Director Candidate", communicationType: "Call", status: "Pending", lastContact: "2026-03-10", nextAction: "Offer F&B Lead / Events Director role", priority: "high", owner: "Walbert", followUpDate: "2026-03-12", workstream: "Staffing", emailThread: "", notes: "Single biggest operational gap", confirmed: false, responseDeadline: "2026-03-12", suggestedBy: "", source: "", tier: "", estValue: "", _notionId: "", _url: "" },
-  ];
-
-  const displayContacts = contacts.length > 0 ? filtered : fallbackContacts;
+  // No fallback data — Notion is the single source of truth
+  const displayContacts = filtered;
   const isLive = contacts.length > 0;
 
   return (

@@ -22,7 +22,10 @@ import {
   X,
   ExternalLink,
 } from "lucide-react";
-import { ImageWithFallback } from "../figma/ImageWithFallback";
+// Inline fallback for deleted Figma helper
+function ImageWithFallback({ src, alt, ...props }: React.ImgHTMLAttributes<HTMLImageElement>) {
+  return <img src={src} alt={alt} loading="lazy" {...props} />;
+}
 import istoryaLogo from "../../../imports/Logo_orange.svg";
 import { projectId, publicAnonKey } from "/utils/supabase/info";
 import { bodyFont, headingFont } from "../../lib/fonts";
