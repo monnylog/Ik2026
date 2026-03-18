@@ -21,7 +21,8 @@ export const IK2026_NOTION_DATABASES = {
 export const IK26_NOTION_DATABASES = IK2026_NOTION_DATABASES;
 
 // ─── Year Three Chef Roster (Final) ──────────────────────────────
-// 1-Rachel  2-Aaron  3-Lord Maynard  4-Christina  5-Patrice
+// Courses: 1-Rachel  2-Aaron  3-Lord Maynard  4-Christina  5-Patrice
+// Istorya Roots: Justin (Hawaii)  Dio (Manila)
 
 export const IK2026_CHEF_PAGE_IDS: Record<string, string> = {
   "Rachel Barril": "326dc6047d2d81f5b384c9af6b0d3d7a",
@@ -49,6 +50,17 @@ export const IK2026_CHEF_PAGE_IDS: Record<string, string> = {
   "Patrice Cleary": "326dc6047d2d817aaec4ff0c123b5d55",
   "Chef Patrice": "326dc6047d2d817aaec4ff0c123b5d55",
   patrice: "326dc6047d2d817aaec4ff0c123b5d55",
+
+  // Istorya Roots — not guest chef courses, representing the Istorya story
+  // Justin Barnes — Hawaii
+  "Justin Barnes": "326dc6047d2d810f980ad69d103f98d2",
+  "Chef Justin": "326dc6047d2d810f980ad69d103f98d2",
+  justin: "326dc6047d2d810f980ad69d103f98d2",
+
+  // Dio Buan — Manila
+  "Dio Buan": "326dc6047d2d81719155e5bc75339f3b",
+  "Chef Dio": "326dc6047d2d81719155e5bc75339f3b",
+  dio: "326dc6047d2d81719155e5bc75339f3b",
 };
 /** @deprecated use IK2026_CHEF_PAGE_IDS */
 export const IK26_CHEF_PAGE_IDS = IK2026_CHEF_PAGE_IDS;
