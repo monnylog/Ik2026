@@ -102,3 +102,20 @@ export const IK2026_DISCORD_CHANNELS = [
 /** @deprecated use IK2026_DISCORD_CHANNELS */
 export const IK26_DISCORD_CHANNELS = IK2026_DISCORD_CHANNELS;
 export type DiscordChannelName = typeof IK2026_DISCORD_CHANNELS[number];
+
+// ─── Workstream Page IDs (Notion Ops Center subpages) ────────────
+export const IK2026_WORKSTREAM_PAGES = {
+  warRoom: "c039a9bd04984885a1b96da9af7523dc",
+  money: "964857d01c6647669a134a0375f6bcd2",
+  riskRegister: "dd700843bbe140ebbc43acb01b081dd6",
+  chefsMenu: "924024e2b82048ed8d6923c2199abf2d",
+  venueKMA: "47e50f8eea3544b39bbafc5ba9579dc9",
+  eventDayFOH: "89f4bb096f6e40229f7cd100cee489c7",
+  teamDeploy: "ada2715ee86b4980a35d46450292b855",
+  marketingContent: "6f29bc201e594a6a835bc056d394b868",
+  postEvent: "b6b238e2410544f78fe2018aeb26e8b8",
+  referenceVault: "30c2aa00dc24489f806095583700ae5f",
+  mainPage: "b60f493a780e4c5ca053f14b3ca5ad23",
+} as const;
+/** @deprecated use IK2026_WORKSTREAM_PAGES */
+export const IK26_WORKSTREAM_PAGES = IK2026_WORKSTREAM_PAGES;

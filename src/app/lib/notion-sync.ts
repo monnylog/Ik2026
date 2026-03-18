@@ -4,6 +4,11 @@
 
 import { useState, useEffect, useCallback, useRef } from "react";
 import { apiFetch } from "./supabase";
+import { IK2026_WORKSTREAM_PAGES } from "./ik26-notion-config";
+
+// Re-export for backward compat (notion-admin.tsx imports these from here)
+export { IK2026_WORKSTREAM_PAGES };
+export const IK26_WORKSTREAM_PAGES = IK2026_WORKSTREAM_PAGES;
 
 // ─── Types ──────────────────────────────────────────────────────
 
@@ -42,43 +47,24 @@ export const CONTENT_TYPE_DESCRIPTIONS: Record<NotionContentType, string> = {
   warroom: "Critical alerts, blockers, escalations (🔥 Mission Control)",
 };
 
-// ─── Default Configuration ──────────────────────────────────────
-// Pre-populated with REAL IK26 Notion workspace page/database IDs.
-// These are the actual IDs from the 'IK26 — Monica's Ops Center' page.
-// Some are page IDs (subpages), some are inline database IDs on the main page.
+// ─── Default config lives in ik26-notion-config.ts and server-side notion-content-routes.tsx
+// Client never calls Notion directly — all data flows through the Edge Function.
 
+
+// Default config (thin reference for NotionAdmin configure dialog)
 export const DEFAULT_NOTION_CONFIG: Record<NotionContentType, { databaseId: string; label: string; isPageId?: boolean }> = {
-  roster: { databaseId: "924024e2b82048ed8d6923c2199abf2d", label: "🍽️ Chefs, Menu & Beverage", isPageId: true },
-  courses: { databaseId: "924024e2b82048ed8d6923c2199abf2d", label: "🍽️ Chefs, Menu & Beverage (Courses view)", isPageId: true },
-  team: { databaseId: "ada2715ee86b4980a35d46450292b855", label: "👥 Team Deploy", isPageId: true },
-  // Direct IK26 Comms Tracker database ID
-  comms: { databaseId: "320dc6047d2d80e0a635c01824b82ab2", label: "IK26 Comms Tracker", isPageId: false },
-  // IK26 Path milestones — embedded in Ops Center page, traverse to find milestones DB
-  milestones: { databaseId: "b60f493a780e4c5ca053f14b3ca5ad23", label: "IK26 Milestones (inline DB)", isPageId: true },
-  budget: { databaseId: "964857d01c6647669a134a0375f6bcd2", label: "💰 Money", isPageId: true },
-  // Filtered from comms — filter by Communication Type: Sponsorship Outreach
-  sponsors: { databaseId: "320dc6047d2d80e0a635c01824b82ab2", label: "Sponsors (from Comms Tracker)", isPageId: false },
-  // Uses same source page — filter by type: Announcement
-  announcements: { databaseId: "320dc6047d2d80e0a635c01824b82ab2", label: "IK26 Announcements", isPageId: true },
-  schedule: { databaseId: "89f4bb096f6e40229f7cd100cee489c7", label: "📋 Event Day & FOH", isPageId: true },
-  decisions: { databaseId: "dd700843bbe140ebbc43acb01b081dd6", label: "⚠️ Risk Register & Decision Log", isPageId: true },
-  warroom: { databaseId: "c039a9bd04984885a1b96da9af7523dc", label: "🔥 Mission Control", isPageId: true },
+  roster: { databaseId: "924024e2b82048ed8d6923c2199abf2d", label: "Chefs, Menu & Beverage", isPageId: true },
+  courses: { databaseId: "924024e2b82048ed8d6923c2199abf2d", label: "Courses view", isPageId: true },
+  team: { databaseId: "ada2715ee86b4980a35d46450292b855", label: "Team Deploy", isPageId: true },
+  comms: { databaseId: "320dc6047d2d80e0a635c01824b82ab2", label: "IK26 Comms Tracker" },
+  milestones: { databaseId: "b60f493a780e4c5ca053f14b3ca5ad23", label: "Milestones", isPageId: true },
+  budget: { databaseId: "964857d01c6647669a134a0375f6bcd2", label: "Money", isPageId: true },
+  sponsors: { databaseId: "320dc6047d2d80e0a635c01824b82ab2", label: "Sponsors (from Comms)" },
+  announcements: { databaseId: "320dc6047d2d80e0a635c01824b82ab2", label: "Announcements", isPageId: true },
+  schedule: { databaseId: "89f4bb096f6e40229f7cd100cee489c7", label: "Event Day & FOH", isPageId: true },
+  decisions: { databaseId: "dd700843bbe140ebbc43acb01b081dd6", label: "Risk Register", isPageId: true },
+  warroom: { databaseId: "c039a9bd04984885a1b96da9af7523dc", label: "Mission Control", isPageId: true },
 };
-
-// Page IDs of workstream subpages for reference
-export const IK26_WORKSTREAM_PAGES = {
-  warRoom: "c039a9bd04984885a1b96da9af7523dc",
-  money: "964857d01c6647669a134a0375f6bcd2",
-  riskRegister: "dd700843bbe140ebbc43acb01b081dd6",
-  chefsMenu: "924024e2b82048ed8d6923c2199abf2d",
-  venueKMA: "47e50f8eea3544b39bbafc5ba9579dc9",
-  eventDayFOH: "89f4bb096f6e40229f7cd100cee489c7",
-  teamDeploy: "ada2715ee86b4980a35d46450292b855",
-  marketingContent: "6f29bc201e594a6a835bc056d394b868",
-  postEvent: "b6b238e2410544f78fe2018aeb26e8b8",
-  referenceVault: "30c2aa00dc24489f806095583700ae5f",
-  mainPage: "b60f493a780e4c5ca053f14b3ca5ad23",
-} as const;
 
 export interface ContentSourceStatus {
   configured: boolean;
