@@ -23,7 +23,7 @@ import {
   ExternalLink,
 } from "lucide-react";
 import { ImageWithFallback } from "../figma/ImageWithFallback";
-import istoryaLogo from "../../../imports/Logo_orange.svg";
+import istoryaLogo from "../../../assets/Logo_orange.svg";
 import { projectId, publicAnonKey } from "/utils/supabase/info";
 import { bodyFont, headingFont } from "../../lib/fonts";
 
