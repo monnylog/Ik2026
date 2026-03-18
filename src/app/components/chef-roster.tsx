@@ -21,6 +21,8 @@ import {
   Award,
   Star,
   Globe,
+  Loader2,
+  RefreshCw,
 } from "lucide-react";
 import type { UserRole, ViewMode } from "./onboarding/use-auth";
 import { useNotionDatabase } from "../lib/notion-sync";
@@ -28,6 +30,19 @@ import { NotionSyncBadge } from "./ui/notion-sync-badge";
 import { transformChef } from "../lib/notion-transforms";
 import { ImageWithFallback } from "./figma/ImageWithFallback";
 import { bodyFont, headingFont } from "../lib/fonts";
+import { writeToNotion } from "../lib/notion-write";
+
+// Simple loading skeleton
+function ChefRosterSkeleton() {
+  return (
+    <div className="flex items-center justify-center min-h-[400px]">
+      <div className="flex flex-col items-center gap-3">
+        <Loader2 className="w-8 h-8 animate-spin" style={{ color: "#4E8282" }} />
+        <p className="text-sm text-muted-foreground" style={bodyFont}>Loading chef roster...</p>
+      </div>
+    </div>
+  );
+}
 
 interface Chef {
   id: string;
@@ -297,13 +312,13 @@ function ChefInitials({ name }: { name: string }) {
 }
 
 // Hook to get chef data from Notion or fallback to hardcoded
-function useChefData(): { data: Chef[]; isLive: boolean; isLoading: boolean } {
-  const { items, isLoading } = useNotionDatabase("roster");
+function useChefData(): { data: Chef[]; isLive: boolean; isLoading: boolean; refresh: () => Promise<void>; items: any[] } {
+  const { items, isLoading, refresh } = useNotionDatabase("roster");
   if (items.length > 0) {
     const transformed = items.map(transformChef);
-    return { data: transformed as unknown as Chef[], isLive: true, isLoading };
+    return { data: transformed as unknown as Chef[], isLive: true, isLoading, refresh, items };
   }
-  return { data: chefs, isLive: false, isLoading };
+  return { data: chefs, isLive: false, isLoading, refresh, items: [] };
 }
 
 export function ChefRoster({ role, onNavigate, viewMode }: ChefRosterProps) {
@@ -318,8 +333,13 @@ export function ChefRoster({ role, onNavigate, viewMode }: ChefRosterProps) {
 
 /* ========== TEAM VIEW: Simplified Read-Only Roster ========== */
 function ChefRosterTeamView({ onNavigate }: { onNavigate?: (page: string) => void }) {
-  const { data: chefData } = useChefData();
+  const { data: chefData, isLoading } = useChefData();
   const [filter, setFilter] = useState<"all" | "confirmed" | "pending">("all");
+
+  // Show loading skeleton while data is being fetched
+  if (isLoading) {
+    return <ChefRosterSkeleton />;
+  }
 
   const filtered = filter === "all"
     ? chefData
@@ -559,14 +579,61 @@ function ChefRosterTeamView({ onNavigate }: { onNavigate?: (page: string) => voi
 
 /* ========== FULL VIEW (Leadership / Chef) ========== */
 function ChefRosterFullView({ role, onNavigate }: { role: UserRole; onNavigate?: (page: string) => void }) {
-  const { data: chefData, isLive } = useChefData();
+  const { data: chefData, isLive, isLoading, refresh, items } = useChefData();
   const [selectedChef, setSelectedChef] = useState<Chef | null>(null);
   const [expandedCards, setExpandedCards] = useState<Record<string, boolean>>({});
   const [allCollapsed, setAllCollapsed] = useState(false);
+  const [isSyncing, setIsSyncing] = useState(false);
   const showDetails = role === "leadership" || role === "chef";
+
+  // Show loading skeleton while data is being fetched
+  if (isLoading) {
+    return <ChefRosterSkeleton />;
+  }
 
   const confirmedCount = chefData.filter((c) => c.travelStatus === "confirmed").length;
   const pendingCount = chefData.filter((c) => c.travelStatus !== "confirmed").length;
+
+  const handleSyncNow = async () => {
+    setIsSyncing(true);
+    try {
+      await refresh();
+    } finally {
+      setIsSyncing(false);
+    }
+  };
+
+  const handleStatusChange = async (chef: Chef, newStatus: "pending" | "confirmed" | "needs-booking") => {
+    // Find the raw Notion item for this chef
+    const rawItem = items.find((item) => {
+      const name = item.Name || item.Chef || item["Chef Name"] || item.name || item.Title || "";
+      return name.toLowerCase().includes(chef.name.toLowerCase().replace("chef ", ""));
+    });
+
+    if (!rawItem || !rawItem._notionId) {
+      console.error("Could not find Notion page ID for chef:", chef.name);
+      return;
+    }
+
+    // Map status to Notion format
+    let notionStatus = "Pending";
+    if (newStatus === "confirmed") notionStatus = "Confirmed";
+    else if (newStatus === "needs-booking") notionStatus = "Needs Booking";
+
+    const success = await writeToNotion({
+      contentType: "roster",
+      pageId: rawItem._notionId,
+      properties: {
+        "Travel Status": { type: "status", value: notionStatus },
+      },
+      successMessage: `${chef.name.split(" ").pop()}'s status updated`,
+    });
+
+    if (success) {
+      // Refresh the data
+      await refresh();
+    }
+  };
 
   const toggleExpand = (id: string, e: React.MouseEvent) => {
     e.stopPropagation();
@@ -604,6 +671,21 @@ function ChefRosterFullView({ role, onNavigate }: { role: UserRole; onNavigate?:
             <NotionSyncBadge isLive={isLive} compact />
           </div>
           <div className="flex items-center gap-2 flex-wrap">
+            {/* Sync Now button */}
+            <button
+              onClick={handleSyncNow}
+              disabled={isSyncing}
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[0.75rem] cursor-pointer transition-all hover:opacity-80 disabled:opacity-50"
+              style={{
+                backgroundColor: "rgba(78,130,130,0.08)",
+                border: "1px solid rgba(78,130,130,0.15)",
+                color: "#4E8282",
+                ...bodyFont,
+              }}
+            >
+              <RefreshCw className={`w-3.5 h-3.5 ${isSyncing ? "animate-spin" : ""}`} />
+              {isSyncing ? "Syncing..." : "Sync Now"}
+            </button>
             <span
               className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[0.6875rem]"
               style={{ backgroundColor: "rgba(201,169,110,0.1)", color: "#C9A96E", ...bodyFont }}
@@ -792,7 +874,35 @@ function ChefRosterFullView({ role, onNavigate }: { role: UserRole; onNavigate?:
                   </div>
                 </div>
                 <div className="flex items-center gap-1.5 flex-wrap">
-                  {role === "leadership" && (
+                  {role === "leadership" ? (
+                    /* Status Dropdown for Leadership */
+                    <div className="relative inline-block">
+                      <select
+                        value={chef.travelStatus}
+                        onChange={(e) => {
+                          e.stopPropagation();
+                          handleStatusChange(chef, e.target.value as any);
+                        }}
+                        onClick={(e) => e.stopPropagation()}
+                        className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[0.5625rem] cursor-pointer appearance-none pr-6"
+                        style={{
+                          backgroundColor: `${statusCfg.color}15`,
+                          color: statusCfg.color,
+                          border: `1px solid ${statusCfg.color}30`,
+                          ...bodyFont,
+                        }}
+                      >
+                        <option value="pending">Pending</option>
+                        <option value="confirmed">Confirmed</option>
+                        <option value="needs-booking">Needs Booking</option>
+                      </select>
+                      <ChevronDown
+                        className="w-2.5 h-2.5 absolute right-1.5 top-1/2 -translate-y-1/2 pointer-events-none"
+                        style={{ color: statusCfg.color }}
+                      />
+                    </div>
+                  ) : (
+                    /* Read-only status badge for non-leadership */
                     <span
                       className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[0.5625rem]"
                       style={{

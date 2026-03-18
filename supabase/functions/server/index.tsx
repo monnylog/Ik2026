@@ -12,7 +12,9 @@ import { audit } from "./audit-routes.tsx";
 import { studio } from "./content-studio.tsx";
 import { notionContent, ensureDefaultConfig, resolveNotionKeyFromHeader, getNotionConfig } from "./notion-content-routes.tsx";
 import { notionTasks, setActiveNotionKey } from "./notion-tasks-routes.tsx";
+import notionWrite from "./notion-write.tsx";
 import { utility, PHOTO_BUCKET } from "./utility-routes.tsx";
+import { chefRoutes } from "./chef-routes.tsx";
 
 const app = new Hono();
 
@@ -44,7 +46,7 @@ app.use(
   cors({
     origin: "*",
     allowHeaders: ["Content-Type", "Authorization", "X-User-Token", "X-Notion-Key"],
-    allowMethods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    allowMethods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
     exposeHeaders: ["Content-Length"],
     maxAge: 600,
   })
@@ -540,7 +542,7 @@ app.get("/make-server-5ed426e6/submission-stats", async (c) => {
 
 // Health check endpoint
 app.get("/make-server-5ed426e6/health", (c) => {
-  return c.json({ status: "ok", timestamp: new Date().toISOString(), version: "3.4.0" });
+  return c.json({ status: "ok", timestamp: new Date().toISOString(), version: "3.5.0" });
 });
 
 // ─── Pre-flight Deployment Validation ──────────────────────────
@@ -767,6 +769,8 @@ app.route("/", audit);
 app.route("/", studio);
 app.route("/", notionContent);
 app.route("/", notionTasks);
+app.route("/", notionWrite);
 app.route("/", utility);
+app.route("/", chefRoutes);
 
 Deno.serve(app.fetch);

@@ -155,6 +155,8 @@ export function StorySharing() {
   const [caption, setCaption] = useState("");
   const [sending, setSending] = useState(false);
   const [showRecorder, setShowRecorder] = useState(false);
+  const [micDenied, setMicDenied] = useState(false);
+  const [textOnlyNote, setTextOnlyNote] = useState("");
 
   // Shuffle mode
   const [shuffleNote, setShuffleNote] = useState<VoiceNote | null>(null);
@@ -182,6 +184,23 @@ export function StorySharing() {
   useEffect(() => {
     loadNotes();
   }, [loadNotes]);
+
+  // Check mic availability on mount
+  useEffect(() => {
+    if (!navigator.mediaDevices?.getUserMedia) {
+      setMicDenied(true);
+      return;
+    }
+    // Proactively probe permission so we show text fallback immediately
+    navigator.mediaDevices.getUserMedia({ audio: true })
+      .then((stream) => {
+        // Mic available — release it immediately
+        stream.getTracks().forEach((t) => t.stop());
+      })
+      .catch(() => {
+        setMicDenied(true);
+      });
+  }, []);
 
   // ─── Recording logic ──────────────────────────────────────────
 
@@ -229,6 +248,8 @@ export function StorySharing() {
       }, 200);
     } catch (err) {
       console.error("Microphone access denied:", err);
+      setMicDenied(true);
+      toast.error("Microphone access is unavailable. You can submit a text-only note instead.");
     }
   };
 
@@ -245,6 +266,38 @@ export function StorySharing() {
     setRecordedBase64("");
     setRecordingDuration(0);
     setCaption("");
+  };
+
+  const submitTextOnly = async () => {
+    if (!textOnlyNote.trim() || !userName) return;
+    setSending(true);
+    const note: VoiceNote = {
+      id: `vn-${Date.now()}`,
+      author: userName,
+      avatarId: userAvatar,
+      caption: textOnlyNote.trim(),
+      audioBase64: "",
+      durationSec: 0,
+      timestamp: new Date().toLocaleString("en-US", {
+        month: "short",
+        day: "numeric",
+        hour: "numeric",
+        minute: "2-digit",
+        hour12: true,
+      }),
+    };
+    try {
+      await apiFetch("/voice-notes", { method: "POST", body: JSON.stringify({ ...note, userId: profile?.id }) });
+      setNotes((prev) => [note, ...prev]);
+      setTextOnlyNote("");
+      setShowRecorder(false);
+      toast.success("Text note shared!");
+    } catch (err) {
+      console.error("Failed to save text note:", err);
+      toast.error("Failed to share note.");
+    } finally {
+      setSending(false);
+    }
   };
 
   const submitVoiceNote = async () => {
@@ -419,6 +472,43 @@ export function StorySharing() {
                 <p className="text-muted-foreground/50 text-[0.8125rem] text-center py-4" style={bodyFont}>
                   Set your display name in Comms to record.
                 </p>
+              ) : micDenied ? (
+                /* ─── Text-only fallback when mic is unavailable ─── */
+                <div className="space-y-4">
+                  <div className="text-center">
+                    <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg mb-3" style={{ backgroundColor: "rgba(205,168,138,0.08)", border: "1px solid rgba(205,168,138,0.15)" }}>
+                      <Mic className="w-3.5 h-3.5 text-muted-foreground/40" />
+                      <span className="text-[0.75rem] text-muted-foreground/60" style={bodyFont}>Microphone unavailable</span>
+                    </div>
+                    <p className="text-muted-foreground text-[0.8125rem]" style={bodyFont}>
+                      Share a written note instead — your perspective still matters.
+                    </p>
+                  </div>
+                  <textarea
+                    value={textOnlyNote}
+                    onChange={(e) => setTextOnlyNote(e.target.value)}
+                    placeholder="Share your thoughts, a story, or commentary..."
+                    className="w-full h-24 px-3 py-2 bg-background rounded-lg text-[0.8125rem] text-foreground placeholder:text-muted-foreground/30 border border-border focus:outline-none focus:ring-1 focus:ring-gold/50 resize-none"
+                    style={bodyFont}
+                    maxLength={1000}
+                  />
+                  <div className="flex items-center justify-between">
+                    <span className="text-[0.625rem] text-muted-foreground/30" style={bodyFont}>
+                      {textOnlyNote.length}/1000
+                    </span>
+                    <motion.button
+                      whileHover={{ scale: 1.02 }}
+                      whileTap={{ scale: 0.98 }}
+                      onClick={submitTextOnly}
+                      disabled={sending || !textOnlyNote.trim()}
+                      className="flex items-center gap-1.5 px-5 py-2 rounded-xl text-[0.75rem] text-white cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed"
+                      style={{ backgroundColor: "#CDA88A", ...bodyFont }}
+                    >
+                      <Send className="w-3 h-3" />
+                      {sending ? "Submitting" : "Share Note"}
+                    </motion.button>
+                  </div>
+                </div>
               ) : (
                 <>
                   {/* Recording / Preview state */}
@@ -606,7 +696,11 @@ export function StorySharing() {
                         {note.caption}
                       </p>
                     )}
-                    <AudioPlayer audioBase64={note.audioBase64} durationSec={note.durationSec} compact />
+                    {note.audioBase64 ? (
+                      <AudioPlayer audioBase64={note.audioBase64} durationSec={note.durationSec} compact />
+                    ) : (
+                      <span className="text-[0.625rem] text-muted-foreground/30 italic" style={bodyFont}>Text note</span>
+                    )}
                   </div>
                 </div>
               </motion.div>

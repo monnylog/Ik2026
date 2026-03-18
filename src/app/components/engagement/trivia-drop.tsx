@@ -181,6 +181,21 @@ export function TriviaDrop() {
         }),
       });
       setCommunityCount((c) => c + 1);
+      
+      // TIER 4A: Track engagement metric
+      try {
+        await apiFetch("/analytics/engagement", {
+          method: "POST",
+          body: JSON.stringify({
+            userId: profile?.id || "anonymous",
+            eventType: "trivia_answered",
+            metadata: { triviaId: trivia.id, correct: choiceId === trivia.correctId },
+          }),
+        });
+      } catch (metricsErr) {
+        // Silently fail - analytics shouldn't block user experience
+        console.log("Analytics tracking skipped:", metricsErr);
+      }
     } catch (err) {
       console.error("Failed to save trivia answer:", err);
     } finally {

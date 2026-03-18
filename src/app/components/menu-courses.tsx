@@ -3,6 +3,7 @@ import { ChefSubmissions } from "./chef-submissions";
 import { SubmissionTracker } from "./submission-tracker";
 import { OverlapAnalysis } from "./overlap-analysis";
 import { CompareSubmissions } from "./compare-submissions";
+import { DishSubmissionForm } from "./dish-submission-form";
 import { apiFetch } from "../lib/supabase";
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "motion/react";
@@ -19,7 +20,12 @@ import {
   ArrowRight,
   Users,
   DollarSign,
+  Save,
+  Loader2,
+  CheckSquare,
+  Square,
 } from "lucide-react";
+import { toast } from "sonner";
 
 import { bodyFont, headingFont } from "../lib/fonts";
 
@@ -466,6 +472,28 @@ export function MenuCourses({ role, onNavigate }: MenuCoursesProps) {
                     ))}
                   </div>
                 </div>
+
+                {/* Chef submission form - only visible to chefs, read-only message for leadership */}
+                {!selectedCourse.special && (
+                  <>
+                    {isChef && (
+                      <DishSubmissionForm
+                        courseNumber={selectedCourse.number}
+                        courseTitle={selectedCourse.title}
+                        onSuccess={() => {
+                          // Optionally close modal or refresh submissions
+                        }}
+                      />
+                    )}
+                    {isLeadership && (
+                      <div className="pt-4 border-t border-gold/15">
+                        <p className="text-[0.8125rem] text-muted-foreground" style={bodyFont}>
+                          Dish submissions from chefs will appear in the Submission Tracker above.
+                        </p>
+                      </div>
+                    )}
+                  </>
+                )}
               </div>
             </motion.div>
           </motion.div>

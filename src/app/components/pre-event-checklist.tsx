@@ -24,6 +24,7 @@ import { toast } from "sonner";
 import { ChecklistSkeleton } from "./ui/skeleton-loaders";
 import { useNotionDatabase } from "../lib/notion-sync";
 import { NotionSyncBadge } from "./ui/notion-sync-badge";
+import { apiFetch } from "../lib/supabase";
 import { bodyFont, headingFont } from "../lib/fonts";
 
 const EVENT_DATE = new Date("2026-06-14T18:00:00");
@@ -165,13 +166,26 @@ export function PreEventChecklist({ role, onNavigate }: PreEventChecklistProps) 
     localStorage.setItem(STORAGE_KEY, JSON.stringify(checked));
   }, [checked]);
 
-  const toggleItem = (id: string) => {
+  const toggleItem = async (id: string) => {
     const item = activeChecklistItems.find((i) => i.id === id);
     const willBeChecked = !checked[id];
     setChecked((prev) => ({ ...prev, [id]: willBeChecked }));
     if (item) {
       announce(`${item.label} marked as ${willBeChecked ? "complete" : "incomplete"}`);
       toast.success(`"${item.label}" marked ${willBeChecked ? "complete" : "incomplete"}`);
+      
+      // TIER 3C: Sync to Notion if this is a Notion-sourced milestone
+      if (isFromNotion && willBeChecked) {
+        try {
+          await apiFetch("/task/milestone-complete", {
+            method: "POST",
+            body: JSON.stringify({ milestoneId: id }),
+          });
+        } catch (err) {
+          console.error("Failed to sync completion to Notion:", err);
+          // Don't block UX, just log
+        }
+      }
     }
   };
 

@@ -119,6 +119,20 @@ export function DailyPrompt() {
       setInputText("");
       setPromptResponded({ ...promptResponded, [todayPrompt.id]: true });
       toast.success("Response submitted!");
+      
+      // TIER 4A: Track engagement metric
+      try {
+        await apiFetch("/analytics/engagement", {
+          method: "POST",
+          body: JSON.stringify({
+            userId: profile?.id || "anonymous",
+            eventType: "prompt_responded",
+            metadata: { promptId: todayPrompt.id, textLength: text.length },
+          }),
+        });
+      } catch (metricsErr) {
+        console.log("Analytics tracking skipped:", metricsErr);
+      }
     } catch (err) {
       console.error("Failed to save prompt response:", err);
       toast.error("Failed to submit response.");

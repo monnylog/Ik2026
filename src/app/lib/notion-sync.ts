@@ -234,124 +234,6 @@ export async function pushToNotion(
 // ─── Hooks ──────────────────────────────────────────────────────
 
 /**
- * useNotionSync — global sync status and actions
- */
-export function useNotionSync() {
-  const [sources, setSources] = useState<Record<NotionContentType, ContentSourceStatus> | null>(null);
-  const [isSyncing, setIsSyncing] = useState(false);
-  const [syncingTypes, setSyncingTypes] = useState<Set<NotionContentType>>(new Set());
-  const [lastGlobalSync, setLastGlobalSync] = useState<number | null>(null);
-  const [syncLog, setSyncLog] = useState<SyncLogEntry[]>([]);
-  const [errors, setErrors] = useState<Record<string, string>>({});
-
-  const loadSources = useCallback(async () => {
-    try {
-      const s = await fetchSources();
-      setSources(s);
-    } catch (err: any) {
-      console.error("Failed to load Notion sources:", err);
-    }
-  }, []);
-
-  const syncType = useCallback(async (type: NotionContentType) => {
-    setSyncingTypes((prev) => new Set(prev).add(type));
-    setErrors((prev) => { const n = { ...prev }; delete n[type]; return n; });
-    try {
-      const items = await pullContent(type, true);
-      // Reload sources to get updated counts
-      const s = await fetchSources();
-      setSources(s);
-      return items;
-    } catch (err: any) {
-      setErrors((prev) => ({ ...prev, [type]: err.message }));
-      return [];
-    } finally {
-      setSyncingTypes((prev) => { const n = new Set(prev); n.delete(type); return n; });
-    }
-  }, []);
-
-  const doSyncAll = useCallback(async () => {
-    setIsSyncing(true);
-    setErrors({});
-    try {
-      await syncAllContent();
-      setLastGlobalSync(Date.now());
-      const s = await fetchSources();
-      setSources(s);
-    } catch (err: any) {
-      console.error("Sync all failed:", err);
-    } finally {
-      setIsSyncing(false);
-    }
-  }, []);
-
-  const doConfigureType = useCallback(async (type: NotionContentType, databaseId: string, label?: string) => {
-    try {
-      const res = await configureContentType(type, databaseId, label);
-      if (res.configured) {
-        await loadSources();
-        // Auto-pull data
-        await pullContent(type, true);
-        return true;
-      }
-      if (res.error) {
-        setErrors((prev) => ({ ...prev, [type]: res.error! }));
-      }
-      return false;
-    } catch (err: any) {
-      setErrors((prev) => ({ ...prev, [type]: err.message }));
-      return false;
-    }
-  }, [loadSources]);
-
-  const doRemoveType = useCallback(async (type: NotionContentType) => {
-    try {
-      await removeContentType(type);
-      await loadSources();
-    } catch (err: any) {
-      setErrors((prev) => ({ ...prev, [type]: err.message }));
-    }
-  }, [loadSources]);
-
-  const doCheckChanges = useCallback(async () => {
-    return await checkChanges();
-  }, []);
-
-  const doLoadSyncLog = useCallback(async () => {
-    const log = await fetchSyncLog();
-    setSyncLog(log);
-  }, []);
-
-  const doPushUpdate = useCallback(async (type: NotionContentType, pageId: string, properties: Record<string, any>) => {
-    return await pushToNotion(type, pageId, properties);
-  }, []);
-
-  const getCachedItems = useCallback((type: NotionContentType) => {
-    return contentCache.get(type) || [];
-  }, []);
-
-  return {
-    // State
-    sources,
-    isSyncing,
-    syncingTypes,
-    lastGlobalSync,
-    syncLog,
-    errors,
-    // Actions
-    loadSources,
-    syncType,
-    syncAll: doSyncAll,
-    configureType: doConfigureType,
-    removeType: doRemoveType,
-    checkForChanges: doCheckChanges,
-    loadSyncLog: doLoadSyncLog,
-    pushUpdate: doPushUpdate,
-    getCachedItems,
-  };
-}
-
-/**
  * useNotionDatabase — subscribe to a specific content type and auto-fetch
  */
 export function useNotionDatabase(type: NotionContentType, enabled = true) {
@@ -360,6 +242,7 @@ export function useNotionDatabase(type: NotionContentType, enabled = true) {
   const [error, setError] = useState<string | null>(null);
   const [lastPulled, setLastPulled] = useState<number | null>(null);
   const mountedRef = useRef(true);
+  const pollingRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   // Subscribe to broadcasts
   useEffect(() => {
@@ -406,6 +289,30 @@ export function useNotionDatabase(type: NotionContentType, enabled = true) {
 
     return () => {
       mountedRef.current = false;
+    };
+  }, [type, enabled]);
+
+  // Auto-refresh every 60 seconds
+  useEffect(() => {
+    if (!enabled) return;
+
+    pollingRef.current = setInterval(async () => {
+      try {
+        const result = await pullContent(type);
+        if (mountedRef.current) {
+          setItems(result);
+          setLastPulled(Date.now());
+          setError(null);
+        }
+      } catch (err: any) {
+        console.error(`[notion-sync] Polling error for ${type}:`, err);
+      }
+    }, 60000); // 60 seconds
+
+    return () => {
+      if (pollingRef.current) {
+        clearInterval(pollingRef.current);
+      }
     };
   }, [type, enabled]);
 

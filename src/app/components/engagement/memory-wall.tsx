@@ -84,6 +84,20 @@ export function MemoryWall({ onNavigate }: { onNavigate?: (page: string) => void
       setPosts((prev) => [post, ...prev]);
       setInputText("");
       toast.success("Memory shared!");
+      
+      // TIER 4A: Track engagement metric
+      try {
+        await apiFetch("/analytics/engagement", {
+          method: "POST",
+          body: JSON.stringify({
+            userId: profile?.id || "anonymous",
+            eventType: "memory_shared",
+            metadata: { tagId: selectedTag, textLength: text.length },
+          }),
+        });
+      } catch (metricsErr) {
+        console.log("Analytics tracking skipped:", metricsErr);
+      }
     } catch (err) {
       console.error("Failed to save memory wall post:", err);
       toast.error("Failed to share memory.");

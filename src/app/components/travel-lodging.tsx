@@ -189,6 +189,29 @@ function TravelManagerView({ role, onNavigate }: { role: UserRole; onNavigate?: 
         method: "POST",
         body: JSON.stringify(recordToSave),
       });
+      
+      // TIER 2C: Mirror to Notion for chef records
+      if (editingRecord.role === "chef" && editingRecord.chefDirectoryId) {
+        try {
+          await apiFetch("/chef/travel-mirror", {
+            method: "POST",
+            body: JSON.stringify({
+              chefId: editingRecord.chefDirectoryId,
+              travelData: {
+                arrival: editingRecord.arrivalDate,
+                departure: editingRecord.departureDate,
+                flightDetails: editingRecord.flightDetails,
+                lodgingDetails: editingRecord.lodgingDetails,
+                groundTransport: editingRecord.groundTransport,
+              },
+            }),
+          });
+        } catch (mirrorErr) {
+          console.error("Failed to mirror to Notion:", mirrorErr);
+          // Don't fail the whole save, just log it
+        }
+      }
+      
       toast.success(`Travel record saved for ${editingRecord.name}`);
       setEditingRecord(null);
       setShowForm(false);

@@ -177,6 +177,29 @@ export function TaskBoard({ role, onNavigate }: TaskBoardProps) {
   }
   const milestoneOwners = Array.from(milestonesByOwner.entries()).sort((a, b) => b[1].length - a[1].length);
 
+  // TIER 3A: Milestone completion sync to Notion
+  const [completingMilestoneId, setCompletingMilestoneId] = useState<string | null>(null);
+  
+  const completeMilestone = useCallback(async (milestoneId: string, milestoneTitle: string) => {
+    setCompletingMilestoneId(milestoneId);
+    try {
+      await apiFetch("/task/milestone-complete", {
+        method: "POST",
+        body: JSON.stringify({ milestoneId }),
+      });
+      toast.success(`Milestone "${milestoneTitle}" marked as done in Notion!`);
+      // Refresh milestones by forcing a re-fetch
+      setTimeout(() => {
+        window.location.reload(); // Simple refresh to show updated state
+      }, 500);
+    } catch (err) {
+      console.error("Failed to complete milestone:", err);
+      toast.error("Failed to update milestone in Notion");
+    } finally {
+      setCompletingMilestoneId(null);
+    }
+  }, []);
+
   // ─── Notion Sync State (legacy task-specific sync) ────────────
   const [notionSyncing, setNotionSyncing] = useState(false);
   const [notionConfigured, setNotionConfigured] = useState(false);
@@ -1283,8 +1306,26 @@ export function TaskBoard({ role, onNavigate }: TaskBoardProps) {
                       critical: { color: "#C75B3F", bg: "rgba(199,91,63,0.1)", label: "Critical" },
                     };
                     const st = statusStyles[m.status] || statusStyles.upcoming;
+                    const isCompleting = completingMilestoneId === m.id;
                     return (
                       <div key={m.id} className="px-4 py-2 flex items-center gap-3">
+                        {/* TIER 3A: Complete button */}
+                        <button
+                          onClick={() => completeMilestone(m.id, m.title)}
+                          disabled={isCompleting}
+                          className="w-5 h-5 rounded border-2 flex items-center justify-center transition-all shrink-0 cursor-pointer disabled:opacity-50"
+                          style={{ 
+                            borderColor: isCompleting ? "#7E9E78" : "rgba(126,158,120,0.3)",
+                            backgroundColor: isCompleting ? "rgba(126,158,120,0.1)" : "transparent"
+                          }}
+                          title="Mark as complete"
+                        >
+                          {isCompleting ? (
+                            <Loader2 className="w-3 h-3 animate-spin" style={{ color: "#7E9E78" }} />
+                          ) : (
+                            <CheckCircle2 className="w-3 h-3 opacity-0 hover:opacity-100 transition-opacity" style={{ color: "#7E9E78" }} />
+                          )}
+                        </button>
                         <div className="w-1.5 h-1.5 rounded-full shrink-0" style={{ backgroundColor: st.color }} />
                         <div className="flex-1 min-w-0">
                           <span className="text-foreground text-[0.8125rem] truncate block" style={bodyFont}>{m.title}</span>

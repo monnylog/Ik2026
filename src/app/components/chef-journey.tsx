@@ -23,6 +23,7 @@ import {
   Loader2,
   Wifi,
   WifiOff,
+  RefreshCw,
 } from "lucide-react";
 import type { ViewMode } from "./onboarding/use-auth";
 import { bodyFont, headingFont } from "../lib/fonts";
@@ -259,16 +260,29 @@ interface ChefJourneyProps {
 
 // ── Hook: merge Notion roster + KV milestones with hardcoded fallbacks ──
 function useChefJourneyData() {
-  const { items: notionChefs, isLoading: notionLoading } = useNotionDatabase("roster");
+  const { items: notionChefs, isLoading: notionLoading, refresh: refreshNotion } = useNotionDatabase("roster");
   const [kvMilestones, setKvMilestones] = useState<Record<string, any>>({});
   const [kvLoading, setKvLoading] = useState(true);
 
-  useEffect(() => {
-    apiFetch("/chef-journey/milestones")
-      .then((d) => setKvMilestones(d.milestones || {}))
-      .catch(() => {})
-      .finally(() => setKvLoading(false));
+  const fetchKvMilestones = useCallback(async () => {
+    setKvLoading(true);
+    try {
+      const d = await apiFetch("/chef-journey/milestones");
+      setKvMilestones(d.milestones || {});
+    } catch (err) {
+      console.error("Failed to fetch KV milestones:", err);
+    } finally {
+      setKvLoading(false);
+    }
   }, []);
+
+  useEffect(() => {
+    fetchKvMilestones();
+  }, [fetchKvMilestones]);
+
+  const refresh = useCallback(async () => {
+    await Promise.all([refreshNotion(), fetchKvMilestones()]);
+  }, [refreshNotion, fetchKvMilestones]);
 
   const mergedChefs = useMemo(() => {
     // Build a lookup from Notion roster by matching name or course number
@@ -316,12 +330,44 @@ function useChefJourneyData() {
   const isLive = notionChefs.length > 0 || Object.keys(kvMilestones).length > 0;
   const isLoading = notionLoading || kvLoading;
 
-  return { chefs: mergedChefs, isLive, isLoading };
+  return { chefs: mergedChefs, isLive, isLoading, refresh };
 }
 
 export function ChefJourney({ viewMode, onNavigate }: ChefJourneyProps) {
-  const { chefs, isLive, isLoading } = useChefJourneyData();
+  const { chefs, isLive, isLoading, refresh } = useChefJourneyData();
   const [selectedChefIdx, setSelectedChefIdx] = useState(0);
+  const [isSyncing, setIsSyncing] = useState(false);
+
+  const handleSyncNow = async () => {
+    setIsSyncing(true);
+    try {
+      await refresh();
+    } finally {
+      setIsSyncing(false);
+    }
+  };
+
+  // Show loading skeleton while data is being fetched
+  if (isLoading) {
+    return (
+      <div className="max-w-6xl mx-auto space-y-6">
+        <div className="rounded-2xl overflow-hidden" style={{ background: "rgba(46,79,82,0.1)", minHeight: 200 }}>
+          <div className="p-6 sm:p-8 animate-pulse">
+            <div className="h-3 w-48 bg-white/10 rounded mb-3" />
+            <div className="h-8 w-2/3 bg-white/20 rounded mb-2" />
+            <div className="h-4 w-3/4 bg-white/10 rounded" />
+          </div>
+        </div>
+        <div className="flex flex-wrap gap-2">
+          {[1, 2, 3, 4, 5, 6, 7].map((i) => (
+            <div key={i} className="h-10 w-32 bg-muted/30 rounded-xl animate-pulse" />
+          ))}
+        </div>
+        <div className="rounded-2xl p-6 bg-muted/20 animate-pulse" style={{ minHeight: 400 }} />
+      </div>
+    );
+  }
+
   const chef = chefs[selectedChefIdx] || chefStories[0];
 
   const completedMilestones = chef.journeyMilestones.filter(
@@ -364,18 +410,34 @@ export function ChefJourney({ viewMode, onNavigate }: ChefJourneyProps) {
             Follow each chef's journey from invitation to event night — their dish, their history,
             and the story they're bringing to Las Vegas on May 22, 2026.
           </p>
-          {/* Data source indicator */}
-          <div className="flex items-center gap-1.5 mt-3">
-            {isLoading ? (
-              <Loader2 className="w-3 h-3 text-white/30 animate-spin" />
-            ) : isLive ? (
-              <Wifi className="w-3 h-3 text-white/40" />
-            ) : (
-              <WifiOff className="w-3 h-3 text-white/25" />
-            )}
-            <span className="text-[0.5625rem] text-white/30" style={bodyFont}>
-              {isLoading ? "Syncing live data..." : isLive ? "Synced with Notion & KV" : "Using local data"}
-            </span>
+          {/* Data source indicator + Sync button */}
+          <div className="flex items-center justify-between gap-3 mt-3 flex-wrap">
+            <div className="flex items-center gap-1.5">
+              {isLoading ? (
+                <Loader2 className="w-3 h-3 text-white/30 animate-spin" />
+              ) : isLive ? (
+                <Wifi className="w-3 h-3 text-white/40" />
+              ) : (
+                <WifiOff className="w-3 h-3 text-white/25" />
+              )}
+              <span className="text-[0.5625rem] text-white/30" style={bodyFont}>
+                {isLoading ? "Syncing live data..." : isLive ? "Synced with Notion & KV" : "Using local data"}
+              </span>
+            </div>
+            <button
+              onClick={handleSyncNow}
+              disabled={isSyncing}
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[0.75rem] cursor-pointer transition-all hover:opacity-90 disabled:opacity-50"
+              style={{
+                backgroundColor: "rgba(255,255,255,0.1)",
+                border: "1px solid rgba(255,255,255,0.15)",
+                color: "white",
+                ...bodyFont,
+              }}
+            >
+              <RefreshCw className={`w-3.5 h-3.5 ${isSyncing ? "animate-spin" : ""}`} />
+              {isSyncing ? "Syncing..." : "Sync Now"}
+            </button>
           </div>
         </div>
       </motion.div>

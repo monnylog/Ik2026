@@ -1,7 +1,7 @@
 import { useState, useCallback } from "react";
 import { motion, AnimatePresence } from "motion/react";
 import { Dices, RefreshCw, Sparkles } from "lucide-react";
-
+import { apiFetch } from "../../lib/supabase";
 import { bodyFont, headingFont } from "../../lib/fonts";
 
 // Roulette categories
@@ -64,8 +64,21 @@ export function RecipeRoulette() {
 
     // Brief delay for animation feel
     setTimeout(() => {
-      setResult(spin());
+      const newResult = spin();
+      setResult(newResult);
       setSpinning(false);
+      
+      // Track the spin for analytics (TIER 4A)
+      const spinId = `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+      apiFetch("/recipe-spins", {
+        method: "POST",
+        body: JSON.stringify({
+          id: spinId,
+          userId: typeof window !== "undefined" ? localStorage.getItem("userId") || "anonymous" : "anonymous",
+          recipe: `${newResult.protein} / ${newResult.technique} / ${newResult.region}`,
+          timestamp: new Date().toISOString(),
+        }),
+      }).catch((err) => console.error("Failed to track recipe spin:", err));
     }, 600);
   }, []);
 

@@ -9,20 +9,20 @@ const formDiscord = new Hono();
 
 const DEFAULT_FORM_URLS: Record<string, string> = {
   chefOnboarding:
-    "https://docs.google.com/forms/d/e/1FAIpQLSfExampleChefOnboarding/viewform?embedded=true",
+    "https://mercury-seashore-ad9.notion.site/a828872a4e7841809cc61b16c18068cf",
+  travelKitchenNeeds:
+    "https://www.notion.so/IK26-Form-B-Travel-Kitchen-Needs-326dc6047d2d81cf97aace133f7ff9d8",
+  mediaRelease:
+    "https://mercury-seashore-ad9.notion.site/a828872a4e7841809cc61b16c18068cf", // PENDING - placeholder
+  riderAgreement:
+    "https://mercury-seashore-ad9.notion.site/a828872a4e7841809cc61b16c18068cf", // PENDING - placeholder
   teamFeedback:
-    "https://docs.google.com/forms/d/e/1FAIpQLSfExampleTeamFeedback/viewform?embedded=true",
-  teamRsvp:
-    "https://docs.google.com/forms/d/e/1FAIpQLSfExampleTeamRSVP/viewform?embedded=true",
-  chefAgreement:
-    "https://docs.google.com/document/d/1ExampleChefAgreement/edit",
+    "https://mercury-seashore-ad9.notion.site/a828872a4e7841809cc61b16c18068cf", // PENDING - placeholder
   volunteerWaiver:
-    "https://docs.google.com/document/d/1ExampleVolunteerWaiver/edit",
-  vendorAgreement:
-    "https://docs.google.com/document/d/1ExampleVendorAgreement/edit",
+    "https://mercury-seashore-ad9.notion.site/a828872a4e7841809cc61b16c18068cf", // PENDING - placeholder
 };
 
-const PLACEHOLDER_MARKERS = ["Example", "1FAIpQLSfExample"];
+const PLACEHOLDER_MARKERS = ["PENDING", "Example", "1FAIpQLSfExample"];
 
 function isPlaceholder(url: string): boolean {
   return PLACEHOLDER_MARKERS.some((m) => url.includes(m));
@@ -188,6 +188,93 @@ formDiscord.get("/make-server-5ed426e6/discord/test", async (c) => {
     });
   } catch (err: any) {
     return c.json({ configured: true, connected: false, error: err.message });
+  }
+});
+
+// ─── Discord Multi-Channel Webhook Management ───────────────────
+// Store and manage multiple Discord webhook URLs for different channels
+
+// GET all configured Discord webhooks
+formDiscord.get("/make-server-5ed426e6/discord/webhooks", async (c) => {
+  try {
+    const webhooks: Record<string, string> = await kv.get("ik26:discord:webhooks") || {};
+    const channels = ["leadership-sync", "general", "kitchen", "travel", "creative", "logistics", "urgent"];
+    
+    const status: Record<string, { configured: boolean; url?: string }> = {};
+    for (const channel of channels) {
+      status[channel] = {
+        configured: !!webhooks[channel],
+        url: webhooks[channel] || undefined,
+      };
+    }
+    
+    return c.json({ webhooks, status });
+  } catch (err) {
+    console.log("Error loading Discord webhooks:", err);
+    return c.json({ error: `Failed to load webhooks: ${err}` }, 500);
+  }
+});
+
+// PUT update Discord webhook for a specific channel
+formDiscord.put("/make-server-5ed426e6/discord/webhooks/:channel", async (c) => {
+  try {
+    const channel = c.req.param("channel");
+    const body = await c.req.json();
+    const { webhookUrl } = body;
+    
+    if (!webhookUrl || typeof webhookUrl !== "string" || !webhookUrl.startsWith("https://discord.com/api/webhooks/")) {
+      return c.json({ error: "Invalid Discord webhook URL" }, 400);
+    }
+    
+    const webhooks: Record<string, string> = await kv.get("ik26:discord:webhooks") || {};
+    webhooks[channel] = webhookUrl;
+    await kv.set("ik26:discord:webhooks", webhooks);
+    
+    return c.json({ success: true, channel, configured: true });
+  } catch (err) {
+    console.log("Error updating Discord webhook:", err);
+    return c.json({ error: `Failed to update webhook: ${err}` }, 500);
+  }
+});
+
+// POST send message to a specific Discord channel
+formDiscord.post("/make-server-5ed426e6/discord/send/:channel", async (c) => {
+  try {
+    const channel = c.req.param("channel");
+    const { content, embeds, username } = await c.req.json();
+    
+    // Get webhook URL for this channel
+    const webhooks: Record<string, string> = await kv.get("ik26:discord:webhooks") || {};
+    const webhookUrl = webhooks[channel] || Deno.env.get("DISCORD_WEBHOOK_URL");
+    
+    if (!webhookUrl) {
+      return c.json({ error: `No webhook configured for channel: ${channel}` }, 404);
+    }
+    
+    const payload: any = {
+      username: username || "IK26 Ops Bot",
+      avatar_url: "https://cdn.discordapp.com/embed/avatars/0.png",
+    };
+    
+    if (content) payload.content = content;
+    if (embeds) payload.embeds = embeds;
+    
+    const resp = await fetch(webhookUrl, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload),
+    });
+    
+    if (!resp.ok) {
+      const errText = await resp.text();
+      console.log(`Discord send error (${channel}):`, resp.status, errText);
+      return c.json({ error: `Discord send failed: HTTP ${resp.status}` }, resp.status);
+    }
+    
+    return c.json({ success: true, channel });
+  } catch (err) {
+    console.log("Error sending to Discord:", err);
+    return c.json({ error: `Send failed: ${err}` }, 500);
   }
 });
 

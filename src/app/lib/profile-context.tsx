@@ -137,44 +137,67 @@ export function ProfileProvider({ children }: ProfileProviderProps) {
 
       try {
         const restorePromise = (async () => {
-          // Try to set the session with Supabase client
-          const { data, error } = await supabase.auth.setSession({
-            access_token: cached.access!,
-            refresh_token: cached.refresh!,
-          });
+          // Try to set the session with Supabase client — retry once on network failure
+          let lastError: any = null;
+          for (let attempt = 0; attempt < 2; attempt++) {
+            try {
+              if (attempt > 0) {
+                await new Promise((r) => setTimeout(r, 2000)); // wait 2s before retry
+              }
+              const { data, error } = await supabase.auth.setSession({
+                access_token: cached.access!,
+                refresh_token: cached.refresh!,
+              });
 
-          if (error || !data.session) {
-            // Session expired or invalid — clear everything and force re-auth
-            console.warn("Session validation failed — clearing cached auth:", error?.message);
-            clearAuthCache();
-            setProfileState(null);
-            setAccessTokenState(null);
-            return "cleared";
-          }
+              if (error || !data.session) {
+                // Session expired or invalid — clear everything and force re-auth
+                console.warn("Session validation failed — clearing cached auth:", error?.message);
+                clearAuthCache();
+                setProfileState(null);
+                setAccessTokenState(null);
+                return "cleared";
+              }
 
-          // Session is valid — update tokens
-          const newToken = data.session.access_token;
-          const newRefresh = data.session.refresh_token;
-          setAccessTokenState(newToken);
-          cacheTokens(newToken, newRefresh);
+              // Session is valid — update tokens
+              const newToken = data.session.access_token;
+              const newRefresh = data.session.refresh_token;
+              setAccessTokenState(newToken);
+              cacheTokens(newToken, newRefresh);
 
-          // Fetch fresh profile from server using userId-based route
-          const cachedP = getCachedProfile();
-          if (cachedP?.id) {
-            const res = await fetch(`${serverBase}/profile/${cachedP.id}`, {
-              headers: {
-                Authorization: `Bearer ${publicAnonKey}`,
-                "Content-Type": "application/json",
-              },
-            });
+              // Fetch fresh profile from server using userId-based route
+              const cachedP = getCachedProfile();
+              if (cachedP?.id) {
+                try {
+                  const res = await fetch(`${serverBase}/profile/${cachedP.id}`, {
+                    headers: {
+                      Authorization: `Bearer ${publicAnonKey}`,
+                      "Content-Type": "application/json",
+                    },
+                  });
 
-            if (res.ok) {
-              const { profile: freshProfile } = await res.json();
-              setProfileState(freshProfile);
-              cacheProfile(freshProfile);
+                  if (res.ok) {
+                    const { profile: freshProfile } = await res.json();
+                    setProfileState(freshProfile);
+                    cacheProfile(freshProfile);
+                  }
+                } catch {
+                  // Profile fetch failed but session is valid — keep cached profile
+                  console.warn("Profile fetch failed during session restore — using cached profile");
+                }
+              }
+              return "restored";
+            } catch (err) {
+              lastError = err;
+              if (attempt === 0 && err instanceof TypeError && String(err).includes("Failed to fetch")) {
+                console.warn("Session restore network error — retrying in 2s...");
+                continue;
+              }
+              throw err;
             }
           }
-          return "restored";
+          // If we exhausted retries on network errors, use cached profile without clearing
+          console.warn("Session restore failed after retry — keeping cached profile:", lastError);
+          return "cached-fallback";
         })();
 
         const result = await Promise.race([restorePromise, timeout]);

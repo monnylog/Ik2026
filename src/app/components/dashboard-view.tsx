@@ -14,6 +14,7 @@ import { ActivityFeed } from "./dashboard/activity-feed";
 import { DailyPrompt } from "./engagement/daily-prompt";
 import { CommsHub } from "./dashboard/comms-hub";
 import { EngagementSection } from "./dashboard/engagement-section";
+import { EngagementMetrics } from "./dashboard/engagement-metrics";
 import { OutreachPipeline } from "./dashboard/outreach-pipeline";
 import { CourseLineup } from "./course-lineup";
 import { LandingAnalytics } from "./dashboard/landing-analytics";
@@ -43,6 +44,7 @@ import { WhatsNew } from "./dashboard/whats-new";
 import { BackendHealthIndicator } from "./dashboard/backend-health";
 import { AuditTrail } from "./dashboard/audit-trail";
 import { ContentStudioWidget } from "./dashboard/content-studio-widget";
+import { DataBackup } from "./dashboard/data-backup";
 
 import { GoldAccentLine } from "./dashboard/dashboard-layout";
 
@@ -303,23 +305,33 @@ export function DashboardView({
           {isLeadershipView && (
             <>
               <SideStagger delay={0.56}>
+                <ErrorBoundary section="Engagement Metrics">
+                  <EngagementMetrics />
+                </ErrorBoundary>
+              </SideStagger>
+              <SideStagger delay={0.6}>
                 <ErrorBoundary section="Sponsor Pipeline">
                   <SponsorPipeline onNavigate={onNavigate} />
                 </ErrorBoundary>
               </SideStagger>
-              <SideStagger delay={0.6}>
+              <SideStagger delay={0.64}>
                 <ErrorBoundary section="Landing Analytics">
                   <LandingAnalytics onNavigate={onNavigate} />
                 </ErrorBoundary>
               </SideStagger>
-              <SideStagger delay={0.64}>
+              <SideStagger delay={0.68}>
                 <ErrorBoundary section="Audit Trail">
                   <AuditTrail onNavigate={onNavigate} />
                 </ErrorBoundary>
               </SideStagger>
-              <SideStagger delay={0.68}>
+              <SideStagger delay={0.72}>
                 <ErrorBoundary section="Content Studio Widget">
                   <ContentStudioWidget onNavigate={onNavigate} />
+                </ErrorBoundary>
+              </SideStagger>
+              <SideStagger delay={0.76}>
+                <ErrorBoundary section="Data Backup">
+                  <DataBackup />
                 </ErrorBoundary>
               </SideStagger>
             </>

@@ -4,8 +4,8 @@ import {
   Lock, Eye, EyeOff, Loader2, CheckCircle2, ShieldCheck,
   ChevronRight, User, Users, ArrowLeft, Check, MapPin, ChefHat,
 } from "lucide-react";
-const istoryaLogo = "/istorya-logo.png";
-const istoryaWordmark = "/istorya-wordmark.png";
+import istoryaLogo from "figma:asset/b55bcac066687e563f77685fc31f20ef43e81d5d.png";
+import istoryaWordmark from "figma:asset/f39822aa8d83145832fad1a77f8dd27c27cd088d.png";
 import { bodyFont, headingFont } from "../../lib/fonts";
 import {
   useProfile, apiLookupProfiles, apiSignIn, apiRegister,

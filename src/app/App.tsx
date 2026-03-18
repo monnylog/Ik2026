@@ -62,6 +62,8 @@ import { PasswordGate }
 from "./components/onboarding/password-gate"; // v3.0.1 fixed imports
 import { OnboardingModal }
 from "./components/onboarding/onboarding-modal";
+import { ChefOnboardingModal }
+from "./components/onboarding/chef-onboarding-modal";
 import { SidebarNav }
 from "./components/sidebar-nav";
 import { TopBar }
@@ -172,6 +174,7 @@ function AppInner() {
   const [signOutDialogOpen, setSignOutDialogOpen] =
     useState(false);
   const [splashDone, setSplashDone] = useState(false);
+  const [showChefOnboarding, setShowChefOnboarding] = useState(false);
 
   // Page transition progress bar
   const { isTransitioning, startTransition, endTransition } =
@@ -667,6 +670,20 @@ function AppInner() {
               <OnboardingModal
                 role={role}
                 onComplete={handleOnboardingComplete}
+              />
+            )}
+          </AnimatePresence>
+
+          {/* Chef onboarding modal */}
+          <AnimatePresence>
+            {showChefOnboarding && role === "chef" && (
+              <ChefOnboardingModal
+                onComplete={() => {
+                  setShowChefOnboarding(false);
+                }}
+                onSkip={() => {
+                  setShowChefOnboarding(false);
+                }}
               />
             )}
           </AnimatePresence>

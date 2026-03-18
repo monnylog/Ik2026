@@ -662,6 +662,22 @@ export function CommsChat({ role, onBack, onNavigate }: CommsChatProps) {
     setInputText(""); inputRef.current?.focus();
     try { await apiFetch("/messages", { method: "POST", body: JSON.stringify(newMsg) }); } catch (e) { console.error("Persist failed:", e); toast.error("Message may not have saved."); }
     try { await supabase.channel(`ik26-chat-${activeChannel}`).send({ type: "broadcast", event: "message", payload: newMsg }); } catch (e) { console.error("Broadcast failed:", e); }
+    
+    // TIER 3B: Discord webhook bridge
+    try {
+      const channelName = channels.find(c => c.id === activeChannel)?.name || activeChannel;
+      await apiFetch("/comms/discord-bridge", {
+        method: "POST",
+        body: JSON.stringify({
+          author: userName.trim(),
+          channel: channelName,
+          message: text,
+        }),
+      });
+    } catch (e) {
+      // Silently fail - Discord is optional, don't interrupt user experience
+      console.log("Discord bridge notification skipped:", e);
+    }
   };
 
   const sendReaction = async (msgId: string, type: TapbackType) => {
