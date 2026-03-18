@@ -7,29 +7,23 @@ Assignments, Capacity, Gaps & RACI — Who owns what, who's stretched, and where
 
 ---
 
-## Critical Gaps (Resolve Immediately)
+## Critical Gaps — RESOLVED (March 17, 2026)
 
 <aside>
-🔴
+✅
 
-F&B Lead / Events Director — TBD
+F&B Lead / Events Director — **Mariana** (confirmed March 17, 2026)
 
-Handbook shows Events Director as TBD. 
-
-Melvin held this in Y1+Y2. Single biggest operational gap. Must assign by Mar 12.
-
-Mariana?
+Mariana replaces Melvin as Events Director. Responsible for BOH coordination, FOH staffing, vendor coordination, and day-of logistics. Reports to Monica + Walbert.
 
 </aside>
 
 <aside>
-🔴
+✅
 
-Beverage Director — TBD
+Beverage Director — **Cy** (confirmed March 17, 2026)
 
-Year 2 had Cy, Aria, Gary (Seattle) as mixologists — who leads 2026?
-
-Cy or Aria
+Cy confirmed as Beverage Director for IK26. Leads beverage program, bar staffing, and cocktail/mocktail menu. Reports to F&B Lead.
 
 </aside>
 
@@ -39,24 +33,53 @@ Cy or Aria
 
 | **Function** | **Lead (Responsible)** | **Accountable** | **Status** |
 | --- | --- | --- | --- |
-| Event Strategy & Ops | Monica/Walbert | Monica + Walbert |  |
-| Creative Direction & Story | Monica/Walbert | Walbert + Monica |  |
-| F&B / Events Director | Mariana | Monica + Walbert |  |
-| Kitchen / BOH | Dio + Justin | F&B Lead |  |
-| Beverage Program | Cy | F&B Lead |  |
-| Research & Storytelling | Andrew | Walbert |  |
-| Social Media / Marketing | Agency | Monica |  |
-| Design | Denise | Monica |  |
-| Content / Video Production | Ayce + Jaryd | Monica |  |
-| Finance / Budget | Jerjon + Monica | Monica |  |
-| Ticketing / Booking Platform | Christine | Monica |  |
-| Documentary / Film | JJ + Ayce | Monica + Walbert |  |
-| FOH Staffing | Griselle | F&B Lead |  |
-| Community Outreach | Monica | Walbert + Ava |  |
-| Sponsorship Outreach | Sarah |  |  |
-| PR | Flerine |  |  |
-| Communications | Sarah |  |  |
-| Day-Of Coordinator | JJ  |  |  |
+| Event Strategy & Ops | Monica/Walbert | Monica + Walbert | Active |
+| Creative Direction & Story | Monica/Walbert | Walbert + Monica | Active |
+| F&B / Events Director | **Mariana** | Monica + Walbert | **Confirmed** |
+| Kitchen / BOH | Dio + Justin | F&B Lead (Mariana) | Active |
+| Beverage Program | **Cy** | F&B Lead (Mariana) | **Confirmed** |
+| Research & Storytelling | Andrew | Walbert | Active |
+| Social Media / Marketing | Agency | Monica | Active |
+| Design | Denise | Monica | Active |
+| Content / Video Production | Ayce + Jaryd | Monica | Active |
+| Finance / Budget | Jerjon + Monica | Monica | Active |
+| Ticketing / Booking Platform | Christine | Monica | Active |
+| Documentary / Film | JJ + Ayce | Monica + Walbert | Active |
+| FOH Staffing | Griselle | F&B Lead (Mariana) | Active |
+| Community Outreach | Monica | Walbert + Ava | Active |
+| Sponsorship Outreach | Sarah | Monica | Active |
+| PR | Flerine | Monica | Active |
+| Communications | Sarah | Monica | Active |
+| Day-Of Coordinator | JJ | Mariana | Active |
+
+---
+
+## Day-Of Boundaries — What Monica and Walbert Will NOT Do on May 22
+
+> These boundaries protect the founders' capacity to hold the creative vision, guest experience, and documentary presence on event day. All operational items below are owned by Mariana (F&B Director) or the designated lead.
+
+**Monica will NOT:**
+- Manage kitchen or BOH logistics
+- Direct FOH staff (servers, runners, bar, expo)
+- Handle vendor arrivals or load-in coordination
+- Troubleshoot staffing gaps on the floor
+- Manage ingredient or equipment issues
+
+**Walbert will NOT:**
+- Direct kitchen prep or plating
+- Manage bar or beverage service
+- Handle vendor payments or invoices on the day
+- Manage FOH floor operations
+
+**Monica and Walbert ARE responsible for on event day:**
+- Guest experience and hospitality (greeting, hosting, presence)
+- Chef relationships and narrative moments
+- Documentary and content capture coordination with Ayce/JJ
+- Final creative calls on activations, pacing, and program flow
+- Sponsor and partner acknowledgment
+- Any unplanned creative or communications decisions
+
+**If an operational issue arises on event day:** First point of contact is Mariana. If Mariana cannot resolve, escalate to Monica or Walbert — do not default to the founders for first-line operations.
 
 ---
 
@@ -97,43 +120,43 @@ Cy or Aria
     
     Dio Buan 
     
-    **The Desert Frontier:** Nevada’s "conversation" with Filipinos started legally in **1911**, when the state updated its miscegenation laws to specifically include "Malays" (Filipinos). However, the massive "entry into the room" happened much later—starting with healthcare professionals and service workers in the **1960s–90s**. 
+    **The Desert Frontier:** Nevada's "conversation" with Filipinos started legally in **1911**, when the state updated its miscegenation laws to specifically include "Malays" (Filipinos). However, the massive "entry into the room" happened much later—starting with healthcare professionals and service workers in the **1960s–90s**. 
     
     ### Course 2. Alaska | 1911
     
     Rachel Barril 
     
-    **The Alaskeros:** While Filipinos were in the Pacific Northwest earlier, the first "Alaskeros" (cannery workers) appeared in Alaskan salmon canneries around **1911**. By the 1920s, thousands of Filipinos from Seattle would travel north every summer for the "canning season," creating a unique migrant subculture.
+    **The Alaskeros:** While Filipinos were in the Pacific Northwest earlier, the first "Alaskeros" (cannery workers) appeared in Alaskan salmon canneries around **1911**. By the 1920s, thousands of Filipinos from Seattle would travel north every summer for the "canning season," creating a unique migrant subculture.
     
     ### Course 3. Hawaii | 1906 (Ninth Island - Vegas-adjacent)
     
     Justin Barnes 
     
-    **The Sakadas:** On **December 20, 1906**, the first 15 Filipino laborers (Sakadas) arrived in Honolulu to work on sugar plantations. This was the start of a massive wave of recruitment by the Hawaiian Sugar Planters' Association that fundamentally reshaped Hawaii’s demographics.
+    **The Sakadas:** On **December 20, 1906**, the first 15 Filipino laborers (Sakadas) arrived in Honolulu to work on sugar plantations. This was the start of a massive wave of recruitment by the Hawaiian Sugar Planters' Association that fundamentally reshaped Hawaii's demographics.
     
     ### Course 4. Washington D.C. | 1903–1907
     
     Patrice Cleary  
     
-    **The Political & Academic Room:** Following the Philippine-American War, the **Pensionado Act of 1903** brought Filipino scholars to U.S. universities, including those in D.C. In **1907**, the first Filipino Resident Commissioners (Benito Legarda and Pablo Ocampo) entered the U.S. House of Representatives to represent the Philippines as a territory.
+    **The Political & Academic Room:** Following the Philippine-American War, the **Pensionado Act of 1903** brought Filipino scholars to U.S. universities, including those in D.C. In **1907**, the first Filipino Resident Commissioners (Benito Legarda and Pablo Ocampo) entered the U.S. House of Representatives to represent the Philippines as a territory.
     
     ### Course 5. Seattle, Washington | 1883
     
     Aaron Versoza 
     
-    **The Lumber Pioneer:** The first known Filipino in the Seattle area was a man simply recorded as "**Manilla**," who worked at the Port Blakely Lumber Mill on Bainbridge Island in 1883. By the early 1900s, Seattle became the primary hub for Filipinos heading to the Alaska canneries and the farms of the Yakima Valley.
+    **The Lumber Pioneer:** The first known Filipino in the Seattle area was a man simply recorded as "**Manilla**," who worked at the Port Blakely Lumber Mill on Bainbridge Island in 1883. By the early 1900s, Seattle became the primary hub for Filipinos heading to the Alaska canneries and the farms of the Yakima Valley.
     
     ### Course 6. New Orleans, Louisiana | 1763
     
     Christina Quackenbush 
     
-    **The First Settlement:** Filipino sailors who deserted the Spanish Manila Galleons established **Saint Malo** in the Louisiana bayous. This became the first permanent Filipino (and Asian American) settlement in the U.S. These "Manilamen" were pioneers of the dried shrimp industry and even fought alongside Andrew Jackson in the **Battle of New Orleans (1815)**.
+    **The First Settlement:** Filipino sailors who deserted the Spanish Manila Galleons established **Saint Malo** in the Louisiana bayous. This became the first permanent Filipino (and Asian American) settlement in the U.S. These "Manilamen" were pioneers of the dried shrimp industry and even fought alongside Andrew Jackson in the **Battle of New Orleans (1815)**.
     
     ### Course 7. California (Morro Bay) | 1587
     
     Lord Maynard 
     
-    **The First Landing:** On **October 18, 1587**, the first documented Filipinos (described as "Luzon Indios") arrived in Morro Bay aboard the Spanish galleon *Nuestra Señora de Buena Esperanza*. They were part of a landing party that stayed for three days, predating the Pilgrims at Plymouth Rock by 33 years.
+    **The First Landing:** On **October 18, 1587**, the first documented Filipinos (described as "Luzon Indios") arrived in Morro Bay aboard the Spanish galleon *Nuestra Señora de Buena Esperanza*. They were part of a landing party that stayed for three days, predating the Pilgrims at Plymouth Rock by 33 years.
     
     ### Course 8. A Shared Dessert amongst all (Halo-Halo)
     
@@ -141,7 +164,7 @@ Cy or Aria
     - **Mini-Activations:** Art exhibits that highlights each part in US-Philippine history
     - **Concert?** Do we have Filipino American music artist(s) who can perform? Or community dance groups?
     - **Production:** Make a documentary about the coming together of the chefs
-    - **VIP Experience:** Curate the VIP, provide special gift box, etc. (Pre-VIP event that’s at an additional cost)
+    - **VIP Experience:** Curate the VIP, provide special gift box, etc. (Pre-VIP event that's at an additional cost)
     - **Q&A Discussion Panel:** Where is Filipino food going?
 
 - Performance? VIP Reception? Silent Auction?
@@ -178,14 +201,14 @@ Would you be interested in leading a short talk, demo, or storytelling about you
 
 Lodging Preferences (any questions or comments): 
 
-- Would you be interested in a hotel? Airbnb? We also offer housing from our team and we’re happy to host you (just let us know, we’re flexible)
-- While we are happy to arrange a hotel or Airbnb, we also wanted to offer a more personal alternative. Our team is opening up their homes to host visiting chefs; if you’re open to a more community-driven stay, we’d love to host you. Just let us know which you’d prefer
+- Would you be interested in a hotel? Airbnb? We also offer housing from our team and we're happy to host you (just let us know, we're flexible)
+- While we are happy to arrange a hotel or Airbnb, we also wanted to offer a more personal alternative. Our team is opening up their homes to host visiting chefs; if you're open to a more community-driven stay, we'd love to host you. Just let us know which you'd prefer
 
-**Ingredients & Logistics:** To ensure we stay within budget and adhere to local health department standards (approved vendors), we have a few standard requirements:
+**Ingredients & Logistics:** To ensure we stay within budget and adhere to local health department standards (approved vendors), we have a few standard requirements:
 
-- **Receipts:** We require receipts for all ingredients transported or prepped off-site for reimbursement.
-- **COGS Ceiling:** We’ll set a pre-approved ceiling for COGS (Cost of Goods Sold) for the off-site prep to keep our overhead predictable.
-- **Food Safety:** A brief confirmation that all off-site prep adheres to standard food handling protocols for transport to Vegas.
+- **Receipts:** We require receipts for all ingredients transported or prepped off-site for reimbursement.
+- **COGS Ceiling:** We'll set a pre-approved ceiling for COGS (Cost of Goods Sold) for the off-site prep to keep our overhead predictable.
+- **Food Safety:** A brief confirmation that all off-site prep adheres to standard food handling protocols for transport to Vegas.
 
 (Yes, understood) 
 
@@ -197,11 +220,11 @@ What is a truth about your heritage that you can only express through a dish
 
 In Filipino culture, feeding someone is often an unspoken act of care. Where in your kitchen or service do we see that care most clearly
 
-What’s a Filipino dish you don’t know how to make? 
+What's a Filipino dish you don't know how to make? 
 
 How do you balance the tension between the 'authentic' flavors you remember and the reality of the ingredients available to you here?
 
-What is a flavor or a kitchen habit you find yourself defending or explaining most often to people who didn’t grow up with it?”
+What is a flavor or a kitchen habit you find yourself defending or explaining most often to people who didn't grow up with it?"
 
 - [ ]  Identify server pool
 - [ ]  Identify bartender pool
@@ -235,7 +258,7 @@ Christine Antonio — Project Manager (Team Directory). Ticketing/Booking Platfo
 
 JJ Mayang — Narrative, Writer (Team Directory). Documentary/Film in RACI.
 
-Cy — Bartender, Social Media Creator (Team Directory). Referenced as Y2 mixologist but still active in directory.
+Cy — Bartender, Social Media Creator (Team Directory). **Confirmed as Beverage Director IK26.**
 
 Anjelique — Head Chef, Kitchen BTS (Team Directory). BOH active.
 
@@ -247,9 +270,11 @@ Zwei — Social Media Lead/Editor (Team Directory). Production/FOH.
 
 **RACI-Only (not in Istorya Team Directory — external):**
 
-Kara — Social Media/Marketing lead . Not in Istorya directory.
+Mariana — **Confirmed as F&B / Events Director IK26.**
 
-Denise — Design lead . Not in Istorya directory.
+Kara — Social Media/Marketing lead. Not in Istorya directory.
+
+Denise — Design lead. Not in Istorya directory.
 
 Sunshine — Not in Istorya directory.
 
@@ -261,9 +286,9 @@ Jerjon — Finance in RACI. Not in Team Directory.
 
 **Key Changes Y2 → Y3:**
 
-F&B Lead/Events Director role vacant — Melvin not returning.
+F&B Lead/Events Director — **Mariana confirmed** (replaces Melvin).
 
-Beverage Director role vacant — Cy still in directory but no Y3 beverage lead assigned.
+Beverage Director — **Cy confirmed** (Y2 mixologist, now leading the program).
 
 Y2 research team (Cat, Andrew, Armida) not confirmed for Y3 — Andrew pending, JJ Mayang potentially stepping in.
 

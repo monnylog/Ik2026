@@ -357,24 +357,35 @@ Follow the naming convention: **Filipino word that describes the agent's functio
 - [x] Figma Make frontend (IK26 v2.1.0+)
 - [x] Supabase schema (all tables in kusina-sync-hub)
 - [x] Edge function routes (10 modules)
-- [x] 6 Apps Script flows (A–F)
+- [x] 6 Apps Script flows (A–F) — Flow D upgraded to actionable digest (v2.0)
 - [x] 6 AI agents (Tulay, Bantay, Salo-Salo, Kuwento, Damdam, Mata)
+- [x] Bantay upgraded: weekly Chief of Staff synthesis + Gemini narrative (`scripts/agents/bantay-data-integrity.gs`)
+- [x] Kuwento upgraded: storytelling question drip (questions 3–6, weekly) + content synthesis (`supabase/functions/agents/kuwento-narrative.ts`)
 - [x] Notion CRM schema defined
 - [x] Instagram sync routes + Supabase tables (routes exist in edge function; verify table deployment before use)
 - [x] GitHub Actions workflow for GitHub Pages deployment
+- [x] `leadership_action_items` view + `resolve_action_item()` RPC (`supabase/migrations/20260317_activity_feed_requires_human.sql`)
+- [x] RACI updated: Mariana (F&B Director) + Cy (Beverage Director) confirmed March 17, 2026
+- [x] Day-Of Boundaries defined (what Monica/Walbert will not do on May 22)
+- [x] Events Director Playbook generated (`playbooks/EVENTS_DIRECTOR_PLAYBOOK.md`)
+- [x] System audit completed (`audits/IK26_SYSTEM_AUDIT.md`)
 
 ### Pending Deployment (Monica's Next Steps)
-- [ ] Create 5 Notion databases under IK26 Ops Center
+- [ ] Create 5 Notion databases under IK26 Ops Center (Organizations, Contacts, Opportunities, Activities, Sync Log)
 - [ ] Run Supabase migration: `supabase/migrations/20260314_create_ik26_tables.sql`
+- [ ] Run Supabase migration: `supabase/migrations/20260317_activity_feed_requires_human.sql`
 - [ ] Set up Google Apps Script project with all Script Properties
 - [ ] Create "IK26 Ops Mirror" Google Sheet with required tabs
-- [ ] Run trigger setup functions for Flows A–D
+- [ ] Run trigger setup functions: `setupFlowDTriggers()`, `setupBantayTriggers()` (Flows A–D)
+- [ ] Deploy Flow D as a Web App and set `FLOW_D_WEBAPP_URL` in Script Properties (enables one-click action buttons in digest emails)
+- [ ] Deploy Kuwento agent to Supabase: `supabase/functions/agents/kuwento-narrative.ts`
 - [ ] End-to-end test: Notion → Sheets → Supabase → App
 - [ ] Migrate existing Comms Tracker data to new Notion CRM
+- [ ] Add `leadership_action_items` view to IK26 App Mission Control dashboard
 
-### Critical Gaps (from event-gaps-raci.md)
-- [ ] F&B Lead / Events Director — Mariana (TBD, due Mar 12)
-- [ ] Beverage Director — Cy or Aria (TBD)
+### Critical Gaps — RESOLVED (March 17, 2026)
+- [x] F&B Lead / Events Director — **Mariana** (confirmed)
+- [x] Beverage Director — **Cy** (confirmed)
 
 ---
 
