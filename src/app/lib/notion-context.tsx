@@ -282,7 +282,7 @@ export function getRecentlyCompleted(milestones: NotionMilestone[]) {
   );
 }
 
-export function getUpcomingThisWeek(milestones: NotionMilestone[], todayStr = "2026-03-11") {
+export function getUpcomingThisWeek(milestones: NotionMilestone[], todayStr = new Date().toISOString().split("T")[0]) {
   const weekAhead = new Date(todayStr + "T00:00:00");
   weekAhead.setDate(weekAhead.getDate() + 7);
   const weekStr = weekAhead.toISOString().split("T")[0];
