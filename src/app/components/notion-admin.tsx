@@ -25,7 +25,7 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 import {
-  useNotionSync,
+  // useNotionSync,
   ALL_CONTENT_TYPES,
   CONTENT_TYPE_LABELS,
   CONTENT_TYPE_DESCRIPTIONS,
@@ -503,7 +503,7 @@ export function NotionAdmin() {
     configureType,
     removeType,
     loadSyncLog,
-  } = useNotionSync();
+  } = {} as any; // useNotionSync();
 
   const [configureTarget, setConfigureTarget] = useState<NotionContentType | null>(null);
   const [activeTab, setActiveTab] = useState<"connections" | "log" | "settings">("connections");
