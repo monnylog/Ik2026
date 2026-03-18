@@ -124,7 +124,7 @@ All routes are prefixed with `/make-server-5ed426e6/`. The base URL is your Supa
 |--------|------|--------|
 | CRM | `crm-routes.tsx` | Contacts, opportunities, pipeline |
 | Travel | `travel-routes.tsx` | Chef travel and lodging |
-| Forms/Discord | `form-discord-routes.tsx` | Form submissions, Discord webhooks |
+| Forms | `form-discord-routes.tsx` | Form submissions (note: Discord webhook code exists in this file but Discord has been deprecated as a communication channel for IK26 — do not add new Discord integrations) |
 | Engagement | `engagement-routes.tsx` | Messages, reactions, prompts, trivia, voice notes, memory wall, flavor fusion |
 | Expenses | `expense-routes.tsx` | Expense tracking and reimbursements |
 | Audit | `audit-routes.tsx` | System audit log |
@@ -284,7 +284,7 @@ These fields are sacred. No automation, no agent, no script should ever overwrit
 1. **Show the structure first.** Describe what you're going to build, which files it touches, and what the data flow looks like.
 2. **Check for existing patterns.** Look at similar components/routes before creating new ones.
 3. **Respect the design system.** Use the gold/green palette, Maragsa/Kantumruy Pro fonts, and Radix UI primitives.
-4. **Never cross-contaminate workspaces.** IK26 data stays in IK26. Monnylog, UNLV, and other Monica projects are separate.
+4. **Never cross-contaminate workspaces.** IK26 data stays in IK26. Do not reference, import, or connect any data or logic from other Istorya projects or unrelated workspaces.
 
 ### Code Standards
 
@@ -360,7 +360,7 @@ Follow the naming convention: **Filipino word that describes the agent's functio
 - [x] 6 Apps Script flows (A–F)
 - [x] 6 AI agents (Tulay, Bantay, Salo-Salo, Kuwento, Damdam, Mata)
 - [x] Notion CRM schema defined
-- [x] Instagram sync routes + Supabase tables
+- [x] Instagram sync routes + Supabase tables (routes exist in edge function; verify table deployment before use)
 - [x] GitHub Actions workflow for GitHub Pages deployment
 
 ### Pending Deployment (Monica's Next Steps)
