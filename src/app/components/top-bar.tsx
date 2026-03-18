@@ -10,7 +10,7 @@ import { getAvatar } from "./engagement/avatars";
 import { GlobalSearch } from "./global-search";
 import { useNotion } from "../lib/notion-context";
 import { NotionSyncBadge } from "./ui/notion-sync-badge";
-import istoryaLogo from "figma:asset/b55bcac066687e563f77685fc31f20ef43e81d5d.png";
+const istoryaLogo = "/istorya-logo.png";
 import { bodyFont, headingFont } from "../lib/fonts";
 
 interface TopBarProps {
