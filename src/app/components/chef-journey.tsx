@@ -1,6 +1,6 @@
 // Chef Journey — narrative storytelling view showing each chef's arc
 // from invitation through event night
-import { useState, useMemo, useEffect, useCallback } from "react";
+import { useState, useCallback } from "react";
 import { motion, AnimatePresence } from "motion/react";
 import {
   ChefHat,
@@ -28,9 +28,7 @@ import {
 import type { ViewMode } from "./onboarding/use-auth";
 import { bodyFont, headingFont } from "../lib/fonts";
 import { ImageWithFallback } from "./figma/ImageWithFallback";
-import { useNotionDatabase } from "../lib/notion-sync";
-import { transformChef } from "../lib/notion-transforms";
-import { apiFetch } from "../lib/supabase";
+import { useChefProfiles, useJourneyProgress } from "../lib/notion-domain-hooks";
 
 // ── Chef data (same source as chef-roster) ──────────────────────
 
@@ -258,78 +256,55 @@ interface ChefJourneyProps {
   onNavigate: (page: string) => void;
 }
 
-// ── Hook: merge Notion roster + KV milestones with hardcoded fallbacks ──
+// ── Map Notion milestone status → UI status ──────────────────────
+function notionMsToUI(s: string): JourneyMilestone["status"] {
+  if (s === "Complete") return "complete";
+  if (s === "In progress") return "active";
+  return "upcoming";
+}
+
+// ── Hook: live Notion milestone data with hardcoded editorial fallback ──
 function useChefJourneyData() {
-  const { items: notionChefs, isLoading: notionLoading, refresh: refreshNotion } = useNotionDatabase("roster");
-  const [kvMilestones, setKvMilestones] = useState<Record<string, any>>({});
-  const [kvLoading, setKvLoading] = useState(true);
-
-  const fetchKvMilestones = useCallback(async () => {
-    setKvLoading(true);
-    try {
-      const d = await apiFetch("/chef-journey/milestones");
-      setKvMilestones(d.milestones || {});
-    } catch (err) {
-      console.error("Failed to fetch KV milestones:", err);
-    } finally {
-      setKvLoading(false);
-    }
-  }, []);
-
-  useEffect(() => {
-    fetchKvMilestones();
-  }, [fetchKvMilestones]);
+  const { chefs: notionChefs, isLoading: chefsLoading, refresh: refreshChefs } = useChefProfiles();
+  const { journey, isLoading: journeyLoading, refresh: refreshJourney } = useJourneyProgress();
 
   const refresh = useCallback(async () => {
-    await Promise.all([refreshNotion(), fetchKvMilestones()]);
-  }, [refreshNotion, fetchKvMilestones]);
+    await Promise.all([refreshChefs(), refreshJourney()]);
+  }, [refreshChefs, refreshJourney]);
 
-  const mergedChefs = useMemo(() => {
-    // Build a lookup from Notion roster by matching name or course number
-    const notionLookup = new Map<string, any>();
-    if (notionChefs.length > 0) {
-      for (const raw of notionChefs) {
-        const t = transformChef(raw);
-        if (t.name) notionLookup.set(t.name.toLowerCase().replace("chef ", ""), t);
-        if (t.course) notionLookup.set(`course-${t.course}`, t);
-      }
+  // Build journey progress lookup by chefId
+  const journeyById = new Map(journey.map((j) => [j.chefId, j]));
+
+  // Overlay Notion live data onto hardcoded editorial stories
+  const mergedChefs = chefStories.map((story) => {
+    const notionRec = notionChefs.find((c) => c.chefId === story.id);
+    const journeyRec = journeyById.get(story.id);
+    const merged = { ...story };
+
+    if (notionRec) {
+      if (notionRec.fullName) merged.name = notionRec.fullName.startsWith("Chef ") ? notionRec.fullName : `Chef ${notionRec.fullName}`;
+      if (notionRec.city) merged.city = notionRec.city;
+      if (notionRec.bio) merged.bio = notionRec.bio;
+      if (notionRec.dishConcept) merged.signatureDish = notionRec.dishConcept;
+      if (notionRec.restaurant) merged.restaurant = notionRec.restaurant;
+      if (notionRec.instagram) merged.instagram = notionRec.instagram;
     }
 
-    return chefStories.map((story) => {
-      // Try to find matching Notion data
-      const nameKey = story.name.toLowerCase().replace("chef ", "");
-      const notionData = notionLookup.get(nameKey) || notionLookup.get(`course-${story.course}`);
+    if (journeyRec) {
+      merged.journeyMilestones = [
+        { label: "Invited",          status: notionMsToUI(journeyRec.milestone1), detail: story.journeyMilestones[0]?.detail || "" },
+        { label: "Concept Submitted",status: notionMsToUI(journeyRec.milestone2), detail: story.journeyMilestones[1]?.detail || "" },
+        { label: "Research Paired",  status: notionMsToUI(journeyRec.milestone3), detail: story.journeyMilestones[2]?.detail || "" },
+        { label: "Menu Finalized",   status: notionMsToUI(journeyRec.milestone4), detail: story.journeyMilestones[3]?.detail || "" },
+        { label: "Event Night",      status: "upcoming" as const,                 detail: "May 22, 2026" },
+      ];
+    }
 
-      // Merge Notion fields over hardcoded (Notion wins if non-empty)
-      const merged = { ...story };
-      if (notionData) {
-        if (notionData.name) merged.name = notionData.name;
-        if (notionData.city) merged.city = notionData.city;
-        if (notionData.bio) merged.bio = notionData.bio;
-        if (notionData.signatureDish) merged.signatureDish = notionData.signatureDish;
-        if (notionData.storySnippet) merged.storySnippet = notionData.storySnippet;
-        if (notionData.specialties?.length) merged.specialties = notionData.specialties;
-        if (notionData.restaurant) merged.restaurant = notionData.restaurant;
-        if (notionData.restaurantUrl) merged.restaurantUrl = notionData.restaurantUrl;
-        if (notionData.restaurantLogoUrl) merged.restaurantLogoUrl = notionData.restaurantLogoUrl;
-        if (notionData.instagram) merged.instagram = notionData.instagram;
-        if (notionData.accolades?.length) merged.accolades = notionData.accolades;
-        if (notionData.jamesBearStatus) merged.jamesBearStatus = notionData.jamesBearStatus;
-      }
+    return merged;
+  });
 
-      // Override milestones from KV if available
-      const kvData = kvMilestones[story.id];
-      if (kvData?.milestones?.length) {
-        merged.journeyMilestones = kvData.milestones;
-      }
-
-      return merged;
-    });
-  }, [notionChefs, kvMilestones]);
-
-  const isLive = notionChefs.length > 0 || Object.keys(kvMilestones).length > 0;
-  const isLoading = notionLoading || kvLoading;
-
+  const isLive = notionChefs.length > 0;
+  const isLoading = chefsLoading || journeyLoading;
   return { chefs: mergedChefs, isLive, isLoading, refresh };
 }
 

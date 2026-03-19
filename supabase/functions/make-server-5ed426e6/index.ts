@@ -11,6 +11,7 @@ import { expenses, EXPENSE_BUCKET as EXPENSE_BUCKET_NAME } from "./expense-route
 import { audit } from "./audit-routes.tsx";
 import { studio } from "./content-studio.tsx";
 import { notionContent, ensureDefaultConfig, resolveNotionKeyFromHeader, getNotionConfig } from "./notion-content-routes.tsx";
+import { notionDomainSync } from "./notion-domain-sync.tsx";
 import { notionTasks, setActiveNotionKey } from "./notion-tasks-routes.tsx";
 import notionWrite from "./notion-write.tsx";
 import { utility, PHOTO_BUCKET } from "./utility-routes.tsx";
@@ -768,6 +769,7 @@ app.route("/", expenses);
 app.route("/", audit);
 app.route("/", studio);
 app.route("/", notionContent);
+app.route("/", notionDomainSync);
 app.route("/", notionTasks);
 app.route("/", notionWrite);
 app.route("/", utility);

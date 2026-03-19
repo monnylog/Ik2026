@@ -25,9 +25,8 @@ import {
   RefreshCw,
 } from "lucide-react";
 import type { UserRole, ViewMode } from "./onboarding/use-auth";
-import { useNotionDatabase } from "../lib/notion-sync";
 import { NotionSyncBadge } from "./ui/notion-sync-badge";
-import { transformChef } from "../lib/notion-transforms";
+import { useChefProfiles, type ChefSyncRecord } from "../lib/notion-domain-hooks";
 import { ImageWithFallback } from "./figma/ImageWithFallback";
 import { bodyFont, headingFont } from "../lib/fonts";
 import { writeToNotion } from "../lib/notion-write";
@@ -311,14 +310,63 @@ function ChefInitials({ name }: { name: string }) {
   );
 }
 
-// Hook to get chef data from Notion or fallback to hardcoded
-function useChefData(): { data: Chef[]; isLive: boolean; isLoading: boolean; refresh: () => Promise<void>; items: any[] } {
-  const { items, isLoading, refresh } = useNotionDatabase("roster");
-  if (items.length > 0) {
-    const transformed = items.map(transformChef);
-    return { data: transformed as unknown as Chef[], isLive: true, isLoading, refresh, items };
-  }
-  return { data: chefs, isLive: false, isLoading, refresh, items: [] };
+// Static editorial data — fields not in Notion (restaurant URLs, accolades, story, etc.)
+const CHEF_EDITORIAL: Record<string, {
+  courseLocation: string; year: string;
+  specialties: string[]; storySnippet: string;
+  restaurantUrl: string; restaurantLogoUrl: string;
+  accolades: string[]; jamesBearStatus: "winner" | "finalist" | null;
+}> = {
+  rachel:   { courseLocation: "Alaska",           year: "1911", specialties: ["Filipino-Alaskan", "Foraging", "Fermentation"],       storySnippet: "\"When you're this far north, you learn quickly that Filipino food and Alaskan food share the same soul — survival through flavor.\"", restaurantUrl: "https://inboccaalupojuneau.com",  restaurantLogoUrl: "https://logo.clearbit.com/inboccaalupojuneau.com",  accolades: ["In Bocca al Lupo — 2019 James Beard Award finalist"],                                       jamesBearStatus: "finalist" },
+  aaron:    { courseLocation: "Seattle, WA",       year: "1883", specialties: ["Progressive Filipino", "Tasting Menu", "PNW Ingredients"], storySnippet: "\"Every dish I make is a letter home to a place I've never been but always knew.\"",                                                                  restaurantUrl: "https://archipelagoseattle.com",  restaurantLogoUrl: "https://logo.clearbit.com/archipelagoseattle.com",  accolades: ["James Beard semifinalist", "Eater Seattle Chef of the Year"],                               jamesBearStatus: null },
+  maynard:  { courseLocation: "California",        year: "1587", specialties: ["Elevated Filipino", "Fast-Casual", "Open Fire"],         storySnippet: "\"1587. That's when we arrived. Before Jamestown, before Plymouth Rock. California was already Filipino.\"",                                        restaurantUrl: "https://kuyalord.com",            restaurantLogoUrl: "https://logo.clearbit.com/kuyalord.com",            accolades: ["2024 James Beard Award — Best Chef California", "CIA Hyde Park graduate"],                  jamesBearStatus: "winner" },
+  christina:{ courseLocation: "New Orleans, LA",   year: "1763", specialties: ["Cajun-Filipino", "Immersive Dining", "Storytelling"],    storySnippet: "\"The bayou remembers. Filipino fishermen were here before Louisiana was even a state.\"",                                                         restaurantUrl: "https://milkfish.co",             restaurantLogoUrl: "https://logo.clearbit.com/milkfish.co",             accolades: ["Eater NOLA recognition", "Food & Wine feature", "Zagat recognition"],                       jamesBearStatus: null },
+  patrice:  { courseLocation: "Washington D.C.",   year: "1903", specialties: ["Filipino-American", "Modern Filipino", "Pastry"],        storySnippet: "\"Filipino food doesn't need permission to sit at the table. It already belongs there.\"",                                                          restaurantUrl: "https://purplepatchdc.com",        restaurantLogoUrl: "https://logo.clearbit.com/purplepatchdc.com",        accolades: ["Washington Post Dining Guide staple", "Tom Sietsema's Favorite 2023", "Best Filipino — DC City Paper 2023 & 2024"], jamesBearStatus: null },
+  justin:   { courseLocation: "Las Vegas / Hawaii", year: "1906", specialties: ["Filipino-Spanish", "Heritage Cuisine", "Pop-Up"],       storySnippet: "\"In Hawaii, every potluck tells a migration story. I cook so that story doesn't get lost.\"",                                                      restaurantUrl: "https://istoryalv.com",           restaurantLogoUrl: "https://logo.clearbit.com/istoryalv.com",           accolades: [],                                                                                            jamesBearStatus: null },
+  dio:      { courseLocation: "Las Vegas, NV",     year: "1911", specialties: ["Fine Dining", "French-Filipino", "Pop-Up"],             storySnippet: "\"My lola would say the kitchen is the loudest room in the house — but also the most honest.\"",                                                  restaurantUrl: "https://istoryalv.com",           restaurantLogoUrl: "https://logo.clearbit.com/istoryalv.com",           accolades: ["Joël Robuchon Las Vegas", "Trained under Thomas Keller lineage"],                            jamesBearStatus: null },
+};
+
+function notionStatusToTravel(status: string, travelNotes: string): Chef["travelStatus"] {
+  if (travelNotes?.toLowerCase().includes("needs booking")) return "needs-booking";
+  if (status === "Event Ready" || status === "Dish Finalized" || status === "Confirmed") return "confirmed";
+  return "pending";
+}
+
+function chefSyncToChef(rec: ChefSyncRecord): Chef {
+  const ed = CHEF_EDITORIAL[rec.chefId] || CHEF_EDITORIAL[rec.chefId.replace("cristina", "christina")] || {} as any;
+  return {
+    id: rec.chefId,
+    name: rec.fullName.startsWith("Chef ") ? rec.fullName : `Chef ${rec.fullName}`,
+    city: rec.city || "Las Vegas, NV",
+    course: rec.courseNumber ?? 0,
+    courseLocation: ed.courseLocation || rec.city || "",
+    year: ed.year || "",
+    travelStatus: notionStatusToTravel(rec.status, rec.travelNotes),
+    bio: rec.bio || "",
+    specialties: ed.specialties || [],
+    signatureDish: rec.dishConcept || "",
+    storySnippet: ed.storySnippet || "",
+    restaurant: rec.restaurant || "",
+    restaurantUrl: ed.restaurantUrl || "",
+    restaurantLogoUrl: ed.restaurantLogoUrl || "",
+    instagram: rec.instagram || "",
+    accolades: ed.accolades || [],
+    jamesBearStatus: ed.jamesBearStatus ?? null,
+  };
+}
+
+// Hook to get chef data from Notion (domain-typed) or fallback to hardcoded
+function useChefData() {
+  const { chefs: notionChefs, isLoading, refresh } = useChefProfiles();
+  const data = notionChefs.length > 0
+    ? notionChefs.map(chefSyncToChef).sort((a, b) => {
+        if (!a.course && !b.course) return 0;
+        if (!a.course) return 1;
+        if (!b.course) return -1;
+        return a.course - b.course;
+      })
+    : chefs;
+  return { data, isLive: notionChefs.length > 0, isLoading, refresh, notionChefs };
 }
 
 export function ChefRoster({ role, onNavigate, viewMode }: ChefRosterProps) {
@@ -579,7 +627,7 @@ function ChefRosterTeamView({ onNavigate }: { onNavigate?: (page: string) => voi
 
 /* ========== FULL VIEW (Leadership / Chef) ========== */
 function ChefRosterFullView({ role, onNavigate }: { role: UserRole; onNavigate?: (page: string) => void }) {
-  const { data: chefData, isLive, isLoading, refresh, items } = useChefData();
+  const { data: chefData, isLive, isLoading, refresh, notionChefs } = useChefData();
   const [selectedChef, setSelectedChef] = useState<Chef | null>(null);
   const [expandedCards, setExpandedCards] = useState<Record<string, boolean>>({});
   const [allCollapsed, setAllCollapsed] = useState(false);
@@ -604,35 +652,19 @@ function ChefRosterFullView({ role, onNavigate }: { role: UserRole; onNavigate?:
   };
 
   const handleStatusChange = async (chef: Chef, newStatus: "pending" | "confirmed" | "needs-booking") => {
-    // Find the raw Notion item for this chef
-    const rawItem = items.find((item) => {
-      const name = item.Name || item.Chef || item["Chef Name"] || item.name || item.Title || "";
-      return name.toLowerCase().includes(chef.name.toLowerCase().replace("chef ", ""));
-    });
-
-    if (!rawItem || !rawItem._notionId) {
-      console.error("Could not find Notion page ID for chef:", chef.name);
+    const notionRec = notionChefs.find((c) => c.chefId === chef.id);
+    if (!notionRec?.notionPageId) {
+      console.error("Could not find Notion page ID for chef:", chef.id);
       return;
     }
-
-    // Map status to Notion format
-    let notionStatus = "Pending";
-    if (newStatus === "confirmed") notionStatus = "Confirmed";
-    else if (newStatus === "needs-booking") notionStatus = "Needs Booking";
-
+    const notionStatus = newStatus === "confirmed" ? "Confirmed" : newStatus === "needs-booking" ? "Invited" : "Invited";
     const success = await writeToNotion({
       contentType: "roster",
-      pageId: rawItem._notionId,
-      properties: {
-        "Travel Status": { type: "status", value: notionStatus },
-      },
+      pageId: notionRec.notionPageId,
+      properties: { "Status": { type: "status", value: notionStatus } },
       successMessage: `${chef.name.split(" ").pop()}'s status updated`,
     });
-
-    if (success) {
-      // Refresh the data
-      await refresh();
-    }
+    if (success) await refresh();
   };
 
   const toggleExpand = (id: string, e: React.MouseEvent) => {

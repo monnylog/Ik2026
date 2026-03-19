@@ -28,9 +28,8 @@ import {
   Leaf,
 } from "lucide-react";
 import type { UserRole } from "./onboarding/use-auth";
-import { useNotionDatabase } from "../lib/notion-sync";
 import { NotionSyncBadge } from "./ui/notion-sync-badge";
-import { transformScheduleBlock } from "../lib/notion-transforms";
+import { useEventSchedule, type ScheduleEntry } from "../lib/notion-domain-hooks";
 import { createCalendarLinkLocal } from "../lib/api-tools";
 
 // Convert "7:00 AM" → "07:00:00" for ISO date construction
@@ -298,26 +297,28 @@ export function EventSchedule({ role, onNavigate }: EventScheduleProps) {
   const [expandedBlock, setExpandedBlock] = useState<string | null>(null);
   const [filterStatus, setFilterStatus] = useState<ScheduleStatus | "all">("all");
 
-  const { items: notionSchedule } = useNotionDatabase("schedule");
+  const { schedule: notionSchedule, isLoading: scheduleLoading } = useEventSchedule();
   const isFromNotion = notionSchedule.length > 0;
 
+  function entryToBlock(e: ScheduleEntry): ScheduleBlock {
+    const status: ScheduleStatus = e.status === "completed" ? "completed" : e.status === "active" ? "active" : "upcoming";
+    return {
+      id: e.id,
+      time: e.time,
+      endTime: e.endTime || "",
+      title: e.activity,
+      description: e.notes || "",
+      team: e.owner || "",
+      location: e.location || "",
+      status,
+      icon: Clock,
+      color: status === "completed" ? "#7E9E78" : status === "active" ? "#D4A843" : "#6B7F8E",
+      details: [],
+    };
+  }
+
   const activeSchedule: ScheduleBlock[] = notionSchedule.length > 0
-    ? notionSchedule.map((item) => {
-        const t = transformScheduleBlock(item);
-        return {
-          id: t.id,
-          time: t.time || "",
-          endTime: t.endTime || "",
-          title: t.title || "",
-          description: t.description || "",
-          team: t.team || "",
-          location: t.location || "",
-          status: (t.status as ScheduleStatus) || "upcoming",
-          icon: Clock,
-          color: t.status === "completed" ? "#7E9E78" : t.status === "active" ? "#D4A843" : "#6B7F8E",
-          details: t.details || [],
-        } as ScheduleBlock;
-      })
+    ? notionSchedule.map(entryToBlock)
     : scheduleBlocks;
 
   const filtered = filterStatus === "all"

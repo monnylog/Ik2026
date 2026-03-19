@@ -64,7 +64,7 @@ function getNotionKey(): string | null {
 
 // Rate limiting: Notion allows 3 req/sec
 let lastNotionReqTime = 0;
-async function rateLimitedNotionFetch(url: string, options: RequestInit): Promise<Response> {
+export async function rateLimitedNotionFetch(url: string, options: RequestInit): Promise<Response> {
   const now = Date.now();
   const elapsed = now - lastNotionReqTime;
   if (elapsed < 340) {
@@ -144,7 +144,7 @@ async function queryNotionDatabase2(
 }
 
 // Extract ALL properties from a Notion page generically
-function extractAllProperties(page: any): Record<string, any> {
+export function extractAllProperties(page: any): Record<string, any> {
   const props = page.properties;
   const result: Record<string, any> = {
     _notionId: page.id,

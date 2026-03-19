@@ -5,6 +5,7 @@ import { OverlapAnalysis } from "./overlap-analysis";
 import { CompareSubmissions } from "./compare-submissions";
 import { DishSubmissionForm } from "./dish-submission-form";
 import { apiFetch } from "../lib/supabase";
+import { useCourseLineup } from "../lib/notion-domain-hooks";
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "motion/react";
 import {
@@ -159,7 +160,21 @@ interface MenuCoursesProps {
 
 export function MenuCourses({ role, onNavigate }: MenuCoursesProps) {
   const [selectedCourse, setSelectedCourse] = useState<Course | null>(null);
-  const chefCount = new Set(courses.filter(c => !c.special).map(c => c.chef)).size;
+  const { courses: notionCourses } = useCourseLineup();
+
+  // Overlay live Notion chef/dish data onto editorial courses by course number
+  const activeCourses: Course[] = courses.map((c) => {
+    if (c.special) return c;
+    const live = notionCourses.find((n) => n.courseNumber === c.number);
+    if (!live) return c;
+    return {
+      ...c,
+      chef: live.chefName.startsWith("Chef ") ? live.chefName : `Chef ${live.chefName}`,
+      description: live.dishConcept ? `${live.dishConcept}. ${c.description}` : c.description,
+    };
+  });
+
+  const chefCount = new Set(activeCourses.filter(c => !c.special).map(c => c.chef)).size;
   const isChef = role === "chef";
   const isLeadership = role === "leadership";
 
@@ -216,7 +231,7 @@ export function MenuCourses({ role, onNavigate }: MenuCoursesProps) {
         className="flex gap-4 flex-wrap"
       >
         {[
-          { label: "Courses", value: courses.length.toString(), color: "text-gold" },
+          { label: "Courses", value: activeCourses.length.toString(), color: "text-gold" },
           { label: "Chefs", value: chefCount.toString(), color: "text-gold" },
           { label: "Regions", value: chefCount.toString(), color: "text-info" },
           { label: "Collaborative Finale", value: "1", color: "text-success" },
@@ -239,8 +254,8 @@ export function MenuCourses({ role, onNavigate }: MenuCoursesProps) {
           Journey Through Filipino America
         </p>
         <div className="flex items-center min-w-[600px]">
-          {courses.map((course, idx) => {
-            const isLast = idx === courses.length - 1;
+          {activeCourses.map((course, idx) => {
+            const isLast = idx === activeCourses.length - 1;
             return (
               <div key={course.number} className="flex items-center flex-1">
                 <button
@@ -277,7 +292,7 @@ export function MenuCourses({ role, onNavigate }: MenuCoursesProps) {
 
       {/* Course cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
-        {courses.map((course, idx) => (
+        {activeCourses.map((course, idx) => (
           <motion.div
             key={course.number}
             initial={{ opacity: 0, y: 16 }}
